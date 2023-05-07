@@ -8,9 +8,14 @@ import {
   Table,
   Text,
   TextInput,
-  Tooltip,
+  Tooltip
 } from "@mantine/core";
-import { IconSquare, IconSquareCheck, IconTrash } from "@tabler/icons-react";
+import {
+  IconExternalLink,
+  IconSquare,
+  IconSquareCheck,
+  IconTrash
+} from "@tabler/icons-react";
 import PouchDB from "pouchdb";
 import { useEffect, useRef, useState } from "react";
 import ReactTimeAgo from "react-time-ago";
@@ -227,7 +232,16 @@ export const App = ({ indexedDbSupported }: AppProps) => {
             ))}
           </tbody>
         </Table>
-        Homepage
+        <Button
+          component="a"
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://github.com/extrange/realtime-todo-list"
+          variant="outline"
+          leftIcon={<IconExternalLink size={"1.2rem"} />}
+        >
+          Github
+        </Button>
       </Container>
     </>
   );
