@@ -4,13 +4,13 @@ import { TextInput, Text, Container, Flex } from "@mantine/core";
 import { FocusTrap } from "@mantine/core";
 import { forwardRef } from "react";
 
-type inputProps = {
-  task: Task;
+type InputProps = {
+  task: PouchDB.Core.ExistingDocument<Task & PouchDB.Core.AllDocsMeta>;
   updateTask(task: Task): Promise<PouchDB.Core.Response> | undefined;
 };
 
 export const TaskDisplay = forwardRef(
-  ({ task, updateTask }: inputProps, ref: Ref<HTMLDivElement>) => {
+  ({ task, updateTask }: InputProps, ref: Ref<HTMLDivElement>) => {
     const [edit, setEdit] = useState<boolean>(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -26,7 +26,6 @@ export const TaskDisplay = forwardRef(
         fluid
         onClick={() => setEdit(true)}
       >
-        {" "}
         {edit ? (
           <FocusTrap active={edit}>
             <TextInput
@@ -36,6 +35,7 @@ export const TaskDisplay = forwardRef(
                 const changes = inputRef.current?.value !== task.title;
                 if (changes) {
                   task.title = inputRef.current?.value || task.title;
+                  task.modified = new Date().toISOString();
                   updateTask(task)?.then(() => setEdit(false));
                 } else setEdit(false);
               }}
@@ -44,6 +44,7 @@ export const TaskDisplay = forwardRef(
         ) : (
           <Flex align={"center"} style={{ height: "100%" }}>
             <Text>{task.title}</Text>
+            <Text>{JSON.stringify(task._conflicts)}</Text>
           </Flex>
         )}
       </Container>

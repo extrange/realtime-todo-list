@@ -4,17 +4,19 @@ import {
   Code,
   Container,
   Flex,
+  Loader,
+  LoadingOverlay,
   Stack,
   Table,
   Text,
   TextInput,
-  Tooltip
+  Tooltip,
 } from "@mantine/core";
 import {
   IconExternalLink,
   IconSquare,
   IconSquareCheck,
-  IconTrash
+  IconTrash,
 } from "@tabler/icons-react";
 import PouchDB from "pouchdb";
 import { useEffect, useRef, useState } from "react";
@@ -28,16 +30,17 @@ export type Task = {
   modified?: string;
 };
 
-type AppProps = {
+type InputProps = {
   indexedDbSupported: boolean;
 };
 
-export const App = ({ indexedDbSupported }: AppProps) => {
+export const App = ({ indexedDbSupported }: InputProps) => {
   const db = useRef<PouchDB.Database<Task>>();
   const addTaskRef = useRef<HTMLInputElement>(null);
   const [tasks, setTasks] = useState<PouchDB.Core.ExistingDocument<Task>[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [loadingMsg] = useState<string>("Loading...");
+  const [count, setCount] = useState<number>(0);
 
   const createTask = (title: string) =>
     db.current?.put<Task>({ title, _id: Date.now().toString() });
@@ -85,12 +88,12 @@ export const App = ({ indexedDbSupported }: AppProps) => {
    */
   const loadDocs = () => {
     db.current
-      ?.allDocs({ include_docs: true, descending: true })
-      .then((docs) =>
+      ?.allDocs({ include_docs: true, descending: true, conflicts: true })
+      .then((docs) => {
         setTasks(
           docs.rows.map((x) => x.doc as PouchDB.Core.ExistingDocument<Task>)
-        )
-      );
+        );
+      });
   };
 
   // TODO This is probably inefficient?
@@ -122,12 +125,7 @@ export const App = ({ indexedDbSupported }: AppProps) => {
   // };
 
   useEffect(() => {
-    const remoteDB = new PouchDB<Task>(
-      "https://couchdb.nicholaslyz.com/lists",
-      {
-        auth: { username: "admin", password: "password" },
-      }
-    );
+    const remoteDB = new PouchDB<Task>("https://couchdb.nicholaslyz.com/lists");
 
     let sync: PouchDB.Replication.Sync<Task> | undefined;
 
@@ -162,11 +160,10 @@ export const App = ({ indexedDbSupported }: AppProps) => {
     };
   }, [indexedDbSupported]);
 
-  return loading ? (
-    <Text>{loadingMsg}</Text>
-  ) : (
+  return (
     <>
       <Container>
+        <LoadingOverlay visible={loading} loader={<Loader variant="bars" />} />
         <Text fz={"xl"} ta={"center"}>
           Tasks
         </Text>

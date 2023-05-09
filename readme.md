@@ -6,20 +6,19 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 ### Full Offline Support
 
-- [ ] Working CRUD when offline
-- [ ] Offline notification
+- [x] Working CRUD when offline
+- [ ] Notification when offline
 - [ ] PWA (so app can be launched without network)
-- [ ] Database sync on reconnection
+- [ ] Database sync on reconnection (refine retry logic)
 
 ### Realtime Synchronization
 
 - [x] Provided via PouchDB
 - [ ] Conflict resolution (`diff` style)
-- [ ] Collaborative editing (Y.js) - do without WebRTC?
 
 ### UI
 
-- [ ] Autosave
+- [ ] Show initial loading spinner
 - CRUD:
   - [x] Create
   - [x] Read
@@ -44,10 +43,11 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 - [ ] Support multiple users
 - [ ] KIV support shared task lists
+- [ ] CouchDB authentication
 
 ### Misc
 
-- [ ] Detect browser IndexedDB compatibility with memory store as fallback
+- [x] Detect browser IndexedDB compatibility with memory store as fallback
 
 ## Todo After Implementation
 
@@ -103,3 +103,19 @@ This doesn't matter, as it is dependent on what connection type the replicated d
 - Routing: React Router
 - State Management: React Hooks, KIV Zustand
 - Animation: AutoAnimate
+
+## Collaborative Editing
+
+[yjs][yjs] could be a solution, together with [HocusPocus] as a provider, optionally using [SyncedStore][syncedstore] on the frontend.
+
+Server: Database just stores the Y document. Each item is a Y document, containing the list it belongs to and other things (probably a Y map).
+
+Client side: a Y document syncs with both a remote provider, as well as a local IndexedDB for persistence.
+
+Sync: I don't really know, but HocusPocus should manage it.
+
+Data structure: Y-map of tasks? 
+
+[yjs]: https://github.com/yjs/yjs
+[hocuspocus]: https://tiptap.dev/hocuspocus
+[syncedstore]: https://syncedstore.org/docs/

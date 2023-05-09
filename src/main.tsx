@@ -9,11 +9,16 @@ import en from "javascript-time-ago/locale/en.json";
 TimeAgo.addDefaultLocale(en);
 
 // Check for IndexedDB support
-new Promise<IDBDatabase | undefined>((resolve) => {
+new Promise<IDBDatabase>((resolve) => {
   const request = indexedDB.open("test-" + Math.random());
   request.onsuccess = () => resolve(request.result);
   request.onerror = () => resolve(request.result);
 }).then((result) => {
+  if (result) {
+    //Remove test DB
+    indexedDB.deleteDatabase(result.name);
+  }
+
   ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <React.StrictMode>
       <MantineProvider
