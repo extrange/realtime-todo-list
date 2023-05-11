@@ -1,5 +1,5 @@
 import { Ref, useRef, useState } from "react";
-import { Task } from "./App";
+import { Task } from "./Provider";
 import { TextInput, Text, Container, Flex } from "@mantine/core";
 import { FocusTrap } from "@mantine/core";
 import { forwardRef } from "react";

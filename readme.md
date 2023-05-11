@@ -1,20 +1,19 @@
 # Lists App
 
-An app to manage tasks within multiple lists, with realtime + offline synchronization.
+An app to manage tasks within multiple lists, with realtime + offline synchronization, and collaborative editing.
 
 ## Features
 
 ### Full Offline Support
 
-- [x] Working CRUD when offline
+- [ ] Working CRUD when offline
 - [ ] Notification when offline
 - [ ] PWA (so app can be launched without network)
 - [ ] Database sync on reconnection (refine retry logic)
 
 ### Realtime Synchronization
 
-- [x] Provided via PouchDB
-- [ ] Conflict resolution (`diff` style)
+- [x] Provided via yjs
 
 ### UI
 
@@ -47,7 +46,7 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 ### Misc
 
-- [x] Detect browser IndexedDB compatibility with memory store as fallback
+- [ ] Detect browser IndexedDB compatibility with memory store as fallback
 
 ## Todo After Implementation
 
@@ -57,56 +56,9 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
   - add make meringue
 - Move TV series and documentaries and movies here?
 
-## Tech Stack
+## Database/Sync Solution
 
-### Database
-
-- Postgres (for learning/performance)
-
-### Backend
-
-None
-
-### Interface
-
-This doesn't matter, as it is dependent on what connection type the replicated database uses.
-
-### Frontend (Vite)
-
-- Realtime Database:
-
-  - [x] PouchDB (simplest, but only for 1 user/all documents shared)
-
-    - [ ] **No observables, but could wrap with RxJS?**
-    - No need to write interface (REST/GraphQL) - this is already specified
-    - Uses HTTP
-    - ?Slow, because whole document revision tree is stored. However this could be a feature!
-    - Multiple users need multiple databases, and sharing is a problem
-
-  - [ ] RxDB (more complex, but supports determining allowed documents)
-
-    - A lot of premium features are gated...
-    - Uses websockets
-    - **Need to write sync logic**
-
-  - [ ] WatermelonDB (more complex)
-
-    - **Doesn't really implement realtime sync, have to debounce it (both for push and pull)**
-    - Uses HTTP
-    - Need to write sync logic
-
-  - [ ] GunDB
-
-    - Code looks badly written
-
-- UI: Mantine
-- Routing: React Router
-- State Management: React Hooks, KIV Zustand
-- Animation: AutoAnimate
-
-## Collaborative Editing
-
-[yjs][yjs] could be a solution, together with [HocusPocus] as a provider, optionally using [SyncedStore][syncedstore] on the frontend.
+Uses [yjs][yjs], together with [HocusPocus] as a provider, optionally using [SyncedStore][syncedstore] on the frontend.
 
 Server: Database just stores the Y document. Each item is a Y document, containing the list it belongs to and other things (probably a Y map).
 
@@ -114,7 +66,18 @@ Client side: a Y document syncs with both a remote provider, as well as a local 
 
 Sync: I don't really know, but HocusPocus should manage it.
 
-Data structure: Y-map of tasks? 
+Data structure: Y-map of tasks?
+
+See [here](databases.md) for previous options considered.
+
+## Frontend
+
+Built with Vite.
+
+- UI: Mantine
+- Routing: React Router
+- State Management: React Hooks, KIV Zustand
+- Animation: AutoAnimate
 
 [yjs]: https://github.com/yjs/yjs
 [hocuspocus]: https://tiptap.dev/hocuspocus
