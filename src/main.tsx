@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { Provider } from "./Provider.tsx";
+import { App } from "./App.tsx";
 import { MantineProvider } from "@mantine/core";
 import TimeAgo from "javascript-time-ago";
 
@@ -15,7 +15,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       withGlobalStyles
       theme={{ colorScheme: "dark" }}
     >
-      <Provider />
+      <App />
     </MantineProvider>
   </React.StrictMode>
 );

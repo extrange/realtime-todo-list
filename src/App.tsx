@@ -5,7 +5,7 @@ import { useSyncedStore } from "../node_modules/@syncedstore/react";
 import { AddTodo } from "./AddTodo";
 import { Todo, store } from "./store";
 
-export const Provider = () => {
+export const App = () => {
   const [editingId, setEditingId] = useState<string>();
   const state = useSyncedStore(store);
 

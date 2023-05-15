@@ -14,13 +14,12 @@ export type Todo = {
   id: string;
 };
 
-// Create your SyncedStore store
 export const store = syncedStore({ todos: [] as Todo[] });
 
-// Get the Yjs document and sync automatically
+// Get/create the Yjs document and sync automatically
 const ydoc = getYjsDoc(store);
 
-// Check if IndexedDB is supported
+// Check if IndexedDB is supported, then sync
 new Promise<IDBDatabase>((resolve) => {
   const request = indexedDB.open("test-" + Math.random());
   request.onsuccess = () => resolve(request.result);
@@ -38,9 +37,7 @@ new Promise<IDBDatabase>((resolve) => {
 
 // Connect to remote server and sync
 export const provider = new HocuspocusProvider({
-  url: "ws://server:1234",
+  url: "wss://tasks-server.nicholaslyz.com",
   document: ydoc,
   name: "default",
 });
-
-provider.on("status", console.log);
