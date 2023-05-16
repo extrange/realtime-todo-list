@@ -1,24 +1,44 @@
-import { Button, Container, Flex, Table, Text } from "@mantine/core";
+import styled from "@emotion/styled";
+import {
+  ActionIcon,
+  Button,
+  Container,
+  Flex,
+  Table,
+  Text,
+  Tooltip
+} from "@mantine/core";
+import { IconCheckbox, IconSquare, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
-import { SyncedXml } from "../node_modules/@syncedstore/core";
+import ReactTimeAgo from "react-time-ago";
+import { v4 as uuidv4 } from "uuid";
+import { XmlFragment } from "yjs";
 import { useSyncedStore } from "../node_modules/@syncedstore/react";
 import { AddTodo } from "./AddTodo";
 import { Todo, store } from "./store";
+
+const StyledTextDiv = styled.div`
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  padding-left: 10px;
+`;
 
 export const App = () => {
   const [editingId, setEditingId] = useState<string>();
   const state = useSyncedStore(store);
 
   const createTodo = () => {
-    const now = Date.now().toString();
-    const newTodo = {
-      id: now,
+    const now = Date.now();
+    const newTodo: Todo = {
+      id: uuidv4(),
       completed: false,
-      content: new SyncedXml(),
+      content: new XmlFragment(),
       created: now,
       modified: now,
     };
-    setEditingId(now);
+    setEditingId(newTodo.id);
     store.todos.push(newTodo);
   };
 
@@ -48,14 +68,38 @@ export const App = () => {
                     }}
                     fluid
                   >
-                    <Flex align={"center"} style={{ height: "100%" }}>
-                      <Button onClick={() => toggleCompleted(todo)}>
-                        Toggle
-                      </Button>
-                      <Text onClick={() => setEditingId(todo.id)}>
-                        {todo.completed ? "completed" : "not completed"}{" "}
-                        {todo.content.toString()}, modified {todo.modified}
-                      </Text>
+                    <Flex
+                      align={"center"}
+                      style={{ height: "100%" }}
+                      justify={"space-between"}
+                    >
+                      <ActionIcon onClick={() => toggleCompleted(todo)}>
+                        {todo.completed ? <IconSquare /> : <IconCheckbox />}
+                      </ActionIcon>
+                      <Tooltip
+                        openDelay={500}
+                        multiline
+                        position={"bottom"}
+                        label={
+                          <div>
+                            <Text>
+                              Modified{" "}
+                              <ReactTimeAgo date={new Date(todo.modified)} />
+                            </Text>
+                            <Text>
+                              Created{" "}
+                              <ReactTimeAgo date={new Date(todo.created)} />
+                            </Text>
+                          </div>
+                        }
+                      >
+                        <StyledTextDiv onClick={() => setEditingId(todo.id)}>
+                          <Text>{todo.content.toDOM().textContent}</Text>
+                        </StyledTextDiv>
+                      </Tooltip>
+                      <ActionIcon>
+                        <IconTrash />
+                      </ActionIcon>
                     </Flex>
                   </Container>
                 </td>

@@ -1,16 +1,16 @@
 import {
   syncedStore,
   getYjsDoc,
-  SyncedXml,
 } from "../node_modules/@syncedstore/core";
+import { XmlFragment } from "yjs";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { HocuspocusProvider } from "../node_modules/@hocuspocus/provider";
 
 export type Todo = {
-  content: SyncedXml;
+  content: XmlFragment;
   completed: boolean;
-  modified: string;
-  created: string;
+  modified: number;
+  created: number;
   id: string;
 };
 

@@ -23,7 +23,7 @@ export const AddTodo = ({ editingId, close }: InputProps) => {
       }),
     ],
     // This is necessary to cause a re-render...
-    onUpdate: () => (todo.modified = Date.now().toString()),
+    onUpdate: () => (todo.modified = Date.now()),
   });
 
   return (
