@@ -6,7 +6,7 @@ import {
   Flex,
   Table,
   Text,
-  Tooltip
+  Tooltip,
 } from "@mantine/core";
 import { IconCheckbox, IconSquare, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
@@ -41,6 +41,9 @@ export const App = () => {
     setEditingId(newTodo.id);
     store.todos.push(newTodo);
   };
+
+  const deleteTodo = (todo: Todo) =>
+    store.todos.splice(store.todos.indexOf(todo), 1);
 
   const toggleCompleted = (todo: Todo) => (todo.completed = !todo.completed);
 
@@ -94,10 +97,14 @@ export const App = () => {
                         }
                       >
                         <StyledTextDiv onClick={() => setEditingId(todo.id)}>
-                          <Text>{todo.content.toDOM().textContent}</Text>
+                          {todo.content.toDOM().textContent ? (
+                            <Text>{todo.content.toDOM().textContent}</Text>
+                          ) : (
+                            <Text italic c={"dimmed"}>(empty)</Text>
+                          )}
                         </StyledTextDiv>
                       </Tooltip>
-                      <ActionIcon>
+                      <ActionIcon onClick={() => deleteTodo(todo)}>
                         <IconTrash />
                       </ActionIcon>
                     </Flex>

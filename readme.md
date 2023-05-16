@@ -6,8 +6,7 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 ### Full Offline Support
 
-- [ ] Working CRUD when offline
-- [ ] Notification when offline
+- [x] Working CRUD when offline
 - [ ] PWA (so app can be launched without network)
 - [ ] Database sync on reconnection (refine retry logic)
 
@@ -17,15 +16,13 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 ### UI
 
-- [ ] Show initial loading spinner
-- CRUD:
-  - [x] Create
-  - [x] Read
-  - [x] Update
-  - [x] Delete
+- [ ] Inline editing/creation vs dialog boxes
+- [ ] Strip newlines on saving
+- [ ] Show IndexedDB notification
+- [ ] Show connection/sync status indicator (offline, syncing)
+- [ ] Support tasklists
 - [ ] Support task notes
 - [ ] Global error handling with snackbars
-- [ ] Use Views on backend for performance
 - [ ] Restore tasks
 - [ ] Restore lists
 - [ ] View revision history of tasks
@@ -41,12 +38,10 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 ### Authentication
 
 - [ ] Support multiple users
-- [ ] KIV support shared task lists
-- [ ] CouchDB authentication
 
 ### Misc
 
-- [ ] Detect browser IndexedDB compatibility with memory store as fallback
+- [x] Detect browser IndexedDB compatibility 
 
 ## Todo After Implementation
 
