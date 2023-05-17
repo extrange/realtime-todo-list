@@ -8,17 +8,22 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 - [x] Working CRUD when offline
 - [ ] PWA (so app can be launched without network)
-- [ ] Database sync on reconnection (refine retry logic)
+- [ ] Check if sync on reconnection works
 
 ### Realtime Synchronization
 
 - [x] Provided via yjs
+- [x] Offline persistence
 
 ### UI
 
+- [x] Collaborative cursor
+- [x] Allow name change
+- [ ] Indicator beside note if recently modified before last seen (color of person)
 - [ ] Inline editing/creation vs dialog boxes
 - [ ] Strip newlines on saving
 - [ ] Show IndexedDB notification
+- [ ] Reordering
 - [ ] Show connection/sync status indicator (offline, syncing)
 - [ ] Support tasklists
 - [ ] Support task notes
@@ -30,7 +35,6 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 - [ ] Multiple lists
 - [ ] Due date support
 - [ ] Repeat support
-- [ ] Arbitrary order of tasks within a list
 - [ ] Ability to add to a 'Focus' view
 - [ ] Markdown support (live editor style)
 - [ ] RTF Editor (Mantine)
