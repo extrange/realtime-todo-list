@@ -1,6 +1,8 @@
 import { Button } from "@mantine/core";
 import { Collaboration } from "@tiptap/extension-collaboration";
 import { CollaborationCursor } from "@tiptap/extension-collaboration-cursor";
+import TaskItem from "@tiptap/extension-task-item";
+import TaskList from "@tiptap/extension-task-list";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { useEffect, useMemo } from "react";
@@ -12,6 +14,7 @@ type InputProps = {
   user: User;
   close: () => void;
 };
+
 export const AddTodo = ({ editingId, close, user }: InputProps) => {
   const todo = useMemo(
     () => store.todos.find((t) => t.id === editingId),
@@ -20,14 +23,13 @@ export const AddTodo = ({ editingId, close, user }: InputProps) => {
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ history: false }),
-      Collaboration.configure({
-        fragment: todo?.content,
+      TaskItem.configure({ nested: true }),
+      TaskList,
+      StarterKit.configure({
+        history: false,
       }),
-      CollaborationCursor.configure({
-        provider: provider,
-        user,
-      }),
+      Collaboration.configure({ fragment: todo?.content }),
+      CollaborationCursor.configure({ provider: provider, user }),
     ],
     // This is necessary to cause a re-render...
     onUpdate: () => (todo.modified = Date.now()),

@@ -7,7 +7,8 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 ### Full Offline Support
 
 - [x] Working CRUD when offline
-- [ ] PWA (so app can be launched without network)
+- [ ] PWA (so app can be launched without network) via `vite-plugin-pwa`
+  - [ ] Visible versioning in bottom bar (link to latest commit+changelog)
 - [ ] Check if sync on reconnection works
 
 ### Realtime Synchronization
@@ -19,14 +20,19 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 - [x] Collaborative cursor
 - [x] Allow name change
+- [ ] Don't show html tags in preview
+- [ ] Show mobile/pc icon beside cursor
+- [ ] Github link
+- [ ] Tiptap header component
+- [ ] Reordering
+- [ ] Scratchpad (kiv drawing?)
 - [ ] Indicator beside note if recently modified before last seen (color of person)
+- [ ] Show last modified by who
 - [ ] Inline editing/creation vs dialog boxes
 - [ ] Strip newlines on saving
 - [ ] Show IndexedDB notification
-- [ ] Reordering
 - [ ] Show connection/sync status indicator (offline, syncing)
 - [ ] Support tasklists
-- [ ] Support task notes
 - [ ] Global error handling with snackbars
 - [ ] Restore tasks
 - [ ] Restore lists
@@ -35,7 +41,7 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 - [ ] Multiple lists
 - [ ] Due date support
 - [ ] Repeat support
-- [ ] Ability to add to a 'Focus' view
+- [ ] 'Focus' view for tasks
 - [ ] Markdown support (live editor style)
 - [ ] RTF Editor (Mantine)
 
@@ -46,13 +52,20 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 ### Misc
 
 - [x] Detect browser IndexedDB compatibility 
+- [ ] i wanted a daily notification like its your task list of the day which includes
+- due today
+- in progress (i.e. items that you shld be working on due at a later date but requires more than one day to do)
+Chanel Ng, [18/5/23 6:40 PM]
+mm no not notifications 
+
+i was thinking of more like comments. i made this change and i want to highlight it to you. so i leave a message on the board which u could see when you logon. there is a tick button which u can tick to acknowledge read then its goneee.
+
+Chanel Ng, [18/5/23 6:41 PM]
+alternatively, its like i submit a message which then gets push to telegram which i might as well send myself haha
 
 ## Todo After Implementation
 
-- Shared task list with Chanel
-  - add make xiao long bao to one of the tasks
-  - add make chocolate ganache (with erythritol?)
-  - add make meringue
+- Move #Urgent to here (after due date + repeat support)
 - Move TV series and documentaries and movies here?
 
 ## Database/Sync Solution

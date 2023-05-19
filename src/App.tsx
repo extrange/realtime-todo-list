@@ -177,7 +177,9 @@ export const App = () => {
                         >
                           <StyledTextDiv onClick={() => setEditingId(todo.id)}>
                             {todo.content.toDOM().textContent ? (
-                              <Text>{todo.content.toDOM().textContent}</Text>
+                              <Text lineClamp={2}>
+                                {todo.content.toDOM().textContent}
+                              </Text>
                             ) : (
                               <Text italic c={"dimmed"}>
                                 (empty)

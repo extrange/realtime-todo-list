@@ -1,13 +1,15 @@
 /* Give a remote user a caret */
 .collaboration-cursor__caret {
-  border-left: 1px solid #0d0d0d;
-  border-right: 1px solid #0d0d0d;
+  border-left: 1px solid;
+  border-right: 1px solid;
   margin-left: -1px;
   margin-right: -1px;
   pointer-events: none;
   position: relative;
   word-break: normal;
+  transition: 0.5s;
 }
+
 /* Render the username above the caret */
 .collaboration-cursor__label {
   border-radius: 3px 3px 3px 0;
@@ -22,4 +24,83 @@
   top: -1.4em;
   user-select: none;
   white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Fade cursor on hover */
+*:hover > .collaboration-cursor__caret {
+  opacity: 0.7;
+  transition: 0.5s;
+}
+
+/* Basic Styles */
+.ProseMirror > * + * {
+  margin-top: 0.75em;
+}
+
+.ProseMirror :is(h1, h2, h3, h4, h5, h6) {
+  line-height: 1.1;
+}
+
+.ProseMirror code {
+  background-color: rgba(#616161, 0.1);
+  color: #616161;
+}
+
+.ProseMirror pre {
+  background: #0d0d0d;
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+}
+
+.ProseMirror pre code {
+  color: inherit;
+  padding: 0;
+  background: none;
+  font-size: 0.8rem;
+}
+
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+}
+
+.ProseMirror blockquote {
+  padding-left: 1rem;
+  border-left: 2px solid rgba(#0d0d0d, 0.1);
+}
+
+.ProseMirror hr {
+  border: none;
+  border-top: 2px solid rgba(#0d0d0d, 0.1);
+  margin: 2rem 0;
+}
+/* Tasklists */
+.ProseMirror ul,
+.ProseMirror ol {
+  padding: 0 1rem;
+}
+
+.ProseMirror ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+}
+
+.ProseMirror ul[data-type="taskList"] li {
+  display: flex;
+}
+
+.ProseMirror ul[data-type="taskList"] li > label {
+  flex: 0 0 auto;
+  margin-right: 0.5rem;
+  user-select: none;
+}
+
+.ProseMirror ul[data-type="taskList"] li > div {
+  flex: 1 1 auto;
+}
+
+.ProseMirror p {
+  margin: 0;
 }

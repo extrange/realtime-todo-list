@@ -3,6 +3,8 @@ import TimeAgo from "javascript-time-ago";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { App } from "./App.tsx";
+import "@fontsource/inter";
+import "@fontsource/jetbrains-mono";
 
 import en from "javascript-time-ago/locale/en.json";
 
@@ -13,7 +15,13 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <MantineProvider
       withNormalizeCSS
       withGlobalStyles
-      theme={{ colorScheme: "dark" }}
+      theme={{
+        colorScheme: "dark",
+        fontFamily:
+          "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji",
+        fontFamilyMonospace:
+          "JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace",
+      }}
     >
       <App />
     </MantineProvider>
