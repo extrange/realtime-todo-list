@@ -42,9 +42,19 @@
   line-height: 1.1;
 }
 
+.ProseMirror p {
+  margin: 0;
+}
+
+/* Code (adapted from Github) */
 .ProseMirror code {
-  background-color: rgba(#616161, 0.1);
-  color: #616161;
+  background-color: rgba(99, 110, 123, 0.4);
+  border-radius: 6px;
+  padding: 0.2em 0.4em;
+  font-size: 85%;
+  color: rgb(173, 186, 199);
+  font-family: JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, Liberation Mono, Courier New, monospace;
 }
 
 .ProseMirror pre {
@@ -61,6 +71,7 @@
   font-size: 0.8rem;
 }
 
+/* Random */
 .ProseMirror img {
   max-width: 100%;
   height: auto;
@@ -99,8 +110,4 @@
 
 .ProseMirror ul[data-type="taskList"] li > div {
   flex: 1 1 auto;
-}
-
-.ProseMirror p {
-  margin: 0;
 }
