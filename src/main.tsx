@@ -5,6 +5,7 @@ import ReactDOM from "react-dom/client";
 import { App } from "./App.tsx";
 import "@fontsource/inter";
 import "@fontsource/jetbrains-mono";
+import { Notifications } from "@mantine/notifications";
 
 import en from "javascript-time-ago/locale/en.json";
 
@@ -23,6 +24,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           "JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace",
       }}
     >
+      <Notifications />
       <App />
     </MantineProvider>
   </React.StrictMode>

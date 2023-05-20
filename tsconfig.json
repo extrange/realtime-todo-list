@@ -22,6 +22,7 @@
     "noFallthroughCasesInSwitch": true,
     "allowSyntheticDefaultImports": true,
     "useDefineForClassFields": true,
+    "types": ["vite-plugin-pwa/client"]
   },
   "include": [
     "src"

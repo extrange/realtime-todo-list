@@ -26,6 +26,8 @@ import { useSyncedStore } from "../node_modules/@syncedstore/react";
 import { AddTodo } from "./AddTodo";
 import "./editor.css";
 import { Todo, store } from "./store";
+import { ReloadPrompt } from "./reloadPrompt";
+import { NetworkStatus } from "./networkStatus";
 
 const StyledTextDiv = styled.div`
   height: 100%;
@@ -117,10 +119,14 @@ export const App = () => {
           />
         </Container>
       </Modal>
+      <ReloadPrompt />
       <Container>
-        <Text fz={"xl"} ta={"center"}>
-          Tasks
-        </Text>
+        <Flex justify={"center"} align={"center"}>
+          <Text fz={"xl"} ta={"center"}>
+            Tasks
+          </Text>
+          <NetworkStatus />
+        </Flex>
         <Flex justify={"space-between"}>
           <Button variant={"subtle"} onClick={createTodo}>
             Add Task

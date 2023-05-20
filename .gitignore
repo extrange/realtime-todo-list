@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+dev-dist
 dist-ssr
 *.local
 
@@ -24,6 +25,3 @@ dist-ssr
 *.sw?
 
 node_modules/
-
-# CouchDB files
-couchdb/
