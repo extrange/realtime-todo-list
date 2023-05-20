@@ -123,7 +123,7 @@ export const App = () => {
       <Container>
         <Flex justify={"center"} align={"center"}>
           <Text fz={"xl"} ta={"center"}>
-            Tasks
+            Tasks2
           </Text>
           <NetworkStatus />
         </Flex>

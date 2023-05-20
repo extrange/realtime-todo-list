@@ -9,7 +9,7 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 - [x] Working CRUD when offline
 - [x] PWA (so app can be launched without network) via `vite-plugin-pwa`
   - [x] Install prompt
-  - [ ] Fix reloading not working on ff
+  - [ ] Show SW unsupported message
 - [ ] Show app version in top bar as an 'I' icon (commit message, link to latest commit+changelog)
 - [ ] Check if sync on reconnection works
 

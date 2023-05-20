@@ -1,12 +1,30 @@
 import { Button } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IconReload } from "@tabler/icons-react";
-import { useEffect } from "react";
+import { FC, useEffect } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
 
 const UPDATE_INTERVAL = 10 * 1000; //10s
 
-export const ReloadPrompt = () => {
+const hasServiceWorker = () => "serviceWorker" in navigator;
+
+const NoServiceWorker = () => {
+  useEffect(() => {
+    notifications.show({
+      title: "No offline support",
+      message: "Not available in private windows",
+      color: "yellow",
+      autoClose: false,
+    });
+  }, []);
+  return null;
+};
+
+const withBrowserCheck = (Component: FC) => {
+  return hasServiceWorker() ? Component : NoServiceWorker;
+};
+
+const _ReloadPrompt = () => {
   const {
     /* offlineReady: a one-time notification on SW install */
     offlineReady: [offlineReady],
@@ -75,3 +93,5 @@ export const ReloadPrompt = () => {
 
   return null;
 };
+
+export const ReloadPrompt = withBrowserCheck(_ReloadPrompt);
