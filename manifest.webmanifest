@@ -1,1 +1,1 @@
-{"name":"list-app","short_name":"list-app","start_url":"/","display":"standalone","background_color":"#ffffff","lang":"en","scope":"/"}
+{"name":"Realtime Todo App","short_name":"Todos","start_url":"/","display":"standalone","background_color":"#11b3ac","lang":"en","scope":"/","description":"A realtime, collaborative, offline ready todo app","icons":[{"src":"/android-chrome-192x192.png","sizes":"192x192","type":"image/png"},{"src":"/android-chrome-512x512.png","sizes":"512x512","type":"image/png","purpose":"maskable any"}],"theme_color":"#11b3ac"}
