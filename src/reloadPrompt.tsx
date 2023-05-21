@@ -4,7 +4,7 @@ import { IconReload } from "@tabler/icons-react";
 import { FC, useEffect } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
 
-const UPDATE_INTERVAL = 10 * 1000; //10s
+const UPDATE_INTERVAL = 1 * 60 * 1000; //10s
 
 const hasServiceWorker = () => "serviceWorker" in navigator;
 
@@ -50,14 +50,19 @@ const _ReloadPrompt = () => {
             },
           })
             .then((resp) => {
-              if (resp.status === 200) r.update();
+              if (resp.ok) r.update();
               else {
                 throw new Error(
                   `Received invalid status code while updating SW: ${resp.status}, ${resp.statusText}`
                 );
               }
             })
-            .catch((e) => console.log(e));
+            .catch((e) =>
+              notifications.show({
+                title: "Error registering SW",
+                message: JSON.stringify(e),
+              })
+            );
         }, UPDATE_INTERVAL);
     },
     onRegisterError(error) {

@@ -3,7 +3,7 @@ import { IconCloud, IconCloudOff } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
 export const NetworkStatus = () => {
-  const [online, setOnline] = useState<boolean>(true);
+  const [online, setOnline] = useState<boolean>(navigator.onLine);
 
   useEffect(() => {
     const onOnline = () => setOnline(true);

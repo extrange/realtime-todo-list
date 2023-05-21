@@ -9,17 +9,20 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 - [x] Working CRUD when offline
 - [x] PWA (so app can be launched without network) via `vite-plugin-pwa`
   - [x] Install prompt
-  - [ ] Show SW unsupported message
+  - [x] Show SW unsupported message
+  - [x] Add manifest so it can be installed
+  - [x] Cache svg, woff files
 - [ ] Show app version in top bar as an 'I' icon (commit message, link to latest commit+changelog)
 - [ ] Check if sync on reconnection works
 
 ### Realtime Synchronization
 
 - [x] Provided via yjs
-- [x] Offline persistence
+- [x] Offline persistence via IndexedDB
 
 ### UI
 
+- [ ] Fix not taking 100% of screen
 - [x] Collaborative cursor
 - [x] Allow name change
 - [ ] Error boundary with snackbars
