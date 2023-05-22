@@ -17,7 +17,7 @@ export const NetworkStatus = () => {
   }, []);
 
   return (
-    <Center sx={{ padding: "0 10px" }}>
+    <Center>
       {online ? (
         <IconCloud color={"grey"} />
       ) : (

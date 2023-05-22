@@ -22,7 +22,7 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 ### UI
 
-- [ ] Fix not taking 100% of screen
+- [x] Fix not taking 100% of screen
 - [x] Collaborative cursor
 - [x] Allow name change
 - [ ] Error boundary with snackbars
