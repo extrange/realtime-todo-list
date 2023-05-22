@@ -137,7 +137,9 @@ export const App = () => {
                 <Text>Commit hash:</Text>
               </td>
               <td>
-                <Code>{import.meta.env.VITE_COMMIT_HASH}</Code>
+                <Code style={{ overflowWrap: "anywhere" }}>
+                  {import.meta.env.VITE_COMMIT_HASH}
+                </Code>
               </td>
             </tr>
             <tr>

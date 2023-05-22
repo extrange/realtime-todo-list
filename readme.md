@@ -12,7 +12,7 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
   - [x] Show SW unsupported message
   - [x] Add manifest so it can be installed
   - [x] Cache svg, woff files
-- [ ] Show app version in top bar as an 'I' icon (commit message, link to latest commit+changelog)
+- [x] Show app version in top bar as an 'I' icon (commit message, link to latest commit+changelog)
 - [ ] Check if sync on reconnection works
 
 ### Realtime Synchronization
@@ -25,13 +25,13 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 - [x] Fix not taking 100% of screen
 - [x] Collaborative cursor
 - [x] Allow name change
-- [ ] Error boundary with snackbars
+- [x] Github link 'I' icon dialog in topbar
+- [ ] Move to useLocalStorage (sync across browser tabs)
+- [ ] Show editor in a dialog instead
 - [ ] Don't show html tags in preview
 - [ ] Show mobile/pc icon beside cursor
-- [ ] Github link 'I' icon dialog in topbar
 - [ ] Tiptap header component
 - [ ] Reordering
-- [ ] Scratchpad (kiv drawing?)
 - [ ] Indicator beside note if recently modified before last seen (color of person)
 - [ ] Show last modified by who
 - [ ] Inline editing/creation vs dialog boxes
