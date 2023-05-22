@@ -33,7 +33,7 @@ const StyledTextDiv = styled.div`
   height: 100%;
   display: flex;
   align-items: center;
-  flex-grow: 1;
+  flex: 1;
   padding-left: 10px;
 `;
 
@@ -142,63 +142,58 @@ export const App = () => {
         {editingId && (
           <AddTodo editingId={editingId} user={user} close={close} />
         )}
-        <Table highlightOnHover>
+        <Table highlightOnHover sx={{ width: "100%", tableLayout: "fixed" }}>
           <tbody>
             {state.todos.map((todo) => {
               return (
                 <tr key={todo.id}>
                   <td>
-                    <Container
-                      px={5}
-                      style={{
-                        marginLeft: "unset",
-                        height: "2.5rem",
-                        flexGrow: 1,
-                      }}
-                      fluid
-                    >
-                      <Flex
-                        align={"center"}
-                        style={{ height: "100%" }}
-                        justify={"space-between"}
+                    <Flex align={"center"}>
+                      <ActionIcon onClick={() => toggleCompleted(todo)}>
+                        {todo.completed ? <IconCheckbox /> : <IconSquare />}
+                      </ActionIcon>
+                      <Tooltip
+                        openDelay={500}
+                        multiline
+                        position={"bottom"}
+                        label={
+                          <div>
+                            <Text>
+                              Modified{" "}
+                              <ReactTimeAgo date={new Date(todo.modified)} />
+                            </Text>
+                            <Text>
+                              Created{" "}
+                              <ReactTimeAgo date={new Date(todo.created)} />
+                            </Text>
+                          </div>
+                        }
                       >
-                        <ActionIcon onClick={() => toggleCompleted(todo)}>
-                          {todo.completed ? <IconCheckbox /> : <IconSquare />}
-                        </ActionIcon>
-                        <Tooltip
-                          openDelay={500}
-                          multiline
-                          position={"bottom"}
-                          label={
-                            <div>
-                              <Text>
-                                Modified{" "}
-                                <ReactTimeAgo date={new Date(todo.modified)} />
-                              </Text>
-                              <Text>
-                                Created{" "}
-                                <ReactTimeAgo date={new Date(todo.created)} />
-                              </Text>
-                            </div>
-                          }
-                        >
-                          <StyledTextDiv onClick={() => setEditingId(todo.id)}>
-                            {todo.content.toDOM().textContent ? (
-                              <Text lineClamp={2}>
-                                {todo.content.toDOM().textContent}
-                              </Text>
-                            ) : (
-                              <Text italic c={"dimmed"}>
-                                (empty)
-                              </Text>
-                            )}
-                          </StyledTextDiv>
-                        </Tooltip>
-                        <ActionIcon onClick={() => deleteTodo(todo)}>
-                          <IconTrash />
-                        </ActionIcon>
-                      </Flex>
-                    </Container>
+                        <StyledTextDiv onClick={() => setEditingId(todo.id)}>
+                          {todo.content.toDOM().textContent ? (
+                            <Text
+                              lineClamp={2}
+                              style={{
+                                overflowWrap: "anywhere",
+                              }}
+                            >
+                              {todo.content.toDOM().textContent}
+                            </Text>
+                          ) : (
+                            <Text italic c={"dimmed"}>
+                              (empty)
+                            </Text>
+                          )}
+                        </StyledTextDiv>
+                      </Tooltip>
+                      <ActionIcon
+                        onClick={() =>
+                          confirm("Are you sure?") && deleteTodo(todo)
+                        }
+                      >
+                        <IconTrash />
+                      </ActionIcon>
+                    </Flex>
                   </td>
                 </tr>
               );
