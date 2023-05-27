@@ -7,7 +7,8 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { useEffect, useMemo } from "react";
 import { User } from "./App";
-import { Todo, provider, store } from "./store";
+import { Todo, provider, useSyncedStore } from "./store";
+import { debounce } from "lodash";
 
 type InputProps = {
   editingId: string;
@@ -16,9 +17,11 @@ type InputProps = {
 };
 
 export const AddTodo = ({ editingId, close, user }: InputProps) => {
+  const state = useSyncedStore();
+
   const todo = useMemo(
-    () => store.todos.find((t) => t.id === editingId),
-    [editingId]
+    () => state.todos.find((t) => t.id === editingId),
+    [editingId, state]
   ) as Todo;
 
   const editor = useEditor({
@@ -31,8 +34,12 @@ export const AddTodo = ({ editingId, close, user }: InputProps) => {
       Collaboration.configure({ fragment: todo?.content }),
       CollaborationCursor.configure({ provider: provider, user }),
     ],
-    // This is necessary to cause a re-render...
-    onUpdate: () => (todo.modified = Date.now()),
+    editorProps: {
+      handleTextInput: debounce(() => {
+        todo.modified = Date.now();
+        return false;
+      }, 500),
+    },
   });
 
   useEffect(() => {

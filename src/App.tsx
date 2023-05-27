@@ -1,4 +1,15 @@
-import styled from "@emotion/styled";
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import {
   ActionIcon,
   Button,
@@ -10,35 +21,25 @@ import {
   Table,
   Text,
   TextInput,
-  Tooltip,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import {
   IconBrandGithub,
-  IconCheckbox,
   IconInfoCircle,
   IconPencil,
-  IconSquare,
-  IconTrash,
 } from "@tabler/icons-react";
+import { generateKeyBetween } from "fractional-indexing";
 import { useState } from "react";
 import ReactTimeAgo from "react-time-ago";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
-import { useSyncedStore } from "../node_modules/@syncedstore/react";
 import { AddTodo } from "./AddTodo";
+import { Task } from "./Task";
 import "./editor.css";
 import { NetworkStatus } from "./networkStatus";
 import { ReloadPrompt } from "./reloadPrompt";
-import { Todo, store } from "./store";
-
-const StyledTextDiv = styled.div`
-  height: 100%;
-  display: flex;
-  align-items: center;
-  flex: 1;
-  padding-left: 10px;
-`;
+import { Todo, useSyncedStore } from "./store";
+import { getMaxSortOrder, todoComparator } from "./util";
 
 const colors = [
   "#958DF1",
@@ -55,7 +56,9 @@ export type User = {
   color: string;
 };
 
-const RELEASE_DATE = new Date(import.meta.env.VITE_COMMIT_DATE);
+const RELEASE_DATE = import.meta.env.VITE_COMMIT_DATE
+  ? new Date(import.meta.env.VITE_COMMIT_DATE)
+  : new Date();
 
 const getInitialUser = (): User => {
   const user = localStorage.getItem("user");
@@ -69,6 +72,14 @@ const getInitialUser = (): User => {
   return user ? JSON.parse(user) : generatedUser;
 };
 
+/* TODO Fractional indexing needs to:
+- Generate keys for all tasks without keys, maintaining their current order
+- This must take into account the possibility that some tasks might have keys, and some might not (e.g. incomplete sync)
+- The sort method should default to not sorting if not all keys have a sort index.
+- The create task method must generate a valid index
+- If two keys have the same index (possible, if two clients create tasks indepedentnly while offline), then arbitrarily change one of them to the midpoint of the others. This check should run on dragEnd events, but only if the items it is being inserted between have the same index (not for the whole array).
+*/
+
 export const App = () => {
   const [editingId, setEditingId] = useState<string>();
   const [user, setUser] = useState<User>(getInitialUser());
@@ -78,23 +89,36 @@ export const App = () => {
     initialValues: user,
   });
 
-  const state = useSyncedStore(store);
+  const state = useSyncedStore();
+
+  // TODO Memoize once syncedStore issue is fixed
+  // https://github.com/YousefED/SyncedStore/issues/105
+  const sortedTodos = state.todos.slice().sort(todoComparator);
+  const todoIds = sortedTodos.map((t) => t.id);
+
+  const sensors = useSensors(useSensor(PointerSensor));
 
   const createTodo = () => {
     const now = Date.now();
+    const sortOrder = generateKeyBetween(
+      getMaxSortOrder(state.todos),
+      undefined
+    );
+
     const newTodo: Todo = {
       id: uuidv4(),
       completed: false,
       content: new XmlFragment(),
       created: now,
       modified: now,
+      sortOrder,
     };
     setEditingId(newTodo.id);
-    store.todos.unshift(newTodo);
+    state.todos.unshift(newTodo);
   };
 
   const deleteTodo = (todo: Todo) =>
-    store.todos.splice(store.todos.indexOf(todo), 1);
+    state.todos.splice(state.todos.indexOf(todo), 1);
 
   const toggleCompleted = (todo: Todo) => (todo.completed = !todo.completed);
 
@@ -106,6 +130,31 @@ export const App = () => {
     setEditUser(false);
     setUser(userForm.values);
     localStorage.setItem("user", JSON.stringify(userForm.values));
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const activeTodo = state.todos.find((t) => t.id === active.id) as Todo;
+      const overTodo = state.todos.find((t) => t.id === over.id) as Todo;
+
+      /* If over's sortOrder > active's, user is moving the Todo to somewhere above it's original positition. In this case, we want to move the active Todo above the over Todo, and vice versa. */
+      // TODO: for now, I'm assuming all todos have sortOrders
+      if (overTodo?.sortOrder > activeTodo?.sortOrder) {
+        // Find the key of the todo above the over todo, in the sorted array
+        const aboveIdx =
+          sortedTodos[sortedTodos.findIndex((t) => t.id === overTodo.id) - 1]
+            ?.sortOrder;
+        activeTodo.sortOrder = generateKeyBetween(overTodo.sortOrder, aboveIdx);
+      } else {
+        // Find the key of the todo below the over todo, in the sorted array
+        const belowIdx =
+          sortedTodos[sortedTodos.findIndex((t) => t.id === overTodo.id) + 1]
+            ?.sortOrder;
+        activeTodo.sortOrder = generateKeyBetween(belowIdx, overTodo.sortOrder);
+      }
+    }
   };
 
   return (
@@ -197,62 +246,28 @@ export const App = () => {
         {editingId && (
           <AddTodo editingId={editingId} user={user} close={close} />
         )}
-        <Table highlightOnHover sx={{ width: "100%", tableLayout: "fixed" }}>
+        <Table highlightOnHover>
           <tbody>
-            {state.todos.map((todo) => {
-              return (
-                <tr key={todo.id}>
-                  <td>
-                    <Flex align={"center"}>
-                      <ActionIcon onClick={() => toggleCompleted(todo)}>
-                        {todo.completed ? <IconCheckbox /> : <IconSquare />}
-                      </ActionIcon>
-                      <Tooltip
-                        openDelay={500}
-                        multiline
-                        position={"bottom"}
-                        label={
-                          <div>
-                            <Text>
-                              Modified{" "}
-                              <ReactTimeAgo date={new Date(todo.modified)} />
-                            </Text>
-                            <Text>
-                              Created{" "}
-                              <ReactTimeAgo date={new Date(todo.created)} />
-                            </Text>
-                          </div>
-                        }
-                      >
-                        <StyledTextDiv onClick={() => setEditingId(todo.id)}>
-                          {todo.content.toDOM().textContent ? (
-                            <Text
-                              lineClamp={2}
-                              style={{
-                                overflowWrap: "anywhere",
-                              }}
-                            >
-                              {todo.content.toDOM().textContent}
-                            </Text>
-                          ) : (
-                            <Text italic c={"dimmed"}>
-                              (empty)
-                            </Text>
-                          )}
-                        </StyledTextDiv>
-                      </Tooltip>
-                      <ActionIcon
-                        onClick={() =>
-                          confirm("Are you sure?") && deleteTodo(todo)
-                        }
-                      >
-                        <IconTrash />
-                      </ActionIcon>
-                    </Flex>
-                  </td>
-                </tr>
-              );
-            })}
+            <DndContext
+              sensors={sensors}
+              onDragEnd={handleDragEnd}
+              collisionDetection={closestCenter}
+            >
+              <SortableContext
+                items={todoIds}
+                strategy={verticalListSortingStrategy}
+              >
+                {sortedTodos.map((todo) => (
+                  <Task
+                    deleteTodo={deleteTodo}
+                    toggleCompleted={toggleCompleted}
+                    setEditingId={setEditingId}
+                    todo={todo}
+                    key={todo.id}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
           </tbody>
         </Table>
       </Container>

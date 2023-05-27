@@ -13,7 +13,7 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
   - [x] Add manifest so it can be installed
   - [x] Cache svg, woff files
 - [x] Show app version in top bar as an 'I' icon (commit message, link to latest commit+changelog)
-- [ ] Check if sync on reconnection works
+- [x] Check if sync on reconnection works
 
 ### Realtime Synchronization
 
@@ -26,14 +26,16 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 - [x] Collaborative cursor
 - [x] Allow name change
 - [x] Github link 'I' icon dialog in topbar
-- [ ] Move to useLocalStorage (sync across browser tabs)
+- [x] Reordering (using fractional indexing)
+- [x] Fix render NaN problem (react time-ago, happens after modifying)
 - [ ] Show editor in a dialog instead
+- [ ] Indicator beside note if recently modified before last seen (color of person)
+  - [ ] Show last modified by who
+- [x] Don't edit modified date if task is just opened for viewing
 - [ ] Don't show html tags in preview
 - [ ] Show mobile/pc icon beside cursor
 - [ ] Tiptap header component
-- [ ] Reordering
-- [ ] Indicator beside note if recently modified before last seen (color of person)
-- [ ] Show last modified by who
+- [ ] Move to useLocalStorage (sync settings across browser tabs)
 - [ ] Inline editing/creation vs dialog boxes
 - [ ] Strip newlines on saving
 - [ ] Show IndexedDB notification
@@ -66,6 +68,10 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 i was thinking of more like comments. i made this change and i want to highlight it to you. so i leave a message on the board which u could see when you logon. there is a tick button which u can tick to acknowledge read then its goneee.
 
 alternatively, its like i submit a message which then gets push to telegram which i might as well send myself haha
+
+## Non-urgent
+
+- [ ] Get pushed commits as an array (using [`toJSON](https://docs.github.com/en/actions/learn-github-actions/expressions#tojson)), and thus show all commits that were pushed, not just the most recent
 
 ## Todo After Implementation
 

@@ -59,14 +59,19 @@ const _ReloadPrompt = () => {
             })
             .catch((e) =>
               notifications.show({
-                title: "Error registering SW",
+                title: "Error updating SW",
                 message: JSON.stringify(e),
+                color: "red",
               })
             );
         }, UPDATE_INTERVAL);
     },
-    onRegisterError(error) {
-      console.log("SW registration error", error);
+    onRegisterError(e) {
+      notifications.show({
+        title: "Error registering SW",
+        message: JSON.stringify(e),
+        color: "red",
+      });
     },
   });
 
