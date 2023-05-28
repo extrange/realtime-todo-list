@@ -38,6 +38,8 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
   - [ ] Complete generateKeys and cleanKeys methods (e.g. duplicate additions offline) - listen to yArray insertions/changes to sortOrder?
 - [x] Fix render NaN problem (react time-ago, happens after modifying)
 - [ ] Show editor in a dialog instead
+  - [x] Add close button (need global context)
+  - [ ] Remember scroll position
 - [ ] Indicator beside task if recently modified before last seen (color of person)
   - [ ] Show last modified by who
 - Footer:

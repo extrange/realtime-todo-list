@@ -1,4 +1,4 @@
-import { Button } from "@mantine/core";
+import { useLocalStorage } from "@mantine/hooks";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import TaskItem from "@tiptap/extension-task-item";
@@ -6,21 +6,19 @@ import TaskList from "@tiptap/extension-task-list";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { debounce } from "lodash";
+import { useEffect, useMemo } from "react";
+import { useStore } from "./stateStore";
 import { Todo, provider, store } from "./store";
-import React, { useMemo, useEffect } from "react";
-import { useLocalStorage } from "@mantine/hooks";
 import { generateUser } from "./util";
+import { Container } from "@mantine/core";
 
-type InputProps = {
-  editingId: string;
-  setEditingId: React.Dispatch<React.SetStateAction<string | undefined>>;
-};
-
-export const EditTodo = ({ editingId, setEditingId }: InputProps) => {
+export const EditTodo = () => {
   const [user] = useLocalStorage({
     key: "user",
     defaultValue: generateUser(),
   });
+
+  const editingId = useStore((store) => store.editingId);
 
   const todo = useMemo(
     () => store.todos.find((t) => t.id === editingId),
@@ -50,9 +48,8 @@ export const EditTodo = ({ editingId, setEditingId }: InputProps) => {
   }, [user, editor]);
 
   return (
-    <>
+    <Container>
       <EditorContent editor={editor} />
-      <Button onClick={() => setEditingId(undefined)}>Close</Button>
-    </>
+    </Container>
   );
 };

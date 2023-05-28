@@ -1,21 +1,27 @@
 import {
-  ActionIcon,
-  Burger,
-  Button,
-  Code,
-  Flex,
-  Header,
-  MediaQuery,
-  Modal,
-  Table,
-  Text,
-  useMantineTheme,
+    ActionIcon,
+    Burger,
+    Button,
+    Code,
+    Flex,
+    Header,
+    MediaQuery,
+    Modal,
+    Table,
+    Text,
+    useMantineTheme
 } from "@mantine/core";
-import { IconBrandGithub, IconInfoCircle } from "@tabler/icons-react";
+import {
+    IconArrowLeft,
+    IconBrandGithub,
+    IconInfoCircle,
+} from "@tabler/icons-react";
 import React, { useState } from "react";
 import ReactTimeAgo from "react-time-ago";
+import { shallow } from "zustand/shallow";
 import { COMMIT_HASH, COMMIT_MSG, RELEASE_DATE } from "./constants";
 import { NetworkStatus } from "./networkStatus";
+import { useStore } from "./stateStore";
 
 type InputProps = {
   navOpen: boolean;
@@ -24,6 +30,10 @@ type InputProps = {
 
 export const AppHeader = ({ navOpen, setNavOpen }: InputProps) => {
   const [showInfo, setShowInfo] = useState<boolean>(false);
+  const [editingId, setEditingId] = useStore(
+    (store) => [store.editingId, store.setEditingId],
+    shallow
+  );
   const theme = useMantineTheme();
 
   return (
@@ -74,8 +84,8 @@ export const AppHeader = ({ navOpen, setNavOpen }: InputProps) => {
       </Modal>
 
       {/* Main content */}
-      <Header height={48}>
-        <Flex justify={"center"} align={"center"}>
+      <Header height={48} sx={{ display: "flex", justifyContent: "center" }}>
+        <Flex justify={"center"} align={"center"} sx={{ height: "100%" }}>
           <MediaQuery largerThan="sm" styles={{ display: "none" }}>
             <Burger
               opened={navOpen}
@@ -85,6 +95,11 @@ export const AppHeader = ({ navOpen, setNavOpen }: InputProps) => {
               mr="xl"
             />
           </MediaQuery>
+          {editingId && (
+            <ActionIcon onClick={() => setEditingId(undefined)}>
+              <IconArrowLeft />
+            </ActionIcon>
+          )}
           <Text fz={"xl"} ta={"center"}>
             Tasks
           </Text>

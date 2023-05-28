@@ -17,21 +17,26 @@ import {
   Affix,
   Container,
   rem,
-  useMantineTheme,
+  useMantineTheme
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
+import { shallow } from "zustand/shallow";
 import { EditTodo } from "./EditTodo";
 import { Task } from "./Task";
+import { useStore } from "./stateStore";
 import { Todo, store, useSyncedStore } from "./store";
 import { getMaxSortOrder, todoComparator } from "./util";
 
 export const TodoView = () => {
-  const [editingId, setEditingId] = useState<string>();
   const [activeId, setActiveId] = useState<string>();
+  const [editingId, setEditingId] = useStore(
+    (store) => [store.editingId, store.setEditingId],
+    shallow
+  );
 
   const theme = useMantineTheme();
 
@@ -94,7 +99,7 @@ export const TodoView = () => {
   };
 
   return editingId ? (
-    <EditTodo editingId={editingId} setEditingId={setEditingId} />
+    <EditTodo />
   ) : (
     <>
       <Affix position={{ bottom: rem(20), right: rem(20) }}>
@@ -107,6 +112,7 @@ export const TodoView = () => {
           <IconPlus />
         </ActionIcon>
       </Affix>
+
       <Container>
         <DndContext
           sensors={sensors}
@@ -119,7 +125,7 @@ export const TodoView = () => {
             strategy={verticalListSortingStrategy}
           >
             {sortedTodos.map((todo) => (
-              <Task setEditingId={setEditingId} todo={todo} key={todo.id} />
+              <Task todo={todo} key={todo.id} />
             ))}
           </SortableContext>
           <DragOverlay>

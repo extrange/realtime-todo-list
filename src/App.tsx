@@ -4,7 +4,7 @@ import {
   Footer,
   MediaQuery,
   Text,
-  useMantineTheme,
+  useMantineTheme
 } from "@mantine/core";
 import { useState } from "react";
 import { AppHeader } from "./AppHeader";

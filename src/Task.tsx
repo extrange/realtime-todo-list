@@ -11,6 +11,7 @@ import { CSS } from "@dnd-kit/utilities";
 import styled from "@emotion/styled";
 import { useCallback } from "react";
 import ReactTimeAgo from "react-time-ago";
+import { useStore } from "./stateStore";
 import { Todo, store } from "./store";
 
 const StyledTextDiv = styled.div`
@@ -44,25 +45,12 @@ const StyledFlex = styled(Flex)`
   }
 `;
 
-type CommonProps = {
+type InputProps = {
   todo: Todo;
+  dragging?: boolean;
 };
 
-type InputProps =
-  | {
-      dragging?: never;
-      setEditingId: (id: string) => void;
-    }
-  | {
-      dragging: true;
-      setEditingId?: never;
-    };
-
-export const Task = ({
-  setEditingId,
-  todo,
-  dragging,
-}: InputProps & CommonProps) => {
+export const Task = ({ todo, dragging }: InputProps) => {
   const {
     attributes,
     listeners,
@@ -73,6 +61,8 @@ export const Task = ({
   } = useSortable({
     id: todo.id,
   });
+
+  const setEditingId = useStore((store) => store.setEditingId);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -135,7 +125,7 @@ export const Task = ({
           </div>
         }
       >
-        <StyledTextDiv onClick={() => !dragging && setEditingId(todo.id)}>
+        <StyledTextDiv onClick={() => setEditingId(todo.id)}>
           {textContent}
         </StyledTextDiv>
       </Tooltip>
