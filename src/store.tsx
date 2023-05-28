@@ -27,6 +27,11 @@ export const provider = new HocuspocusProvider({
   name: "default",
 });
 
+/**
+ * Force a rerender when store changes.
+ * 
+ * Uses a debounce for performance.
+ */
 export const useSyncedStore = () => {
   const [, forceUpdate] = useState<object>();
 

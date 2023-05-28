@@ -35,33 +35,33 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
   - [ ] Fix disjoint on grabend
   - [x] Show item in original position still (dragoverlay)
   - [x] Fix z-index issues
-  - [ ] Complete generateKeys and cleanKeys methods
+  - [ ] Complete generateKeys and cleanKeys methods (e.g. duplicate additions offline) - listen to yArray insertions/changes to sortOrder?
 - [x] Fix render NaN problem (react time-ago, happens after modifying)
 - [ ] Show editor in a dialog instead
-- [ ] Indicator beside note if recently modified before last seen (color of person)
+- [ ] Indicator beside task if recently modified before last seen (color of person)
   - [ ] Show last modified by who
+- Footer:
+  - [ ] Show other users online/last online (max 2, sorted by most recent, ignore self)
+  - [ ] Show sync status indicator (up to date, or last synced)
 - [ ] Perf: wrap items in React.memo
 - [x] Don't edit modified date if task is just opened for viewing
 - [ ] Don't show html tags in preview
 - [ ] Show mobile/pc icon beside cursor
 - [ ] Tiptap header component
 - [x] Move to useLocalStorage (sync settings across browser tabs)
-- [ ] Inline editing/creation vs dialog boxes
 - [ ] Strip newlines on saving
 - [ ] Show IndexedDB notification
 - [x] Show connection status indicator
   - [ ] Connection status show appear when back online for 3s, then fade
-- [ ] Show sync status indicator
 - [ ] Support tasklists
 - [ ] Restore tasks
 - [ ] Restore lists
 - [ ] View revision history of tasks
 - [ ] Search tasks/lists
-- [ ] Multiple lists
 - [ ] Due date support
 - [ ] Repeat support
 - [ ] 'Focus' view for tasks
-- [ ] Markdown support (live editor style)
+- [x] Markdown support (live editor style)
 - [ ] RTF Editor (Mantine)
 
 ### Authentication
