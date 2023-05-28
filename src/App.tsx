@@ -14,6 +14,7 @@ import {
 } from "@dnd-kit/sortable";
 import {
   ActionIcon,
+  Affix,
   Button,
   Code,
   ColorPicker,
@@ -23,12 +24,14 @@ import {
   Table,
   Text,
   TextInput,
+  rem,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import {
   IconBrandGithub,
   IconInfoCircle,
   IconPencil,
+  IconPlus,
 } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
 import { useState } from "react";
@@ -224,6 +227,16 @@ export const App = () => {
         </Button>
       </Modal>
       <ReloadPrompt />
+      <Affix position={{ bottom: rem(20), right: rem(20) }}>
+        <ActionIcon
+          color={"blue"}
+          variant="filled"
+          size={"xl"}
+          onClick={createTodo}
+        >
+          <IconPlus />
+        </ActionIcon>
+      </Affix>
       <Flex direction={"column"}>
         <Flex justify={"center"} align={"center"}>
           <Text fz={"xl"} ta={"center"}>
@@ -235,9 +248,6 @@ export const App = () => {
           <NetworkStatus />
         </Flex>
         <Flex justify={"space-between"}>
-          <Button variant={"subtle"} onClick={createTodo}>
-            Add Task
-          </Button>
           <Button
             rightIcon={<IconPencil color={"white"} />}
             variant={"subtle"}
