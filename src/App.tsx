@@ -25,6 +25,7 @@ import {
   Text,
   TextInput,
   rem,
+  useMantineTheme,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import {
@@ -96,6 +97,7 @@ export const App = () => {
   });
 
   const state = useSyncedStore();
+  const theme = useMantineTheme();
 
   // TODO Memoize once syncedStore issue is fixed
   // https://github.com/YousefED/SyncedStore/issues/105
@@ -229,7 +231,7 @@ export const App = () => {
       <ReloadPrompt />
       <Affix position={{ bottom: rem(20), right: rem(20) }}>
         <ActionIcon
-          color={"blue"}
+        color={theme.primaryColor}
           variant="filled"
           size={"xl"}
           onClick={createTodo}
