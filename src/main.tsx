@@ -23,6 +23,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         fontFamilyMonospace:
           "JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace",
         primaryColor: "blue",
+        loader: 'bars',
       }}
     >
       <Notifications />

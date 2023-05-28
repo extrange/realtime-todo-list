@@ -45,7 +45,7 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 - [ ] Don't show html tags in preview
 - [ ] Show mobile/pc icon beside cursor
 - [ ] Tiptap header component
-- [ ] Move to useLocalStorage (sync settings across browser tabs)
+- [x] Move to useLocalStorage (sync settings across browser tabs)
 - [ ] Inline editing/creation vs dialog boxes
 - [ ] Strip newlines on saving
 - [ ] Show IndexedDB notification

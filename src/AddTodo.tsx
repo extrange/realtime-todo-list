@@ -5,18 +5,22 @@ import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
-import { useEffect, useMemo } from "react";
-import { User } from "./App";
-import { Todo, provider, useSyncedStore } from "./store";
 import { debounce } from "lodash";
+import { useEffect, useMemo } from "react";
+import { Todo, provider, useSyncedStore } from "./store";
+import { useLocalStorage } from "@mantine/hooks";
+import { generateUser } from "./util";
 
 type InputProps = {
   editingId: string;
-  user: User;
   close: () => void;
 };
 
-export const AddTodo = ({ editingId, close, user }: InputProps) => {
+export const AddTodo = ({ editingId, close }: InputProps) => {
+  const [user] = useLocalStorage({
+    key: "user",
+    defaultValue: generateUser(),
+  });
   const state = useSyncedStore();
 
   const todo = useMemo(

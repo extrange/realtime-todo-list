@@ -101,11 +101,11 @@ export const Task = ({
   );
 
   const textContent = todo.content?.toDOM().textContent ? (
-    <Text lineClamp={2} style={{ overflowWrap: "anywhere" }}>
+    <Text lineClamp={2} style={{ overflowWrap: "anywhere", cursor: "default" }}>
       {todo.content?.toDOM().textContent}
     </Text>
   ) : (
-    <Text italic c={"dimmed"}>
+    <Text italic c={"dimmed"} style={{ cursor: "default" }}>
       (empty)
     </Text>
   );

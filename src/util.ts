@@ -1,6 +1,8 @@
 import { notifications } from "@mantine/notifications";
 import { generateKeyBetween } from "fractional-indexing";
+import { v4 as uuidv4 } from "uuid";
 import { Todo } from "./store";
+import { colors } from "./constants";
 
 /**
  * Generate keys for all objects in an array, which don't already have keys.
@@ -48,7 +50,6 @@ export const cleanKeys = () => {
   // Order should be preserved
 };
 
-
 /**
  * Sort an array of todos lexicographically, in descending order.
  *
@@ -76,3 +77,11 @@ export const getMaxSortOrder = (arr: Todo[]) => {
     });
   return max;
 };
+
+/**
+ * Generate a random user if not initialized.
+ */
+export const generateUser = () => ({
+  name: `User ${uuidv4().slice(0, 6)}`,
+  color: colors[Math.floor(Math.random() * colors.length)],
+});

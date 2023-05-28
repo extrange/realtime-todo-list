@@ -15,68 +15,29 @@ import {
 import {
   ActionIcon,
   Affix,
-  Button,
-  Code,
-  ColorPicker,
+  AppShell,
+  Aside,
   Container,
   Flex,
-  Modal,
-  Table,
+  Footer,
+  MediaQuery,
   Text,
-  TextInput,
   rem,
   useMantineTheme,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
-import {
-  IconBrandGithub,
-  IconInfoCircle,
-  IconPencil,
-  IconPlus,
-} from "@tabler/icons-react";
+import { IconPlus } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
 import { useState } from "react";
-import ReactTimeAgo from "react-time-ago";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
 import { AddTodo } from "./AddTodo";
+import { AppHeader } from "./AppHeader";
+import { AppNavbar } from "./AppNavbar";
 import { Task } from "./Task";
 import "./editor.css";
-import { NetworkStatus } from "./networkStatus";
 import { ReloadPrompt } from "./reloadPrompt";
 import { Todo, useSyncedStore } from "./store";
 import { getMaxSortOrder, todoComparator } from "./util";
-
-const colors = [
-  "#958DF1",
-  "#F98181",
-  "#FBBC88",
-  "#FAF594",
-  "#70CFF8",
-  "#94FADB",
-  "#B9F18D",
-];
-
-export type User = {
-  name: string;
-  color: string;
-};
-
-const RELEASE_DATE = import.meta.env.VITE_COMMIT_DATE
-  ? new Date(import.meta.env.VITE_COMMIT_DATE)
-  : new Date();
-
-const getInitialUser = (): User => {
-  const user = localStorage.getItem("user");
-  const generatedUser = {
-    name: `User ${uuidv4().slice(0, 6)}`,
-    color: colors[Math.floor(Math.random() * colors.length)],
-  };
-  if (!user) {
-    localStorage.setItem("user", JSON.stringify(generatedUser));
-  }
-  return user ? JSON.parse(user) : generatedUser;
-};
 
 /* TODO Fractional indexing needs to:
 - Generate keys for all tasks without keys, maintaining their current order
@@ -86,15 +47,15 @@ const getInitialUser = (): User => {
 - If two keys have the same index (possible, if two clients create tasks indepedentnly while offline), then arbitrarily change one of them to the midpoint of the others. This check should run on dragEnd events, but only if the items it is being inserted between have the same index (not for the whole array).
 */
 
+export type User = {
+  name: string;
+  color: string;
+};
+
 export const App = () => {
   const [editingId, setEditingId] = useState<string>();
-  const [user, setUser] = useState<User>(getInitialUser());
-  const [editUser, setEditUser] = useState<boolean>(false);
-  const [showInfo, setShowInfo] = useState<boolean>(false);
+  const [navOpen, setNavOpen] = useState<boolean>(false);
   const [activeId, setActiveId] = useState<string>();
-  const userForm = useForm({
-    initialValues: user,
-  });
 
   const state = useSyncedStore();
   const theme = useMantineTheme();
@@ -129,12 +90,6 @@ export const App = () => {
     setEditingId(undefined);
   };
 
-  const onEditUserClose = () => {
-    setEditUser(false);
-    setUser(userForm.values);
-    localStorage.setItem("user", JSON.stringify(userForm.values));
-  };
-
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id.toString());
   };
@@ -167,71 +122,10 @@ export const App = () => {
 
   return (
     <>
-      <Modal opened={editUser} onClose={onEditUserClose} returnFocus={false}>
-        <Container>
-          <Text ta={"center"} c={userForm.values.color}>
-            {userForm.values.name}
-          </Text>
-          <TextInput data-autofocus {...userForm.getInputProps("name")} />
-          <ColorPicker
-            format={"hex"}
-            swatches={colors}
-            withPicker={false}
-            fullWidth
-            {...userForm.getInputProps("color")}
-          />
-        </Container>
-      </Modal>
-      <Modal
-        opened={showInfo}
-        onClose={() => setShowInfo(false)}
-        withCloseButton={false}
-      >
-        <Table>
-          <tbody>
-            <tr>
-              <td>
-                <Text>Commit hash:</Text>
-              </td>
-              <td>
-                <Code style={{ overflowWrap: "anywhere" }}>
-                  {import.meta.env.VITE_COMMIT_HASH}
-                </Code>
-              </td>
-            </tr>
-            <tr>
-              <td>Released:</td>
-              <td>
-                {new Intl.DateTimeFormat("en-SG", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                  timeZone: "Asia/Singapore",
-                }).format(RELEASE_DATE)}{" "}
-                (
-                <ReactTimeAgo date={RELEASE_DATE} />)
-              </td>
-            </tr>
-            <tr>
-              <td>Changes:</td>
-              <td>{import.meta.env.VITE_COMMIT_MSG}</td>
-            </tr>
-          </tbody>
-        </Table>
-        <Button
-          leftIcon={<IconBrandGithub />}
-          component="a"
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://github.com/extrange/realtime-todo-list"
-          variant={"subtle"}
-        >
-          View on Github
-        </Button>
-      </Modal>
       <ReloadPrompt />
       <Affix position={{ bottom: rem(20), right: rem(20) }}>
         <ActionIcon
-        color={theme.primaryColor}
+          color={theme.primaryColor}
           variant="filled"
           size={"xl"}
           onClick={createTodo}
@@ -239,54 +133,64 @@ export const App = () => {
           <IconPlus />
         </ActionIcon>
       </Affix>
-      <Flex direction={"column"}>
-        <Flex justify={"center"} align={"center"}>
-          <Text fz={"xl"} ta={"center"}>
-            Tasks
-          </Text>
-          <ActionIcon mx={5} onClick={() => setShowInfo(true)}>
-            <IconInfoCircle color={"grey"} />
-          </ActionIcon>
-          <NetworkStatus />
-        </Flex>
-        <Flex justify={"space-between"}>
-          <Button
-            rightIcon={<IconPencil color={"white"} />}
-            variant={"subtle"}
-            onClick={() => setEditUser(true)}
-          >
-            <Text color={user.color}>{user.name}</Text>
-          </Button>
-        </Flex>
-        {editingId && (
-          <AddTodo editingId={editingId} user={user} close={close} />
-        )}
-        <Container>
-          <DndContext
-            sensors={sensors}
-            onDragEnd={handleDragEnd}
-            onDragStart={handleDragStart}
-            collisionDetection={closestCenter}
-          >
-            <SortableContext
-              items={todoIds}
-              strategy={verticalListSortingStrategy}
+
+      {/* Main content starts here */}
+      <AppShell
+        padding="md"
+        styles={{
+          main: {
+            background:
+              theme.colorScheme === "dark"
+                ? theme.colors.dark[8]
+                : theme.colors.gray[0],
+          },
+        }}
+        navbarOffsetBreakpoint="sm"
+        asideOffsetBreakpoint="sm"
+        navbar={<AppNavbar navOpen={navOpen} />}
+        header={<AppHeader navOpen={navOpen} setNavOpen={setNavOpen} />}
+        footer={
+          <Footer height={20}>
+            Show user online status here, maybe even network status
+          </Footer>
+        }
+        aside={
+          <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
+            <Aside p="md" hiddenBreakpoint="sm" width={{ sm: 200, lg: 300 }}>
+              <Text>Application sidebar</Text>
+            </Aside>
+          </MediaQuery>
+        }
+      >
+        <Flex direction={"column"}>
+          {editingId && <AddTodo editingId={editingId} close={close} />}
+          <Container>
+            <DndContext
+              sensors={sensors}
+              onDragEnd={handleDragEnd}
+              onDragStart={handleDragStart}
+              collisionDetection={closestCenter}
             >
-              {sortedTodos.map((todo) => (
-                <Task setEditingId={setEditingId} todo={todo} key={todo.id} />
-              ))}
-            </SortableContext>
-            <DragOverlay>
-              {activeId && (
-                <Task
-                  dragging
-                  todo={state.todos.find((t) => t.id === activeId) as Todo}
-                />
-              )}
-            </DragOverlay>
-          </DndContext>
-        </Container>
-      </Flex>
+              <SortableContext
+                items={todoIds}
+                strategy={verticalListSortingStrategy}
+              >
+                {sortedTodos.map((todo) => (
+                  <Task setEditingId={setEditingId} todo={todo} key={todo.id} />
+                ))}
+              </SortableContext>
+              <DragOverlay>
+                {activeId && (
+                  <Task
+                    dragging
+                    todo={state.todos.find((t) => t.id === activeId) as Todo}
+                  />
+                )}
+              </DragOverlay>
+            </DndContext>
+          </Container>
+        </Flex>
+      </AppShell>
     </>
   );
 };
