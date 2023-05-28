@@ -27,6 +27,8 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 - [x] Allow name change
 - [x] Github link 'I' icon dialog in topbar
 - [x] Reordering (using fractional indexing)
+  - [x] Fix re-ordering not working on mobile (dragOverlay?)
+  - [ ] Complete generateKeys and cleanKeys methods
 - [x] Fix render NaN problem (react time-ago, happens after modifying)
 - [ ] Show editor in a dialog instead
 - [ ] Indicator beside note if recently modified before last seen (color of person)

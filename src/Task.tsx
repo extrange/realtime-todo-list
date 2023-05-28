@@ -40,7 +40,10 @@ export const Task = ({ setEditingId, deleteTodo, todo }: InputProps) => {
     <tr ref={setNodeRef} style={style} {...attributes}>
       <td>
         <Flex align={"center"} sx={{ padding: 0 }}>
-          <IconGripVertical {...listeners} style={{ cursor: "grab" }} />
+          <IconGripVertical
+            {...listeners}
+            style={{ cursor: "grab", touchAction: "none" }}
+          />
           <ActionIcon onClick={() => (todo.completed = !todo.completed)}>
             {todo.completed ? <IconCheckbox /> : <IconSquare />}
           </ActionIcon>
