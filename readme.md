@@ -28,11 +28,19 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 - [x] Github link 'I' icon dialog in topbar
 - [x] Reordering (using fractional indexing)
   - [x] Fix re-ordering not working on mobile (dragOverlay?)
+  - [x] Fix not working on mobile scroll
+  - [x] Animation on dragend (flyback)
+  - [ ] Animation on delete
+  - [x] Animation on grab (scale up)
+  - [ ] Fix disjoint on grabend
+  - [x] Show item in original position still (dragoverlay)
+  - [x] Fix z-index issues
   - [ ] Complete generateKeys and cleanKeys methods
 - [x] Fix render NaN problem (react time-ago, happens after modifying)
 - [ ] Show editor in a dialog instead
 - [ ] Indicator beside note if recently modified before last seen (color of person)
   - [ ] Show last modified by who
+- [ ] Perf: wrap items in React.memo
 - [x] Don't edit modified date if task is just opened for viewing
 - [ ] Don't show html tags in preview
 - [ ] Show mobile/pc icon beside cursor

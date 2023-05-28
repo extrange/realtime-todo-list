@@ -1,6 +1,8 @@
 import {
   DndContext,
   DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
   PointerSensor,
   closestCenter,
   useSensor,
@@ -85,6 +87,7 @@ export const App = () => {
   const [user, setUser] = useState<User>(getInitialUser());
   const [editUser, setEditUser] = useState<boolean>(false);
   const [showInfo, setShowInfo] = useState<boolean>(false);
+  const [activeId, setActiveId] = useState<string>();
   const userForm = useForm({
     initialValues: user,
   });
@@ -117,11 +120,6 @@ export const App = () => {
     state.todos.unshift(newTodo);
   };
 
-  const deleteTodo = (todo: Todo) =>
-    state.todos.splice(state.todos.indexOf(todo), 1);
-
-  const toggleCompleted = (todo: Todo) => (todo.completed = !todo.completed);
-
   const close = () => {
     setEditingId(undefined);
   };
@@ -132,8 +130,13 @@ export const App = () => {
     localStorage.setItem("user", JSON.stringify(userForm.values));
   };
 
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id.toString());
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    setActiveId(undefined);
 
     if (over && active.id !== over.id) {
       const activeTodo = state.todos.find((t) => t.id === active.id) as Todo;
@@ -221,7 +224,7 @@ export const App = () => {
         </Button>
       </Modal>
       <ReloadPrompt />
-      <Container>
+      <Flex direction={"column"}>
         <Flex justify={"center"} align={"center"}>
           <Text fz={"xl"} ta={"center"}>
             Tasks
@@ -246,31 +249,32 @@ export const App = () => {
         {editingId && (
           <AddTodo editingId={editingId} user={user} close={close} />
         )}
-        <Table highlightOnHover>
-          <tbody>
-            <DndContext
-              sensors={sensors}
-              onDragEnd={handleDragEnd}
-              collisionDetection={closestCenter}
+        <Container>
+          <DndContext
+            sensors={sensors}
+            onDragEnd={handleDragEnd}
+            onDragStart={handleDragStart}
+            collisionDetection={closestCenter}
+          >
+            <SortableContext
+              items={todoIds}
+              strategy={verticalListSortingStrategy}
             >
-              <SortableContext
-                items={todoIds}
-                strategy={verticalListSortingStrategy}
-              >
-                {sortedTodos.map((todo) => (
-                  <Task
-                    deleteTodo={deleteTodo}
-                    toggleCompleted={toggleCompleted}
-                    setEditingId={setEditingId}
-                    todo={todo}
-                    key={todo.id}
-                  />
-                ))}
-              </SortableContext>
-            </DndContext>
-          </tbody>
-        </Table>
-      </Container>
+              {sortedTodos.map((todo) => (
+                <Task setEditingId={setEditingId} todo={todo} key={todo.id} />
+              ))}
+            </SortableContext>
+            <DragOverlay>
+              {activeId && (
+                <Task
+                  dragging
+                  todo={state.todos.find((t) => t.id === activeId) as Todo}
+                />
+              )}
+            </DragOverlay>
+          </DndContext>
+        </Container>
+      </Flex>
     </>
   );
 };

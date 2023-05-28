@@ -9,8 +9,9 @@ import {
 
 import { CSS } from "@dnd-kit/utilities";
 import styled from "@emotion/styled";
+import { useCallback } from "react";
 import ReactTimeAgo from "react-time-ago";
-import { Todo } from "./store";
+import { Todo, store } from "./store";
 
 const StyledTextDiv = styled.div`
   height: 100%;
@@ -20,73 +21,127 @@ const StyledTextDiv = styled.div`
   padding-left: 10px;
 `;
 
-type InputProps = {
-  toggleCompleted: (todo: Todo) => void;
-  setEditingId: (id: string) => void;
-  deleteTodo: (todo: Todo) => void;
+const StyledFlex = styled(Flex)`
+  @keyframes pop {
+    0% {
+      transform: scale(1);
+      box-shadow: var(--box-shadow);
+    }
+    100% {
+      transform: scale(var(--scale));
+      box-shadow: var(--box-shadow-picked-up);
+    }
+  }
+  animation: pop 200ms cubic-bezier(0.18, 0.67, 0.6, 1.22);
+  transform: scale(var(--scale));
+  padding: 0;
+  padding: 10px 0;
+  /* border: 2px solid red; */
+  border-bottom: 0.0625rem solid rgb(55, 58, 64);
+
+  :hover {
+    background-color: rgb(44, 46, 51);
+  }
+`;
+
+type CommonProps = {
   todo: Todo;
 };
 
-export const Task = ({ setEditingId, deleteTodo, todo }: InputProps) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: todo.id });
+type InputProps =
+  | {
+      dragging?: never;
+      setEditingId: (id: string) => void;
+    }
+  | {
+      dragging: true;
+      setEditingId?: never;
+    };
+
+export const Task = ({
+  setEditingId,
+  todo,
+  dragging,
+}: InputProps & CommonProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: todo.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-  };
+
+    // isDragging: the 'shadow' of the active item (follows overlay)
+    ...(isDragging && { opacity: 0.5 }),
+
+    // dragging: the overlay of the dragged thing
+    ...(dragging && {
+      "--scale": 1.05,
+      backgroundColor: "rgb(44, 46, 51)",
+    }),
+  } as React.CSSProperties;
+
+  const deleteTodo = useCallback(
+    () =>
+      confirm("Are you sure?") &&
+      store.todos.splice(store.todos.indexOf(todo), 1),
+    [todo]
+  );
+
+  const completeTodo = useCallback(
+    () => (todo.completed = !todo.completed),
+    [todo]
+  );
+
+  const textContent = todo.content?.toDOM().textContent ? (
+    <Text lineClamp={2} style={{ overflowWrap: "anywhere" }}>
+      {todo.content?.toDOM().textContent}
+    </Text>
+  ) : (
+    <Text italic c={"dimmed"}>
+      (empty)
+    </Text>
+  );
 
   return (
-    <tr ref={setNodeRef} style={style} {...attributes}>
-      <td>
-        <Flex align={"center"} sx={{ padding: 0 }}>
-          <IconGripVertical
-            {...listeners}
-            style={{ cursor: "grab", touchAction: "none" }}
-          />
-          <ActionIcon onClick={() => (todo.completed = !todo.completed)}>
-            {todo.completed ? <IconCheckbox /> : <IconSquare />}
-          </ActionIcon>
-          <Tooltip
-            openDelay={500}
-            multiline
-            position={"bottom"}
-            label={
-              <div>
-                <Text>
-                  Modified <ReactTimeAgo date={new Date(todo.modified)} />
-                </Text>
-                <Text>
-                  Created <ReactTimeAgo date={new Date(todo.created)} />
-                </Text>
-                <Text>sortOrder: {todo.sortOrder ?? "N/A"}</Text>
-              </div>
-            }
-          >
-            <StyledTextDiv onClick={() => setEditingId(todo.id)}>
-              {todo.content?.toDOM().textContent ? (
-                <Text
-                  lineClamp={2}
-                  style={{
-                    overflowWrap: "anywhere",
-                  }}
-                >
-                  {todo.content?.toDOM().textContent}
-                </Text>
-              ) : (
-                <Text italic c={"dimmed"}>
-                  (empty)
-                </Text>
-              )}
-            </StyledTextDiv>
-          </Tooltip>
-          <ActionIcon
-            onClick={() => confirm("Are you sure?") && deleteTodo(todo)}
-          >
-            <IconTrash />
-          </ActionIcon>
-        </Flex>
-      </td>
-    </tr>
+    <StyledFlex align={"center"} ref={setNodeRef} {...attributes} style={style}>
+      <IconGripVertical
+        {...listeners}
+        style={{ cursor: "grab", touchAction: "none" }}
+      />
+      <ActionIcon onClick={completeTodo}>
+        {todo.completed ? <IconCheckbox /> : <IconSquare />}
+      </ActionIcon>
+      <Tooltip
+        openDelay={500}
+        multiline
+        position={"bottom"}
+        label={
+          <div>
+            <Text>
+              Modified <ReactTimeAgo date={new Date(todo.modified)} />
+            </Text>
+            <Text>
+              Created <ReactTimeAgo date={new Date(todo.created)} />
+            </Text>
+            <Text>sortOrder: {todo.sortOrder ?? "N/A"}</Text>
+          </div>
+        }
+      >
+        <StyledTextDiv onClick={() => !dragging && setEditingId(todo.id)}>
+          {textContent}
+        </StyledTextDiv>
+      </Tooltip>
+      <ActionIcon onClick={deleteTodo}>
+        <IconTrash />
+      </ActionIcon>
+    </StyledFlex>
   );
 };
