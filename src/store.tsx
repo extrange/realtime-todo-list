@@ -5,11 +5,13 @@ import { useEffect, useState } from "react";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { XmlFragment } from "yjs";
 import { generateKeys } from "./util";
+import { User } from "./App";
 
 export type Todo = {
   content: XmlFragment;
   completed: boolean;
   modified: number;
+  by?: User;
   created: number;
   id: string;
   sortOrder: string;

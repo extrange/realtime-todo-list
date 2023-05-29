@@ -19,6 +19,12 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 - [x] Provided via yjs
 - [x] Offline persistence via IndexedDB
+- [ ] Do not allow outdated clients to sync
+
+### Undo/Snapshots
+
+- [ ] Support snapshots (`ydoc.gc` to `false`, check perf)
+- [ ] Support undo (within fixed interval/number of actions)
 
 ### UI
 
@@ -35,21 +41,23 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
   - [ ] Fix disjoint on grabend
   - [x] Show item in original position still (dragoverlay)
   - [x] Fix z-index issues
-  - [ ] Complete generateKeys and cleanKeys methods (e.g. duplicate additions offline) - listen to yArray insertions/changes to sortOrder?
 - [x] Fix render NaN problem (react time-ago, happens after modifying)
 - [ ] Show editor in a dialog instead
   - [x] Add close button (need global context)
-  - [ ] Remember scroll position
+  - [ ] Remember scroll position of todos (only if > 0 on close)
+  - [ ] Open in dialog instead (might not even need Zustand then)
 - [ ] Indicator beside task if recently modified before last seen (color of person)
   - [ ] Show last modified by who
 - Footer:
   - [ ] Show other users online/last online (max 2, sorted by most recent, ignore self)
   - [ ] Show sync status indicator (up to date, or last synced)
+  - [ ] Network status to show server connection status
 - [ ] Perf: wrap items in React.memo
 - [x] Don't edit modified date if task is just opened for viewing
 - [ ] Don't show html tags in preview
 - [ ] Show mobile/pc icon beside cursor
 - [ ] Tiptap header component
+- [ ] Show document outline on desktop in application sidebar
 - [x] Move to useLocalStorage (sync settings across browser tabs)
 - [ ] Strip newlines on saving
 - [ ] Show IndexedDB notification
@@ -65,6 +73,7 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 - [ ] 'Focus' view for tasks
 - [x] Markdown support (live editor style)
 - [ ] RTF Editor (Mantine)
+- [ ] Add background changing daily
 
 ### Authentication
 

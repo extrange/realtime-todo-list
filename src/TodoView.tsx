@@ -16,8 +16,10 @@ import {
   ActionIcon,
   Affix,
   Container,
+  MediaQuery,
+  Modal,
   rem,
-  useMantineTheme
+  useMantineTheme,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
@@ -29,7 +31,11 @@ import { EditTodo } from "./EditTodo";
 import { Task } from "./Task";
 import { useStore } from "./stateStore";
 import { Todo, store, useSyncedStore } from "./store";
-import { getMaxSortOrder, todoComparator } from "./util";
+import {
+  generateKeyBetweenSafe,
+  getMaxSortOrder,
+  todoComparator,
+} from "./util";
 
 export const TodoView = () => {
   const [activeId, setActiveId] = useState<string>();
@@ -83,25 +89,26 @@ export const TodoView = () => {
       /* If over's sortOrder > active's, user is moving the Todo to somewhere above it's original positition. In this case, we want to move the active Todo above the over Todo, and vice versa. */
       // TODO: for now, I'm assuming all todos have sortOrders
       if (overTodo?.sortOrder > activeTodo?.sortOrder) {
-        // Find the key of the todo above the over todo, in the sorted array
-        const aboveIdx =
-          sortedTodos[sortedTodos.findIndex((t) => t.id === overTodo.id) - 1]
-            ?.sortOrder;
-        activeTodo.sortOrder = generateKeyBetween(overTodo.sortOrder, aboveIdx);
+        // Find the todo above the over todo, in the sorted array
+        const aboveTodo =
+          sortedTodos[sortedTodos.findIndex((t) => t.id === overTodo.id) - 1];
+
+        activeTodo.sortOrder = generateKeyBetweenSafe(overTodo, aboveTodo);
       } else {
-        // Find the key of the todo below the over todo, in the sorted array
-        const belowIdx =
-          sortedTodos[sortedTodos.findIndex((t) => t.id === overTodo.id) + 1]
-            ?.sortOrder;
-        activeTodo.sortOrder = generateKeyBetween(belowIdx, overTodo.sortOrder);
+        // Find the todo below the over todo, in the sorted array
+        const belowTodo =
+          sortedTodos[sortedTodos.findIndex((t) => t.id === overTodo.id) + 1];
+
+        activeTodo.sortOrder = generateKeyBetweenSafe(belowTodo, overTodo);
       }
     }
   };
 
-  return editingId ? (
-    <EditTodo />
-  ) : (
+  return (
     <>
+        <Modal opened={!!editingId} onClose={() => setEditingId(undefined)}>
+          {editingId && <EditTodo />}
+        </Modal>
       <Affix position={{ bottom: rem(20), right: rem(20) }}>
         <ActionIcon
           color={theme.primaryColor}
@@ -113,6 +120,7 @@ export const TodoView = () => {
         </ActionIcon>
       </Affix>
 
+      {/* Visible content starts here */}
       <Container>
         <DndContext
           sensors={sensors}

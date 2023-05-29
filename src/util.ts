@@ -1,8 +1,8 @@
 import { notifications } from "@mantine/notifications";
 import { generateKeyBetween } from "fractional-indexing";
 import { v4 as uuidv4 } from "uuid";
-import { Todo } from "./store";
 import { colors } from "./constants";
+import { Todo } from "./store";
 
 /**
  * Generate keys for all objects in an array, which don't already have keys.
@@ -40,14 +40,33 @@ export const generateKeys = (todoArray: Todo[]) =>
   });
 
 /**
- * Clean duplicate and invalid keys from an array.
+ * Generates a key in-between 2 Todos (or prior/after if either is undefined)
  *
- * Run this before `generateKeys`.
+ * If both Todos have the same ID (e.g. in collisions happening during offline sync), then change the sortOrder of the upper Todo to something just above it.
+ *
+ * Note: this may cause the upper todo to sometimes 'jump'. Also, while relative order of the 3 Todos will be preserved, their absolute order is not guaranteed. As a result, subsequent rearranging may result in subtle UI bugs.
+ *
+ * This scenario should hopefully be rare.
+ * 
+ * TODO Suboptimal, but works.
+ * @param a
+ * @param b
  */
-export const cleanKeys = () => {
-  //TODO Test with duplicate keys, invalid keys
-  // Test two clients creating two items with same index while offline
-  // Order should be preserved
+export const generateKeyBetweenSafe = (a?: Todo, b?: Todo) => {
+  try {
+    return generateKeyBetween(a?.sortOrder, b?.sortOrder);
+  } catch (e) {
+    // Only handle the case where the sortOrders are the same
+    // The order looks weird because we sort by descending...
+    if (a?.sortOrder && b?.sortOrder && a.sortOrder === b.sortOrder) {
+      const upperKey = generateKeyBetween(b.sortOrder, undefined);
+      b.sortOrder = upperKey;
+      return generateKeyBetween(a.sortOrder, upperKey);
+    }
+
+    // Otherwise, throw
+    throw new Error(`Error while generating sort keys: ${JSON.stringify(e)}`);
+  }
 };
 
 /**

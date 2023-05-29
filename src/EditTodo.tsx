@@ -1,3 +1,4 @@
+import { Container } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
@@ -10,7 +11,6 @@ import { useEffect, useMemo } from "react";
 import { useStore } from "./stateStore";
 import { Todo, provider, store } from "./store";
 import { generateUser } from "./util";
-import { Container } from "@mantine/core";
 
 export const EditTodo = () => {
   const [user] = useLocalStorage({
@@ -38,6 +38,7 @@ export const EditTodo = () => {
     editorProps: {
       handleTextInput: debounce(() => {
         todo.modified = Date.now();
+        todo.by = user;
         return false;
       }, 500),
     },
@@ -47,9 +48,5 @@ export const EditTodo = () => {
     editor?.chain().updateUser(user).focus().run();
   }, [user, editor]);
 
-  return (
-    <Container>
-      <EditorContent editor={editor} />
-    </Container>
-  );
+  return <EditorContent editor={editor} />;
 };
