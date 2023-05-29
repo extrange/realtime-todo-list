@@ -28,6 +28,7 @@
     "@tiptap/extension-code": "^2.0.3",
     "@tiptap/extension-collaboration": "^2.0.3",
     "@tiptap/extension-collaboration-cursor": "^2.0.3",
+    "@tiptap/extension-placeholder": "^2.0.3",
     "@tiptap/extension-task-item": "^2.0.3",
     "@tiptap/extension-task-list": "^2.0.3",
     "@tiptap/pm": "^2.0.3",
@@ -50,8 +51,7 @@
     "uuid": "^9.0.0",
     "y-indexeddb": "^9.0.11",
     "y-websocket": "^1.5.0",
-    "yjs": "^13.6.1",
-    "zustand": "^4.3.8"
+    "yjs": "^13.6.1"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.195",

@@ -19,12 +19,6 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 - [x] Provided via yjs
 - [x] Offline persistence via IndexedDB
-- [ ] Do not allow outdated clients to sync
-
-### Undo/Snapshots
-
-- [ ] Support snapshots (`ydoc.gc` to `false`, check perf)
-- [ ] Support undo (within fixed interval/number of actions)
 
 ### UI
 
@@ -36,41 +30,39 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
   - [x] Fix re-ordering not working on mobile (dragOverlay?)
   - [x] Fix not working on mobile scroll
   - [x] Animation on dragend (flyback)
-  - [ ] Animation on delete
   - [x] Animation on grab (scale up)
-  - [ ] Fix disjoint on grabend
   - [x] Show item in original position still (dragoverlay)
   - [x] Fix z-index issues
 - [x] Fix render NaN problem (react time-ago, happens after modifying)
-- [ ] Show editor in a dialog instead
+- [x] Show editor in a dialog instead
   - [x] Add close button (need global context)
   - [ ] Remember scroll position of todos (only if > 0 on close)
-  - [ ] Open in dialog instead (might not even need Zustand then)
+  - [ ] Show title + last modified when and by who in header, truncated to 1 line
 - [ ] Indicator beside task if recently modified before last seen (color of person)
   - [ ] Show last modified by who
-- Footer:
+- [ ] Support tasklists
+- [ ] Due date support
+- [ ] 'Focus' view for tasks
+  - [ ] Suggest upcoming tasks due
+- [ ] Footer:
   - [ ] Show other users online/last online (max 2, sorted by most recent, ignore self)
   - [ ] Show sync status indicator (up to date, or last synced)
   - [ ] Network status to show server connection status
-- [ ] Perf: wrap items in React.memo
 - [x] Don't edit modified date if task is just opened for viewing
 - [ ] Don't show html tags in preview
 - [ ] Show mobile/pc icon beside cursor
-- [ ] Tiptap header component
+- [x] Tiptap header component
 - [ ] Show document outline on desktop in application sidebar
 - [x] Move to useLocalStorage (sync settings across browser tabs)
 - [ ] Strip newlines on saving
 - [ ] Show IndexedDB notification
 - [x] Show connection status indicator
   - [ ] Connection status show appear when back online for 3s, then fade
-- [ ] Support tasklists
 - [ ] Restore tasks
 - [ ] Restore lists
 - [ ] View revision history of tasks
 - [ ] Search tasks/lists
-- [ ] Due date support
 - [ ] Repeat support
-- [ ] 'Focus' view for tasks
 - [x] Markdown support (live editor style)
 - [ ] RTF Editor (Mantine)
 - [ ] Add background changing daily
@@ -79,20 +71,18 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 - [ ] Support multiple users
 
-### Misc
+### Undo/Snapshots
 
-- [x] Detect browser IndexedDB compatibility
-- [ ] i wanted a daily notification like its your task list of the day which includes
-- due today
-- in progress (i.e. items that you shld be working on due at a later date but requires more than one day to do)
-
-i was thinking of more like comments. i made this change and i want to highlight it to you. so i leave a message on the board which u could see when you logon. there is a tick button which u can tick to acknowledge read then its goneee.
-
-alternatively, its like i submit a message which then gets push to telegram which i might as well send myself haha
+- [ ] Support snapshots (`ydoc.gc` to `false`, check perf)
+- [ ] Support undo (within fixed interval/number of actions)
 
 ## Non-urgent
 
+- [ ] Rewrite reactivity layer (for performance, also using store doesn't cause re-renders selectively)
 - [ ] Get pushed commits as an array (using [`toJSON](https://docs.github.com/en/actions/learn-github-actions/expressions#tojson)), and thus show all commits that were pushed, not just the most recent
+- [ ] Fix disjoint on grabend
+- [ ] Animation on delete
+- [ ] Perf: wrap items in React.memo
 
 ## Todo After Implementation
 

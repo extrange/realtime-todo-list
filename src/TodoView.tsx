@@ -16,20 +16,18 @@ import {
   ActionIcon,
   Affix,
   Container,
-  MediaQuery,
   Modal,
   rem,
-  useMantineTheme,
+  useMantineTheme
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
-import { shallow } from "zustand/shallow";
 import { EditTodo } from "./EditTodo";
 import { Task } from "./Task";
-import { useStore } from "./stateStore";
 import { Todo, store, useSyncedStore } from "./store";
 import {
   generateKeyBetweenSafe,
@@ -39,12 +37,9 @@ import {
 
 export const TodoView = () => {
   const [activeId, setActiveId] = useState<string>();
-  const [editingId, setEditingId] = useStore(
-    (store) => [store.editingId, store.setEditingId],
-    shallow
-  );
-
+  const [editingId, setEditingId] = useState<string>();
   const theme = useMantineTheme();
+  const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`);
 
   useSyncedStore();
 
@@ -52,6 +47,11 @@ export const TodoView = () => {
   // https://github.com/YousefED/SyncedStore/issues/105
   const sortedTodos = store.todos.slice().sort(todoComparator);
   const todoIds = sortedTodos.map((t) => t.id);
+
+  const editingTodo = useMemo(
+    () => store.todos.find((t) => t.id === editingId),
+    [editingId]
+  );
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -106,9 +106,14 @@ export const TodoView = () => {
 
   return (
     <>
-        <Modal opened={!!editingId} onClose={() => setEditingId(undefined)}>
-          {editingId && <EditTodo />}
-        </Modal>
+      <Modal
+        opened={!!editingId}
+        onClose={() => setEditingId(undefined)}
+        fullScreen={isMobile}
+        size={"min(70%, 800px)"} // Not applied if fullScreen=True
+      >
+        {editingTodo && <EditTodo todo={editingTodo} />}
+      </Modal>
       <Affix position={{ bottom: rem(20), right: rem(20) }}>
         <ActionIcon
           color={theme.primaryColor}
@@ -133,7 +138,7 @@ export const TodoView = () => {
             strategy={verticalListSortingStrategy}
           >
             {sortedTodos.map((todo) => (
-              <Task todo={todo} key={todo.id} />
+              <Task todo={todo} key={todo.id} setEditingId={setEditingId} />
             ))}
           </SortableContext>
           <DragOverlay>

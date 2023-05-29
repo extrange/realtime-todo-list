@@ -1,4 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import styled from "@emotion/styled";
 import { ActionIcon, Flex, Text, Tooltip } from "@mantine/core";
 import {
   IconCheckbox,
@@ -6,12 +8,8 @@ import {
   IconSquare,
   IconTrash,
 } from "@tabler/icons-react";
-
-import { CSS } from "@dnd-kit/utilities";
-import styled from "@emotion/styled";
-import { useCallback } from "react";
+import React from "react";
 import ReactTimeAgo from "react-time-ago";
-import { useStore } from "./stateStore";
 import { Todo, store } from "./store";
 
 const StyledTextDiv = styled.div`
@@ -45,12 +43,19 @@ const StyledFlex = styled(Flex)`
   }
 `;
 
-type InputProps = {
-  todo: Todo;
-  dragging?: boolean;
-};
+type InputProps =
+  | {
+      todo: Todo;
+      dragging?: false;
+      setEditingId: React.Dispatch<React.SetStateAction<string | undefined>>;
+    }
+  | {
+      todo: Todo;
+      dragging: true;
+      setEditingId?: never;
+    };
 
-export const Task = ({ todo, dragging }: InputProps) => {
+export const Task = ({ todo, dragging, setEditingId }: InputProps) => {
   const {
     attributes,
     listeners,
@@ -61,8 +66,6 @@ export const Task = ({ todo, dragging }: InputProps) => {
   } = useSortable({
     id: todo.id,
   });
-
-  const setEditingId = useStore((store) => store.setEditingId);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -78,17 +81,11 @@ export const Task = ({ todo, dragging }: InputProps) => {
     }),
   } as React.CSSProperties;
 
-  const deleteTodo = useCallback(
-    () =>
-      confirm("Are you sure?") &&
-      store.todos.splice(store.todos.indexOf(todo), 1),
-    [todo]
-  );
+  const deleteTodo = () =>
+    confirm("Are you sure?") &&
+    store.todos.splice(store.todos.indexOf(todo), 1);
 
-  const completeTodo = useCallback(
-    () => (todo.completed = !todo.completed),
-    [todo]
-  );
+  const completeTodo = () => (todo.completed = !todo.completed);
 
   const textContent = todo.content?.toDOM().textContent ? (
     <Text lineClamp={2} style={{ overflowWrap: "anywhere", cursor: "default" }}>
@@ -125,7 +122,7 @@ export const Task = ({ todo, dragging }: InputProps) => {
           </div>
         }
       >
-        <StyledTextDiv onClick={() => setEditingId(todo.id)}>
+        <StyledTextDiv onClick={() => !dragging && setEditingId(todo.id)}>
           {textContent}
         </StyledTextDiv>
       </Tooltip>

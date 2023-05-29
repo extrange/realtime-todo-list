@@ -111,3 +111,12 @@
 .ProseMirror ul[data-type="taskList"] li > div {
   flex: 1 1 auto;
 }
+
+/* Placeholder */
+.ProseMirror :is(p, h2).is-empty:nth-child(-n + 2)::before {
+  color: #5c5f66;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
