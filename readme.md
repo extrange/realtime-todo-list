@@ -36,7 +36,7 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 - [x] Fix render NaN problem (react time-ago, happens after modifying)
 - [x] Show editor in a dialog instead
   - [x] Add close button (need global context)
-  - [ ] Remember scroll position of todos (only if > 0 on close)
+  - [x] Remember scroll position of todos (only if > 0 on close)
   - [ ] Show title + last modified when and by who in header, truncated to 1 line
   - [ ] Fix mobile keyboard issue
   - [ ] Tap/click to edit - but must still be able to see other's cursor

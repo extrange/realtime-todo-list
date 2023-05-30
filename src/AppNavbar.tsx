@@ -1,17 +1,19 @@
 import {
-    Button,
-    ColorPicker,
-    Container,
-    Modal,
-    Navbar,
-    Text,
-    TextInput,
+  Button,
+  Center,
+  ColorPicker,
+  Container,
+  Modal,
+  Navbar,
+  Text,
+  TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useLocalStorage } from "@mantine/hooks";
 import { IconPencil } from "@tabler/icons-react";
 import { useState } from "react";
 import { colors } from "./constants";
+import "./editor.css";
 import { generateUser } from "./util";
 
 type InputProps = {
@@ -37,9 +39,20 @@ export const AppNavbar = ({ navOpen }: InputProps) => {
     <>
       <Modal opened={edit} onClose={onClose} returnFocus={false}>
         <Container>
-          <Text ta={"center"} c={userForm.values.color}>
-            {userForm.values.name}
-          </Text>
+          <Center sx={{ paddingBottom: "10px" }}>
+            <Text
+              className={"collaboration-cursor__label"}
+              style={{
+                position: "inherit",
+                fontSize: "initial",
+                display: "inline-block",
+              }}
+              bg={userForm.values.color}
+              ta={"center"}
+            >
+              {userForm.values.name}
+            </Text>
+          </Center>
           <TextInput data-autofocus {...userForm.getInputProps("name")} />
           <ColorPicker
             format={"hex"}
