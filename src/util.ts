@@ -47,7 +47,7 @@ export const generateKeys = (todoArray: Todo[]) =>
  * Note: this may cause the upper todo to sometimes 'jump'. Also, while relative order of the 3 Todos will be preserved, their absolute order is not guaranteed. As a result, subsequent rearranging may result in subtle UI bugs.
  *
  * This scenario should hopefully be rare.
- * 
+ *
  * TODO Suboptimal, but works.
  * @param a
  * @param b
@@ -104,3 +104,28 @@ export const generateUser = () => ({
   name: `User ${uuidv4().slice(0, 6)}`,
   color: colors[Math.floor(Math.random() * colors.length)],
 });
+
+/**
+ * Format storage sizes into human readable formats.
+ */
+export const formatBytes = (bytes: number, decimals = 2) => {
+  if (!+bytes) return "0 Bytes";
+
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = [
+    "bytes",
+    "KiB",
+    "MiB",
+    "GiB",
+    "TiB",
+    "PiB",
+    "EiB",
+    "ZiB",
+    "YiB",
+  ];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+};

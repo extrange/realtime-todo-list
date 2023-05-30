@@ -23,7 +23,7 @@ import {
 import { useMediaQuery } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
 import { EditTodo } from "./EditTodo";
@@ -107,7 +107,6 @@ export const TodoView = () => {
       }
     }
   };
-  useEffect(() => console.log("rendered"));
 
   /* Editor has been created, so we can use scrollTo now
   Previously, using a ref callback would give the wrong height
@@ -115,7 +114,6 @@ export const TodoView = () => {
   const onEditorCreate = useCallback(() => {
     if (editingId && dialogRef.current) {
       const lastScrollPos = scrollPositions.current[editingId];
-      console.log("el", dialogRef.current);
       if (lastScrollPos) dialogRef.current.scroll(0, lastScrollPos);
       else dialogRef.current.scroll(0, 0);
     }
@@ -124,7 +122,6 @@ export const TodoView = () => {
   const onDialogClose = () => {
     if (editingId && dialogRef.current) {
       scrollPositions.current[editingId] = dialogRef.current.scrollTop;
-      console.log("saved scroll position", dialogRef.current.scrollTop);
     }
     setEditingId(undefined);
   };
@@ -162,7 +159,7 @@ export const TodoView = () => {
       </Affix>
 
       {/* Visible content starts here */}
-      <Container>
+      <Container p={0}>
         <DndContext
           sensors={sensors}
           onDragEnd={handleDragEnd}

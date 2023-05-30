@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import styled from "@emotion/styled";
-import { ActionIcon, Flex, Text, Tooltip } from "@mantine/core";
+import { ActionIcon, Chip, Flex, Text, Tooltip } from "@mantine/core";
 import {
   IconCheckbox,
   IconGripVertical,
@@ -35,7 +35,6 @@ const StyledFlex = styled(Flex)`
   transform: scale(var(--scale));
   padding: 0;
   padding: 10px 0;
-  /* border: 2px solid red; */
   border-bottom: 0.0625rem solid rgb(55, 58, 64);
 
   :hover {
@@ -126,6 +125,7 @@ export const Task = ({ todo, dragging, setEditingId }: InputProps) => {
           {textContent}
         </StyledTextDiv>
       </Tooltip>
+      <Chip></Chip>
       <ActionIcon onClick={deleteTodo}>
         <IconTrash />
       </ActionIcon>

@@ -38,12 +38,13 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
   - [x] Add close button (need global context)
   - [x] Remember scroll position of todos (only if > 0 on close)
   - [ ] Show title + last modified when and by who in header, truncated to 1 line
-  - [ ] Fix mobile keyboard issue
   - [ ] Tap/click to edit - but must still be able to see other's cursor
-  - [ ] Fix placeholder text
-  - [ ] Remove left padding
+  - [x] Remove left padding
   - [ ] Catch tab key
   - [ ] Scroll to last modified position on open (by any user)
+  - [ ] Mobile: Fix placeholder text out of alignment
+  - [ ] Mobile: tap to edit
+  - [ ] Mobile: top bar disappearing on keyboard popup (tap to edit might fix this)
 - [ ] Support links
 - [ ] Indicator beside task if recently modified before last seen (color of person)
   - [ ] Show last modified by who

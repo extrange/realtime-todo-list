@@ -11,14 +11,12 @@ import {
   Text,
   useMantineTheme,
 } from "@mantine/core";
-import {
-  IconBrandGithub,
-  IconInfoCircle
-} from "@tabler/icons-react";
-import React, { useState } from "react";
+import { IconBrandGithub, IconInfoCircle } from "@tabler/icons-react";
+import React, { useEffect, useState } from "react";
 import ReactTimeAgo from "react-time-ago";
 import { COMMIT_HASH, COMMIT_MSG, RELEASE_DATE } from "./constants";
 import { NetworkStatus } from "./networkStatus";
+import { formatBytes } from "./util";
 
 type InputProps = {
   navOpen: boolean;
@@ -27,7 +25,14 @@ type InputProps = {
 
 export const AppHeader = ({ navOpen, setNavOpen }: InputProps) => {
   const [showInfo, setShowInfo] = useState<boolean>(false);
+  const [storageEstimate, setStorageEstimate] = useState<
+    StorageEstimate | undefined
+  >();
   const theme = useMantineTheme();
+  useEffect(
+    () => void navigator.storage.estimate().then(setStorageEstimate),
+    []
+  );
 
   return (
     <>
@@ -61,6 +66,16 @@ export const AppHeader = ({ navOpen, setNavOpen }: InputProps) => {
             <tr>
               <td>Changes:</td>
               <td>{COMMIT_MSG}</td>
+            </tr>
+            <tr>
+              <td>Storage used:</td>
+              <td>
+                {storageEstimate?.quota && storageEstimate.usage
+                  ? `${formatBytes(storageEstimate.usage)} of ${formatBytes(
+                      storageEstimate.quota
+                    )}`
+                  : "Calculating..."}
+              </td>
             </tr>
           </tbody>
         </Table>
