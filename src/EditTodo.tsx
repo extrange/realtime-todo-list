@@ -1,4 +1,5 @@
 import { useLocalStorage } from "@mantine/hooks";
+import { Editor } from "@tiptap/core";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { debounce } from "lodash";
 import { useEffect } from "react";
@@ -8,9 +9,10 @@ import { generateUser } from "./util";
 
 type InputProps = {
   todo: Todo;
+  onCreate: (props: { editor: Editor }) => void;
 };
 
-export const EditTodo = ({ todo }: InputProps) => {
+export const EditTodo = ({ todo, onCreate }: InputProps) => {
   const [user] = useLocalStorage({
     key: "user",
     defaultValue: generateUser(),
@@ -25,10 +27,12 @@ export const EditTodo = ({ todo }: InputProps) => {
         return false;
       }, 500),
     },
+    onCreate,
   });
 
   useEffect(() => {
-    editor?.chain().updateUser(user).focus().run();
+    // If .focus() is called here it messes up scroll
+    editor?.chain().updateUser(user).run();
   }, [user, editor]);
 
   return <EditorContent editor={editor} />;

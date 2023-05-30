@@ -38,6 +38,13 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
   - [x] Add close button (need global context)
   - [ ] Remember scroll position of todos (only if > 0 on close)
   - [ ] Show title + last modified when and by who in header, truncated to 1 line
+  - [ ] Fix mobile keyboard issue
+  - [ ] Tap/click to edit - but must still be able to see other's cursor
+  - [ ] Fix placeholder text
+  - [ ] Remove left padding
+  - [ ] Catch tab key
+  - [ ] Scroll to last modified position on open (by any user)
+- [ ] Support links
 - [ ] Indicator beside task if recently modified before last seen (color of person)
   - [ ] Show last modified by who
 - [ ] Support tasklists
@@ -48,6 +55,7 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
   - [ ] Show other users online/last online (max 2, sorted by most recent, ignore self)
   - [ ] Show sync status indicator (up to date, or last synced)
   - [ ] Network status to show server connection status
+  - [ ] Set user as offline if ??window focus lost
 - [x] Don't edit modified date if task is just opened for viewing
 - [ ] Don't show html tags in preview
 - [ ] Show mobile/pc icon beside cursor
@@ -83,6 +91,7 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 - [ ] Fix disjoint on grabend
 - [ ] Animation on delete
 - [ ] Perf: wrap items in React.memo
+- [ ] Perf: don't deep equals in useAwareness
 
 ## Todo After Implementation
 

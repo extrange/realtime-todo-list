@@ -18,12 +18,12 @@ import {
   Container,
   Modal,
   rem,
-  useMantineTheme
+  useMantineTheme,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
 import { EditTodo } from "./EditTodo";
@@ -35,9 +35,13 @@ import {
   todoComparator,
 } from "./util";
 
+type ScrollPosition = Record<string, number>;
+
 export const TodoView = () => {
   const [activeId, setActiveId] = useState<string>();
   const [editingId, setEditingId] = useState<string>();
+  const dialogRef = useRef<HTMLElement | null>(null);
+  const scrollPositions = useRef<ScrollPosition>({});
   const theme = useMantineTheme();
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`);
 
@@ -103,17 +107,49 @@ export const TodoView = () => {
       }
     }
   };
+  useEffect(() => console.log("rendered"));
+
+  /* Editor has been created, so we can use scrollTo now
+  Previously, using a ref callback would give the wrong height
+  as the editor had not loaded yet*/
+  const onEditorCreate = useCallback(() => {
+    if (editingId && dialogRef.current) {
+      const lastScrollPos = scrollPositions.current[editingId];
+      console.log("el", dialogRef.current);
+      if (lastScrollPos) dialogRef.current.scroll(0, lastScrollPos);
+      else dialogRef.current.scroll(0, 0);
+    }
+  }, [editingId]);
+
+  const onDialogClose = () => {
+    if (editingId && dialogRef.current) {
+      scrollPositions.current[editingId] = dialogRef.current.scrollTop;
+      console.log("saved scroll position", dialogRef.current.scrollTop);
+    }
+    setEditingId(undefined);
+  };
 
   return (
     <>
-      <Modal
+      <Modal.Root
         opened={!!editingId}
-        onClose={() => setEditingId(undefined)}
+        onClose={onDialogClose}
         fullScreen={isMobile}
         size={"min(70%, 800px)"} // Not applied if fullScreen=True
       >
-        {editingTodo && <EditTodo todo={editingTodo} />}
-      </Modal>
+        <Modal.Overlay />
+        <Modal.Content ref={dialogRef}>
+          <Modal.Header>
+            {/* <Modal.Title>Modal title</Modal.Title> */}
+            <Modal.CloseButton />
+          </Modal.Header>
+          <Modal.Body>
+            {editingTodo && (
+              <EditTodo todo={editingTodo} onCreate={onEditorCreate} />
+            )}
+          </Modal.Body>
+        </Modal.Content>
+      </Modal.Root>
       <Affix position={{ bottom: rem(20), right: rem(20) }}>
         <ActionIcon
           color={theme.primaryColor}
