@@ -42,12 +42,17 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
   - [x] Remove left padding
   - [ ] Catch tab key
   - [ ] Scroll to last modified position on open (by any user)
+  - [ ] Mobile: remember scroll position
   - [ ] Mobile: Fix placeholder text out of alignment
   - [ ] Mobile: tap to edit
   - [ ] Mobile: top bar disappearing on keyboard popup (tap to edit might fix this)
+- [ ] Info: show newlines for changes
 - [ ] Support links
-- [ ] Indicator beside task if recently modified before last seen (color of person)
-  - [ ] Show last modified by who
+- [x] Indicator beside task if recently modified before last seen (color of person)
+  - [x] Show last modified by who
+  - [x] Fix useSyncStore not accepting identity function as default, then implement lastActive (AwarenessState) and editingId (yDoc) respectively...
+  - [ ] Indicator not to show if no user 'lastOpened'
+  - [ ] Improve Task.tsx rendering - subscribe to User object changes
 - [ ] Support tasklists
 - [ ] Due date support
 - [ ] 'Focus' view for tasks
@@ -75,6 +80,8 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 - [x] Markdown support (live editor style)
 - [ ] RTF Editor (Mantine)
 - [ ] Add background changing daily
+- [ ] Support changing room
+- [ ] Support chat in room
 
 ### Authentication
 
@@ -87,6 +94,7 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 ## Non-urgent
 
+- [ ] useSyncedStore to accept selector and then only rerender on that selector change
 - [ ] Rewrite reactivity layer (for performance, also using store doesn't cause re-renders selectively)
 - [ ] Get pushed commits as an array (using [`toJSON](https://docs.github.com/en/actions/learn-github-actions/expressions#tojson)), and thus show all commits that were pushed, not just the most recent
 - [ ] Fix disjoint on grabend

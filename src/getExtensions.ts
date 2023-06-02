@@ -26,6 +26,7 @@ export const getExtensions = ({ todo, user }: { todo?: Todo; user?: User }) => [
   Document.extend({ content: "title block*" }),
   ...(todo ? [Collaboration.configure({ fragment: todo.content })] : []),
   ...(user
+    // Uses user.name and user.color for rendering
     ? [CollaborationCursor.configure({ provider: provider, user })]
     : []),
   Placeholder.configure({

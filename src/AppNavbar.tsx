@@ -8,36 +8,34 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
-import { useLocalStorage } from "@mantine/hooks";
 import { IconPencil } from "@tabler/icons-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { colors } from "./constants";
 import "./editor.css";
-import { generateUser } from "./util";
+import { useUserData } from "./useUserData";
 
 type InputProps = {
   navOpen?: boolean;
 };
+
 export const AppNavbar = ({ navOpen }: InputProps) => {
-  const [user, setUser] = useLocalStorage({
-    key: "user",
-    defaultValue: generateUser(),
-  });
   const [edit, setEdit] = useState<boolean>(false);
+  const [userData, setUserData] = useUserData();
 
-  const userForm = useForm({
-    initialValues: user,
-  });
+  /* useForm doesn't work here, because it caches values from the
+  first render. I would have to find a way to update the form state
+  on initial load. */
 
-  const onClose = () => {
-    setEdit(false);
-    setUser(userForm.values);
-  };
+  const onNameInput: React.FormEventHandler<HTMLInputElement> = ({
+    currentTarget: { value: name },
+  }) => setUserData((u) => ({ ...u, user: { ...u.user, name } }));
+
+  const onColorInput = (color: string) =>
+    color && setUserData((u) => ({ ...u, user: { ...u.user, color } }));
 
   return (
     <>
-      <Modal opened={edit} onClose={onClose} returnFocus={false}>
+      <Modal opened={edit} onClose={() => setEdit(false)} returnFocus={false}>
         <Container>
           <Center sx={{ paddingBottom: "10px" }}>
             <Text
@@ -47,22 +45,30 @@ export const AppNavbar = ({ navOpen }: InputProps) => {
                 fontSize: "initial",
                 display: "inline-block",
               }}
-              bg={userForm.values.color}
+              bg={userData.user.color}
               ta={"center"}
             >
-              {userForm.values.name}
+              {userData.user.name}
             </Text>
           </Center>
-          <TextInput data-autofocus {...userForm.getInputProps("name")} />
+          <TextInput
+            value={userData.user.name}
+            data-autofocus
+            onInput={onNameInput}
+            error={!userData.user.name && "You must enter a name"}
+          />
           <ColorPicker
             format={"hex"}
             swatches={colors}
             withPicker={false}
             fullWidth
-            {...userForm.getInputProps("color")}
+            onChange={onColorInput}
+            value={userData.user.color}
           />
         </Container>
       </Modal>
+
+      {/* Content starts here */}
       <Navbar
         p="md"
         hiddenBreakpoint="sm"
@@ -74,8 +80,9 @@ export const AppNavbar = ({ navOpen }: InputProps) => {
           variant={"subtle"}
           onClick={() => setEdit(true)}
         >
-          <Text color={user.color}>{user.name}</Text>
+          <Text color={userData.user.color}>{userData.user.name}</Text>
         </Button>
+        <Text>Lists will appear here</Text>
       </Navbar>
     </>
   );

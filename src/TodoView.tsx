@@ -45,14 +45,16 @@ export const TodoView = () => {
   const theme = useMantineTheme();
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`);
 
-  useSyncedStore();
+  const todos = useSyncedStore((s) => s.todos);
 
   // TODO Memoize once syncedStore issue is fixed
   // https://github.com/YousefED/SyncedStore/issues/105
-  const sortedTodos = store.todos.slice().sort(todoComparator);
+  const sortedTodos = todos.slice().sort(todoComparator);
+
   const todoIds = sortedTodos.map((t) => t.id);
 
   const editingTodo = useMemo(
+    // Must use store.todos here since this is passod to EditTodo
     () => store.todos.find((t) => t.id === editingId),
     [editingId]
   );
@@ -123,6 +125,10 @@ export const TodoView = () => {
     if (editingId && dialogRef.current) {
       scrollPositions.current[editingId] = dialogRef.current.scrollTop;
     }
+
+    // Update last opened
+    editingId && localStorage.setItem(editingId, Date.now().toString());
+
     setEditingId(undefined);
   };
 

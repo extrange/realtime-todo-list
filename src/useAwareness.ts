@@ -1,25 +1,52 @@
-import { isEqual } from "lodash";
-import { useCallback, useRef, useSyncExternalStore } from "react";
+import { debounce } from "lodash";
+import { useEffect, useState } from "react";
 import { provider } from "./store";
 
+export interface AwarenessState {
+  /**This is only used by the editor.
+   * store.storedUser is the source of truth, not this*/
+  user?: {
+    name: string;
+    color: string;
+  };
+  /**Used by the editor. */
+  cursor?: null | object;
+
+  /**The value of userId in localStorage.
+   * This uniquely ties multiple provider.awareness.ClientIds
+   * to one user (e.g. if multiple of the same tab open). */
+  userId?: string;
+
+  /**The current task the user is editing. If the user is not
+   * editing anything, they are either online, or idle.  */
+  editingId?: string;
+}
+
+export type AwarenessMap = Map<number, AwarenessState>;
+
+/**
+ * Fires on change in awareness. Debounced.
+ *
+ * Awareness disappears on desktop browser close, or after ~30s of closing browser on mobile.
+ * 
+ * Not (yet) suitable for use in dependency arrays.
+ */
 export const useAwareness = () => {
-  const state = useRef<Record<string, object>[]>();
-  const subscribe = useCallback((onUpdate: () => void) => {
-    provider.on("awarenessChange", onUpdate);
-    return () => provider.off("awarenessChange", onUpdate);
-  }, []);
-  
-  const getSnapshot = useCallback(() => {
-    const incoming = Array.from(provider.awareness.states.values());
-    // TODO there shouldn't be a need to deepequal, we already know there's an update
-    if (isEqual(incoming, state.current)) {
-      return state.current;
-    }
+  const [state, setState] = useState<{ value: AwarenessMap }>({
+    value: provider.awareness.states,
+  });
 
-    state.current = incoming;
+  useEffect(() => {
+    const debouncedUpdate = debounce(
+      () => setState({ value: provider.awareness.states }),
+      1000,
+      { maxWait: 1000 }
+    );
 
-    return state.current;
+    provider.on("awarenessChange", debouncedUpdate);
+
+    return () => void provider.off("awarenessChange", debouncedUpdate);
   }, []);
 
-  return useSyncExternalStore(subscribe, getSnapshot);
+  return state.value;
 };

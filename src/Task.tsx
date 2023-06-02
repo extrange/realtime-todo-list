@@ -1,7 +1,14 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import styled from "@emotion/styled";
-import { ActionIcon, Chip, Flex, Text, Tooltip } from "@mantine/core";
+import {
+  ActionIcon,
+  Avatar,
+  Flex,
+  Text,
+  Tooltip,
+  useMantineTheme,
+} from "@mantine/core";
 import {
   IconCheckbox,
   IconGripVertical,
@@ -9,8 +16,8 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import React from "react";
-import ReactTimeAgo from "react-time-ago";
-import { Todo, store } from "./store";
+import TimeAgo from "react-timeago";
+import { Todo, USER_ID, store } from "./store";
 
 const StyledTextDiv = styled.div`
   height: 100%;
@@ -44,13 +51,13 @@ const StyledFlex = styled(Flex)`
 
 type InputProps =
   | {
-      todo: Todo;
       dragging?: false;
+      todo: Todo;
       setEditingId: React.Dispatch<React.SetStateAction<string | undefined>>;
     }
   | {
-      todo: Todo;
       dragging: true;
+      todo: Todo;
       setEditingId?: never;
     };
 
@@ -65,6 +72,7 @@ export const Task = ({ todo, dragging, setEditingId }: InputProps) => {
   } = useSortable({
     id: todo.id,
   });
+  const theme = useMantineTheme();
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -79,6 +87,13 @@ export const Task = ({ todo, dragging, setEditingId }: InputProps) => {
       backgroundColor: "rgb(44, 46, 51)",
     }),
   } as React.CSSProperties;
+
+  const byUser =
+    todo.by && todo.by !== USER_ID
+      ? store.storedUsers[todo.by]?.user
+      : undefined;
+
+  const lastOpened = localStorage.getItem(todo.id);
 
   const deleteTodo = () =>
     confirm("Are you sure?") &&
@@ -112,10 +127,11 @@ export const Task = ({ todo, dragging, setEditingId }: InputProps) => {
         label={
           <div>
             <Text>
-              Modified <ReactTimeAgo date={new Date(todo.modified)} />
+              Modified <TimeAgo live={false} date={todo.modified} /> by{" "}
+              {byUser && byUser.name}
             </Text>
             <Text>
-              Created <ReactTimeAgo date={new Date(todo.created)} />
+              Created <TimeAgo live={false} date={todo.created} />
             </Text>
             <Text>sortOrder: {todo.sortOrder ?? "N/A"}</Text>
           </div>
@@ -125,7 +141,21 @@ export const Task = ({ todo, dragging, setEditingId }: InputProps) => {
           {textContent}
         </StyledTextDiv>
       </Tooltip>
-      <Chip></Chip>
+      {lastOpened &&
+        parseInt(lastOpened) < todo.modified &&
+        byUser &&
+        byUser.color && (
+          <Avatar
+            styles={{
+              placeholder: {
+                background: theme.fn.darken(byUser.color, 0.3),
+                color: theme.fn.lighten(byUser.color, 0.5),
+              },
+            }}
+          >
+            {byUser.name?.charAt(0).toUpperCase()}
+          </Avatar>
+        )}
       <ActionIcon onClick={deleteTodo}>
         <IconTrash />
       </ActionIcon>

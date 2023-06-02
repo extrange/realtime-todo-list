@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { IconBrandGithub, IconInfoCircle } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
-import ReactTimeAgo from "react-time-ago";
+import TimeAgo from "react-timeago";
 import { COMMIT_HASH, COMMIT_MSG, RELEASE_DATE } from "./constants";
 import { NetworkStatus } from "./networkStatus";
 import { formatBytes } from "./util";
@@ -29,8 +29,9 @@ export const AppHeader = ({ navOpen, setNavOpen }: InputProps) => {
     StorageEstimate | undefined
   >();
   const theme = useMantineTheme();
+
   useEffect(
-    () => void navigator.storage.estimate().then(setStorageEstimate),
+    () => void navigator.storage?.estimate().then(setStorageEstimate),
     []
   );
 
@@ -60,12 +61,14 @@ export const AppHeader = ({ navOpen, setNavOpen }: InputProps) => {
                   timeZone: "Asia/Singapore",
                 }).format(RELEASE_DATE)}{" "}
                 (
-                <ReactTimeAgo date={RELEASE_DATE} />)
+                <TimeAgo live={false} date={RELEASE_DATE} />)
               </td>
             </tr>
             <tr>
               <td>Changes:</td>
-              <td>{COMMIT_MSG}</td>
+              <td>
+                <Code block>{COMMIT_MSG}</Code>
+              </td>
             </tr>
             <tr>
               <td>Storage used:</td>

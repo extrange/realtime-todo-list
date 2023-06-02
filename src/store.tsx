@@ -1,23 +1,52 @@
 import { HocuspocusProvider } from "@hocuspocus/provider";
-import { getYjsDoc, syncedStore } from "@syncedstore/core";
+import { notifications } from "@mantine/notifications";
+import { getYjsDoc, observeDeep, syncedStore } from "@syncedstore/core";
+import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import { debounce } from "lodash";
 import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { XmlFragment } from "yjs";
-import { generateKeys } from "./util";
 import { User } from "./App";
 
 export type Todo = {
   content: XmlFragment;
   completed: boolean;
   modified: number;
-  by?: User;
+
+  /**UserID */
+  by?: string;
   created: number;
   id: string;
   sortOrder: string;
 };
 
-export const store = syncedStore({ todos: [] as Todo[] });
+/** The master copy is stored in localStorage, and changes
+ * are synced to this object via useUser. Values could be undefined
+ * if store is in the progress of updating. */
+export type UserData = {
+  user?: User;
+  /** The last time the user was non-idle.
+   * Updated even if the user was offline.
+   */
+  lastActive?: number;
+};
+
+export type Store = {
+  todos: Todo[];
+  storedUsers: {
+    [id: string]: UserData;
+  };
+};
+
+const DOCUMENT_NAME =
+  import.meta.env.MODE === "development" ? "test" : "default";
+
+/**
+ * Use this to modify the store.
+ * Will not cause rerenders on state changes.
+ */
+export const store = syncedStore<Store>({ todos: [], storedUsers: {} });
 
 // Get/create the Yjs document and sync automatically
 const ydoc = getYjsDoc(store);
@@ -26,36 +55,65 @@ const ydoc = getYjsDoc(store);
 export const provider = new HocuspocusProvider({
   url: "wss://tasks-server.nicholaslyz.com",
   document: ydoc,
-  name: "default",
+  name: DOCUMENT_NAME,
+
+  // TESTING
+  onConnect: () => notifications.show({ message: "onConnect" }),
+  onSynced: (data) =>
+    notifications.show({ title: "onSynced", message: JSON.stringify(data) }),
+  onDisconnect: (data) =>
+    notifications.show({
+      title: "onDisconnect",
+      message: JSON.stringify(data),
+    }),
 });
 
+/**The unique ID for a user, persisted in localStorage, and shared across
+ * browser tabs. */
+export const USER_ID = (() => {
+  /* Check localStorage for a clientID, and generate one if not existing */
+  /* User ID doesn't exist */
+  const existingId = localStorage.getItem("userId");
+  if (!existingId) {
+    const userId = uuidv4();
+    localStorage.setItem("userId", userId);
+    return userId;
+  } else {
+    return existingId;
+  }
+})();
+
+/**Propagate userID (local GUID) to awareness object */
+provider.on("sync", () => provider.setAwarenessField("userId", USER_ID));
+
 /**
- * Force a rerender when store changes.
- * 
- * Uses a debounce for performance.
+ * Selectively subscribe to changes in the store.
+ * Optionally uses a debounce for performance.
+ *
+ * Returned values are not suitable for memoization.
+ *
+ * Note: selector function must return an observable slice of the
+ * original store, as its result is used by observeDeep.
  */
-export const useSyncedStore = () => {
-  const [, forceUpdate] = useState<object>();
+export const useSyncedStore = <T,>(
+  selector: (s: MappedTypeDescription<Store>) => T,
+  debounceMs = 0
+) => {
+  const [state, setState] = useState({ value: selector(store) });
 
-  /* Some downsides to this method:
-  - UI updates are delayed (mitigated somewhat by leading=true)
-  - whole component rerenders on updates (albeit debounced)
-  */
   useEffect(() => {
-    const onUpdate = debounce(() => forceUpdate({}), 500, {
-      maxWait: 500,
-      leading: true,
-    });
+    const onUpdate = () => {
+      setState({ value: selector(store) });
+    };
 
-    ydoc.on("update", onUpdate);
-    return () => ydoc.off("update", onUpdate);
-  }, []);
+    const debouncedUpdate = debounceMs
+      ? debounce(onUpdate, debounceMs, { maxWait: debounceMs })
+      : onUpdate;
+    return observeDeep(selector ? selector(store) : store, debouncedUpdate);
+  }, [debounceMs, selector]);
 
-  return store;
+  return state.value;
 };
-
-// Generate keys for the store, only on first run
-ydoc.once("update", () => generateKeys(store.todos));
 
 // Check if IndexedDB is supported, then sync
 new Promise<IDBDatabase>((resolve) => {
@@ -68,7 +126,11 @@ new Promise<IDBDatabase>((resolve) => {
     indexedDB.deleteDatabase(result.name);
 
     // Persist to local IndexedDB
-    new IndexeddbPersistence("default", ydoc);
-    console.log("IndexedDB is supported");
-  } else console.warn("IndexedDB not supported");
+    new IndexeddbPersistence(DOCUMENT_NAME, ydoc);
+  } else
+    notifications.show({
+      title: "IndexedDB not supported",
+      message: "Changes will not be saved on exiting",
+      color: "yellow",
+    });
 });
