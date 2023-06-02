@@ -52,15 +52,21 @@ export const DebugTools = () => {
 
   const makeYdocAvailableInWindow = () => {
     window.YDoc = getYjsDoc(store);
+    notifications.show({
+      message: "YDoc now available in window",
+    });
   };
 
   return (
     <>
       {[
-        [clearStoredUsers, "Clear storedUsers"] as const,
+        [clearStoredUsers, "Clear storedUsers (affects all users)"] as const,
         [clearLocalStorage, "Clear localStorage (will reload)"] as const,
         [clearIndexedDb, "Clear IndexedDB"] as const,
-        [makeYdocAvailableInWindow, "Make YDoc available in window"] as const,
+        [
+          makeYdocAvailableInWindow,
+          "Make YDoc available (as window.YDoc)",
+        ] as const,
       ].map(([handler, title]) => (
         <Button variant="subtle" onClick={handler}>
           {title}

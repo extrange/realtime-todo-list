@@ -13,7 +13,11 @@ import {
   Text,
   useMantineTheme,
 } from "@mantine/core";
-import { IconBrandGithub, IconInfoCircle } from "@tabler/icons-react";
+import {
+  IconAlertTriangle,
+  IconBrandGithub,
+  IconInfoCircle,
+} from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import TimeAgo from "react-timeago";
@@ -104,7 +108,9 @@ export const AppHeader = ({ navOpen, setNavOpen }: InputProps) => {
         </Button>
         <Accordion>
           <Accordion.Item value="debugging">
-            <Accordion.Control>Debugging</Accordion.Control>
+            <Accordion.Control icon={<IconAlertTriangle />}>
+              Debugging (dangerous!)
+            </Accordion.Control>
             <Accordion.Panel>
               <Stack>
                 <Button
