@@ -57,8 +57,8 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 - [ ] Due date support
 - [ ] 'Focus' view for tasks
   - [ ] Suggest upcoming tasks due
-- [ ] Footer:
-  - [ ] Show other users online/last online (max 2, sorted by most recent, ignore self)
+- Footer:
+  - [x] Show other users online/last online (max 2, sorted by most recent, ignore self)
   - [ ] Show sync status indicator (up to date, or last synced)
   - [ ] Network status to show server connection status
   - [ ] Set user as offline if ??window focus lost

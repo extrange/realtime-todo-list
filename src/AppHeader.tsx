@@ -55,7 +55,9 @@ export const AppHeader = ({ navOpen, setNavOpen }: InputProps) => {
                 <Text>Commit hash:</Text>
               </td>
               <td>
-                <Code style={{ overflowWrap: "anywhere" }}>{COMMIT_HASH}</Code>
+                <Code block sx={{ whiteSpace: "pre-wrap" }}>
+                  {COMMIT_HASH}
+                </Code>
               </td>
             </tr>
             <tr>
