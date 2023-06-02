@@ -15,3 +15,6 @@ export const RELEASE_DATE = import.meta.env.VITE_COMMIT_DATE
 export const COMMIT_HASH = import.meta.env.VITE_COMMIT_HASH;
 
 export const COMMIT_MSG = import.meta.env.VITE_COMMIT_MSG;
+
+export const DOCUMENT_NAME =
+  import.meta.env.MODE === "development" ? "test" : "default";

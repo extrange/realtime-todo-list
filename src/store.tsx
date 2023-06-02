@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { XmlFragment } from "yjs";
 import { User } from "./App";
+import { DOCUMENT_NAME } from "./constants";
 
 export type Todo = {
   content: XmlFragment;
@@ -39,9 +40,6 @@ export type Store = {
   };
 };
 
-const DOCUMENT_NAME =
-  import.meta.env.MODE === "development" ? "test" : "default";
-
 /**
  * Use this to modify the store.
  * Will not cause rerenders on state changes.
@@ -58,6 +56,9 @@ export const provider = new HocuspocusProvider({
   name: DOCUMENT_NAME,
 
   // TESTING
+  /* State diagram:
+  onConnect -> onSynced: {state: true} -> onDisconnect ->
+  onSynced: {state: false} -> onConnect ... */
   onConnect: () => notifications.show({ message: "onConnect" }),
   onSynced: (data) =>
     notifications.show({ title: "onSynced", message: JSON.stringify(data) }),

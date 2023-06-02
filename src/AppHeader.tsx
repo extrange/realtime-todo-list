@@ -1,4 +1,5 @@
 import {
+  Accordion,
   ActionIcon,
   Burger,
   Button,
@@ -7,13 +8,16 @@ import {
   Header,
   MediaQuery,
   Modal,
+  Stack,
   Table,
   Text,
   useMantineTheme,
 } from "@mantine/core";
 import { IconBrandGithub, IconInfoCircle } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
+import { useErrorBoundary } from "react-error-boundary";
 import TimeAgo from "react-timeago";
+import { DebugTools } from "./DebugTools";
 import { COMMIT_HASH, COMMIT_MSG, RELEASE_DATE } from "./constants";
 import { NetworkStatus } from "./networkStatus";
 import { formatBytes } from "./util";
@@ -29,6 +33,8 @@ export const AppHeader = ({ navOpen, setNavOpen }: InputProps) => {
     StorageEstimate | undefined
   >();
   const theme = useMantineTheme();
+
+  const { showBoundary } = useErrorBoundary();
 
   useEffect(
     () => void navigator.storage?.estimate().then(setStorageEstimate),
@@ -67,7 +73,9 @@ export const AppHeader = ({ navOpen, setNavOpen }: InputProps) => {
             <tr>
               <td>Changes:</td>
               <td>
-                <Code block>{COMMIT_MSG}</Code>
+                <Code block sx={{ whiteSpace: "pre-wrap" }}>
+                  {COMMIT_MSG}
+                </Code>
               </td>
             </tr>
             <tr>
@@ -92,6 +100,22 @@ export const AppHeader = ({ navOpen, setNavOpen }: InputProps) => {
         >
           View on Github
         </Button>
+        <Accordion>
+          <Accordion.Item value="debugging">
+            <Accordion.Control>Debugging</Accordion.Control>
+            <Accordion.Panel>
+              <Stack>
+                <Button
+                  variant="subtle"
+                  onClick={() => showBoundary(new Error("Test Error Message"))}
+                >
+                  Throw error
+                </Button>
+                <DebugTools />
+              </Stack>
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
       </Modal>
 
       {/* Main content */}

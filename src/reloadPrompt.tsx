@@ -70,7 +70,7 @@ const _ReloadPrompt = () => {
       notifications.show({
         title: "Error registering SW",
         message: JSON.stringify(e),
-        color: "red",
+        color: "yellow",
       });
     },
   });
