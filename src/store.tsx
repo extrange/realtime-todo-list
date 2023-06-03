@@ -129,9 +129,13 @@ new Promise<IDBDatabase>((resolve) => {
     // Persist to local IndexedDB
     new IndexeddbPersistence(DOCUMENT_NAME, ydoc);
   } else
-    notifications.show({
-      title: "IndexedDB not supported",
-      message: "Changes will not be saved on exiting",
-      color: "yellow",
-    });
+    setTimeout(
+      () =>
+        notifications.show({
+          title: "IndexedDB not supported",
+          message: "Changes will not be saved on exiting",
+          color: "yellow",
+        }),
+      1000
+    );
 });

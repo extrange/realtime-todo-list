@@ -88,18 +88,27 @@ export const Task = ({ todo, dragging, setEditingId }: InputProps) => {
     }),
   } as React.CSSProperties;
 
-  const byUser =
-    todo.by && todo.by !== USER_ID
-      ? store.storedUsers[todo.by]?.user
-      : undefined;
+  const byUser = todo.by ? store.storedUsers[todo.by]?.user : undefined;
 
-  const lastOpened = localStorage.getItem(todo.id);
+  const lastOpenedStr = localStorage.getItem(todo.id);
+  const lastOpened = lastOpenedStr ? parseInt(lastOpenedStr) : undefined;
+
+  /* Show avatar if all are true:
+  - todo.by exists and is not the current user
+  - there is no lastOpened, or lastOpened < todo.modified */
+  const showAvatar =
+    todo.by &&
+    todo.by !== USER_ID &&
+    (!lastOpened || lastOpened < todo.modified);
 
   const deleteTodo = () =>
     confirm("Are you sure?") &&
     store.todos.splice(store.todos.indexOf(todo), 1);
 
-  const completeTodo = () => (todo.completed = !todo.completed);
+  const completeTodo = () => {
+    todo.modified = Date.now();
+    todo.completed = !todo.completed;
+  };
 
   const textContent = todo.content?.toDOM().textContent ? (
     <Text lineClamp={2} style={{ overflowWrap: "anywhere", cursor: "default" }}>
@@ -141,21 +150,18 @@ export const Task = ({ todo, dragging, setEditingId }: InputProps) => {
           {textContent}
         </StyledTextDiv>
       </Tooltip>
-      {lastOpened &&
-        parseInt(lastOpened) < todo.modified &&
-        byUser &&
-        byUser.color && (
-          <Avatar
-            styles={{
-              placeholder: {
-                background: theme.fn.darken(byUser.color, 0.3),
-                color: theme.fn.lighten(byUser.color, 0.5),
-              },
-            }}
-          >
-            {byUser.name?.charAt(0).toUpperCase()}
-          </Avatar>
-        )}
+      {showAvatar && (
+        <Avatar
+          styles={{
+            placeholder: {
+              background: theme.fn.darken(byUser?.color || "#000000", 0.3),
+              color: theme.fn.lighten(byUser?.color || "#FFFFFF", 0.5),
+            },
+          }}
+        >
+          {byUser?.name?.charAt(0).toUpperCase() || "?"}
+        </Avatar>
+      )}
       <ActionIcon onClick={deleteTodo}>
         <IconTrash />
       </ActionIcon>

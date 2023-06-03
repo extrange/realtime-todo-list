@@ -12,7 +12,7 @@ const NoServiceWorker = () => {
   useEffect(() => {
     notifications.show({
       title: "No offline support",
-      message: "Not available in private windows",
+      message: "Service Worker is not available in private windows",
       color: "yellow",
       autoClose: false,
     });
@@ -33,10 +33,10 @@ const _ReloadPrompt = () => {
     updateServiceWorker,
   } = useRegisterSW({
     onRegisteredSW(swUrl, r) {
-      console.log("Service Worker registered.");
+      console.info("Service Worker registered.");
       r &&
         setInterval(() => {
-          console.log("Checking for sw update");
+          console.info("Checking for sw update");
 
           // Don't update if offline
           if (!navigator.onLine) return;
