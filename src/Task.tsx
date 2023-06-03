@@ -126,6 +126,7 @@ const TaskInternal = React.memo(
               userSelect: "none",
             }}
           >
+            {/* https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/ */}
             {(todoReadOnly.content as unknown as string).replace(
               /(<([^>]+)>)/gi,
               ""
