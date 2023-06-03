@@ -1,4 +1,4 @@
-import { AppShell, MediaQuery, useMantineTheme } from "@mantine/core";
+import { AppShell, useMantineTheme } from "@mantine/core";
 import { useState } from "react";
 import { AppAside } from "./AppAside";
 import { AppFooter } from "./AppFooter";
@@ -13,7 +13,8 @@ export type User = {
 };
 
 export const App = () => {
-  const [navOpen, setNavOpen] = useState<boolean>(false);
+  const [navOpen, setNavOpen] = useState(false);
+  const [asideOpen, setAsideOpen] = useState(false);
 
   const theme = useMantineTheme();
 
@@ -31,13 +32,16 @@ export const App = () => {
       navbarOffsetBreakpoint="sm"
       asideOffsetBreakpoint="sm"
       navbar={<AppNavbar navOpen={navOpen} />}
-      header={<AppHeader navOpen={navOpen} setNavOpen={setNavOpen} />}
-      footer={<AppFooter />}
-      aside={
-        <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
-          <AppAside />
-        </MediaQuery>
+      header={
+        <AppHeader
+          navOpen={navOpen}
+          setNavOpen={setNavOpen}
+          asideOpen={asideOpen}
+          setAsideOpen={setAsideOpen}
+        />
       }
+      footer={<AppFooter />}
+      aside={<AppAside asideOpen={asideOpen} />}
     >
       <TodoView />
     </AppShell>

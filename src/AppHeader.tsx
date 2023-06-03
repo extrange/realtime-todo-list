@@ -23,15 +23,21 @@ import { useErrorBoundary } from "react-error-boundary";
 import TimeAgo from "react-timeago";
 import { DebugTools } from "./DebugTools";
 import { COMMIT_HASH, COMMIT_MSG, RELEASE_DATE } from "./constants";
-import { NetworkStatus } from "./networkStatus";
 import { formatBytes } from "./util";
 
 type InputProps = {
   navOpen: boolean;
   setNavOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  asideOpen: boolean;
+  setAsideOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const AppHeader = ({ navOpen, setNavOpen }: InputProps) => {
+export const AppHeader = ({
+  navOpen,
+  setNavOpen,
+  asideOpen,
+  setAsideOpen,
+}: InputProps) => {
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [storageEstimate, setStorageEstimate] = useState<
     StorageEstimate | undefined
@@ -144,7 +150,15 @@ export const AppHeader = ({ navOpen, setNavOpen }: InputProps) => {
           <ActionIcon mx={5} onClick={() => setShowInfo(true)}>
             <IconInfoCircle color={"grey"} />
           </ActionIcon>
-          <NetworkStatus />
+          <MediaQuery largerThan="sm" styles={{ display: "none" }}>
+            <Burger
+              opened={asideOpen}
+              onClick={() => setAsideOpen((o) => !o)}
+              size="sm"
+              color={theme.colors.gray[6]}
+              mr="xl"
+            />
+          </MediaQuery>
         </Flex>
       </Header>
     </>
