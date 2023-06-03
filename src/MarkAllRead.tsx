@@ -1,5 +1,5 @@
 import { Button } from "@mantine/core";
-import { useSyncedStore } from "./store";
+import { USER_ID, useSyncedStore } from "./store";
 
 type MarkAllRead = "markAllRead";
 
@@ -21,7 +21,14 @@ export const MarkAllRead = () => {
 
   const noUnreadTodos = todos.every((t) => {
     const lastOpened = localStorage.getItem(t.id);
-    return lastOpened && parseInt(lastOpened) >= t.modified;
+
+    /* For a todo to have been read, it must
+    - have been opened, ever
+    - be opened after the latest modified OR
+    - was modified by this user */
+    return (
+      lastOpened && (parseInt(lastOpened) >= t.modified || t.by === USER_ID)
+    );
   });
 
   const markAllRead = () => {

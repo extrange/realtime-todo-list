@@ -1,5 +1,5 @@
 import { AppShell, useMantineTheme } from "@mantine/core";
-import { useState } from "react";
+import { SetStateAction, useCallback, useState } from "react";
 import { AppAside } from "./AppAside";
 import { AppFooter } from "./AppFooter";
 import { AppHeader } from "./AppHeader";
@@ -15,6 +15,17 @@ export type User = {
 export const App = () => {
   const [navOpen, setNavOpen] = useState(false);
   const [asideOpen, setAsideOpen] = useState(false);
+
+  /* Don't allow both the NavBar and Aside to be open */
+  const _setNavOpen = useCallback((open: SetStateAction<boolean>) => {
+    setNavOpen(open);
+    open && setAsideOpen(false);
+  }, []);
+
+  const _setAsideOpen = useCallback((open: SetStateAction<boolean>) => {
+    setAsideOpen(open);
+    open && setNavOpen(false);
+  }, []);
 
   const theme = useMantineTheme();
 
@@ -35,9 +46,9 @@ export const App = () => {
       header={
         <AppHeader
           navOpen={navOpen}
-          setNavOpen={setNavOpen}
+          setNavOpen={_setNavOpen}
           asideOpen={asideOpen}
-          setAsideOpen={setAsideOpen}
+          setAsideOpen={_setAsideOpen}
         />
       }
       footer={<AppFooter />}
