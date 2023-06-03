@@ -15,8 +15,8 @@ import {
 import {
   ActionIcon,
   Affix,
-  Container,
   Modal,
+  ScrollArea,
   rem,
   useMantineTheme,
 } from "@mantine/core";
@@ -76,7 +76,14 @@ export const TodoView = () => {
     [editingId]
   );
 
-  const sensors = useSensors(useSensor(PointerSensor));
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    })
+  );
 
   const createTodo = () => {
     const now = Date.now();
@@ -183,7 +190,7 @@ export const TodoView = () => {
       </Affix>
 
       {/* Visible content starts here */}
-      <Container p={0}>
+      <ScrollArea>
         <DndContext
           sensors={sensors}
           onDragEnd={handleDragEnd}
@@ -202,7 +209,7 @@ export const TodoView = () => {
             {activeId && <Task dragging todoId={activeId} />}
           </DragOverlay>
         </DndContext>
-      </Container>
+      </ScrollArea>
     </>
   );
 };

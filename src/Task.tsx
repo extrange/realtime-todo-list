@@ -10,13 +10,8 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
-import {
-  IconCheckbox,
-  IconGripVertical,
-  IconSquare,
-  IconTrash,
-} from "@tabler/icons-react";
-import React, { useCallback, useMemo } from "react";
+import { IconCheckbox, IconSquare, IconTrash } from "@tabler/icons-react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import TimeAgo from "react-timeago";
 import { Store, USER_ID, store, useSyncedStore } from "./store";
 
@@ -70,8 +65,8 @@ const TaskInternal = React.memo(
     );
 
     const [todoReadOnly, todo] = useSyncedStore(memoizedSelect, 100);
-
     const theme = useMantineTheme();
+    const [showAvatar, setShowAvatar] = useState(false);
 
     if (!todoReadOnly || !todo) {
       throw Error(`Couldn't find Todo with ID ${todoId}`);
@@ -81,41 +76,64 @@ const TaskInternal = React.memo(
       ? store.storedUsers[todoReadOnly.by]?.user
       : undefined;
 
-    const lastOpenedStr = localStorage.getItem(todoReadOnly.id);
-    const lastOpened = lastOpenedStr ? parseInt(lastOpenedStr) : undefined;
+    useEffect(() => {
+      const handleMarkAllRead = () => {
+        const lastOpenedStr = localStorage.getItem(todoReadOnly.id);
+        const lastOpened = lastOpenedStr ? parseInt(lastOpenedStr) : undefined;
 
-    /* Show avatar if all are true:
-  - todo.by exists and is not the current user
-  - there is no lastOpened, or lastOpened < todo.modified */
-    const showAvatar =
-      todoReadOnly.by &&
-      todoReadOnly.by !== USER_ID &&
-      (!lastOpened || lastOpened < todoReadOnly.modified);
+        /* Show avatar if all are true:
+        - todo.by exists and is not the current user
+        - there is no lastOpened, or lastOpened < todo.modified */
+        const shouldShowAvatar =
+          todoReadOnly.by &&
+          todoReadOnly.by !== USER_ID &&
+          (!lastOpened || lastOpened < todoReadOnly.modified);
+
+        setShowAvatar(!!shouldShowAvatar);
+      };
+      // Run once on initial render
+      handleMarkAllRead();
+
+      document.addEventListener("markAllRead", handleMarkAllRead);
+      return () =>
+        document.removeEventListener("markAllRead", handleMarkAllRead);
+    }, [todoReadOnly]);
 
     const deleteTodo = useCallback(
       () =>
         confirm("Are you sure?") &&
-        store.todos.splice(store.todos.indexOf(todo), 1),
-      []
+        store.todos.splice(
+          store.todos.findIndex((t) => t.id === todoReadOnly.id),
+          1
+        ),
+      [todoReadOnly]
     );
 
-    const completeTodo = useCallback(() => {
+    const completeTodo = () => {
       todo.modified = Date.now();
       todo.by = USER_ID;
       todo.completed = !todoReadOnly.completed;
-    }, []);
+    };
 
     const textContent = useMemo(
       () =>
         todoReadOnly.content ? (
           <Text
             lineClamp={2}
-            style={{ overflowWrap: "anywhere", cursor: "default" }}
+            style={{
+              overflowWrap: "anywhere",
+              cursor: "default",
+              userSelect: "none",
+            }}
           >
             {todoReadOnly.content as unknown as string}
           </Text>
         ) : (
-          <Text italic c={"dimmed"} style={{ cursor: "default" }}>
+          <Text
+            italic
+            c={"dimmed"}
+            style={{ cursor: "default", userSelect: "none" }}
+          >
             (empty)
           </Text>
         ),
@@ -125,7 +143,11 @@ const TaskInternal = React.memo(
     return (
       <>
         <ActionIcon onClick={completeTodo}>
-          {todoReadOnly.completed ? <IconCheckbox /> : <IconSquare />}
+          {todoReadOnly.completed ? (
+            <IconCheckbox color={theme.colors.gray[6]} />
+          ) : (
+            <IconSquare color={theme.colors.gray[6]} />
+          )}
         </ActionIcon>
         <Tooltip
           openDelay={500}
@@ -166,7 +188,7 @@ const TaskInternal = React.memo(
           </Avatar>
         )}
         <ActionIcon onClick={deleteTodo}>
-          <IconTrash />
+          <IconTrash color={theme.colors.gray[6]} />
         </ActionIcon>
       </>
     );
@@ -204,15 +226,19 @@ export const Task = React.memo((props: InputProps) => {
     ...(dragging && {
       "--scale": 1.05,
       backgroundColor: "rgb(44, 46, 51)",
+      curser: "grab",
     }),
+    touchAction: "none",
   } as React.CSSProperties;
 
   return (
-    <StyledFlex align={"center"} ref={setNodeRef} {...attributes} style={style}>
-      <IconGripVertical
-        {...listeners}
-        style={{ cursor: "grab", touchAction: "none" }}
-      />
+    <StyledFlex
+      {...listeners}
+      align={"center"}
+      ref={setNodeRef}
+      {...attributes}
+      style={style}
+    >
       <TaskInternal {...props} />
     </StyledFlex>
   );

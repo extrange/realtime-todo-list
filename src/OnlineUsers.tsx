@@ -6,7 +6,7 @@ import { useAwareness } from "./useAwareness";
 
 export const OnlineUsers = () => {
   const awareness = useAwareness();
-  const storedUsers = useSyncedStore((s) => s.storedUsers, 1000);
+  const [storedUsers] = useSyncedStore((s) => s.storedUsers, 1000);
 
   const { onlineUsers, offlineUsers } = getUserStatus(awareness, storedUsers);
 

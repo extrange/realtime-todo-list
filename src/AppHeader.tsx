@@ -3,6 +3,7 @@ import {
   ActionIcon,
   Burger,
   Button,
+  CloseButton,
   Code,
   Flex,
   Header,
@@ -17,6 +18,7 @@ import {
   IconAlertTriangle,
   IconBrandGithub,
   IconInfoCircle,
+  IconUsers,
 } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
@@ -134,7 +136,12 @@ export const AppHeader = ({
 
       {/* Main content */}
       <Header height={48} sx={{ display: "flex", justifyContent: "center" }}>
-        <Flex justify={"center"} align={"center"} sx={{ height: "100%" }}>
+        <Flex
+          justify={"center"}
+          align={"center"}
+          sx={{ height: "100%", width: "100%" }}
+          mx={10}
+        >
           <MediaQuery largerThan="sm" styles={{ display: "none" }}>
             <Burger
               opened={navOpen}
@@ -142,22 +149,30 @@ export const AppHeader = ({
               size="sm"
               color={theme.colors.gray[6]}
               mr="xl"
+              sx={{ flexGrow: 0 }}
             />
           </MediaQuery>
-          <Text fz={"xl"} ta={"center"}>
-            Tasks
-          </Text>
-          <ActionIcon mx={5} onClick={() => setShowInfo(true)}>
-            <IconInfoCircle color={"grey"} />
-          </ActionIcon>
+          <Flex justify={"center"} align={"center"} sx={{ flexGrow: 1 }}>
+            <Text fz={"xl"} ta={"center"}>
+              Tasks
+            </Text>
+            <ActionIcon mx={5} onClick={() => setShowInfo(true)}>
+              <IconInfoCircle color={"grey"} />
+            </ActionIcon>
+          </Flex>
           <MediaQuery largerThan="sm" styles={{ display: "none" }}>
-            <Burger
-              opened={asideOpen}
-              onClick={() => setAsideOpen((o) => !o)}
-              size="sm"
-              color={theme.colors.gray[6]}
-              mr="xl"
-            />
+            {asideOpen ? (
+              <CloseButton
+                variant="subtle"
+                c={theme.colors.gray[6]}
+                onClick={() => setAsideOpen(false)}
+                size="md"
+              />
+            ) : (
+              <ActionIcon onClick={() => setAsideOpen((o) => !o)}>
+                <IconUsers color={theme.colors.gray[6]} />
+              </ActionIcon>
+            )}
           </MediaQuery>
         </Flex>
       </Header>

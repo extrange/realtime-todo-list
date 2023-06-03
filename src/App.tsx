@@ -5,7 +5,6 @@ import { AppFooter } from "./AppFooter";
 import { AppHeader } from "./AppHeader";
 import { AppNavbar } from "./AppNavbar";
 import { TodoView } from "./TodoView";
-import "./editor.css";
 
 export type User = {
   name?: string;
