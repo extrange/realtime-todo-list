@@ -1,7 +1,8 @@
-import { Navbar, Transition, useMantineTheme } from "@mantine/core";
+import { Flex, Navbar, Transition, useMantineTheme } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { CSSProperties } from "react";
 import { EditUser } from "./EditUser";
+import { MarkAllRead } from "./MarkAllRead";
 import "./editor.css";
 
 type InputProps = {
@@ -15,6 +16,9 @@ export const AppNavbar = ({ navOpen }: InputProps) => {
   const render = (styles?: CSSProperties) => (
     <Navbar style={styles} p="md" width={{ sm: 200, lg: 300 }}>
       <EditUser />
+      <Flex direction={"column"} justify={"flex-end"} sx={{ height: "100%" }}>
+        <MarkAllRead />
+      </Flex>
     </Navbar>
   );
 

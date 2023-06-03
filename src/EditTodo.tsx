@@ -1,7 +1,6 @@
 import { Editor } from "@tiptap/core";
 import { EditorContent, useEditor } from "@tiptap/react";
-import { debounce } from "lodash";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { User } from "./App";
 import { getExtensions } from "./getExtensions";
 import { Todo, USER_ID, provider, useSyncedStore } from "./store";
@@ -12,16 +11,19 @@ type InputProps = {
 };
 
 export const EditTodo = ({ todo, onCreate }: InputProps) => {
-  const user = useSyncedStore((s) => s.storedUsers[USER_ID]?.user) as User;
+  const user = useSyncedStore((s) => s.storedUsers[USER_ID]?.user, 300) as User;
+  const edited = useRef(false);
 
   const editor = useEditor({
     extensions: getExtensions({ todo, user }),
-    editorProps: {
-      handleTextInput: debounce(() => {
-        todo.modified = Date.now();
-        todo.by = USER_ID;
-        return false;
-      }, 500),
+    onUpdate: () => {
+      if (!edited.current) {
+        // This is to disregard the initial onUpdate, which is fired on focus
+        edited.current = true;
+        return;
+      }
+      todo.modified = Date.now();
+      todo.by = USER_ID;
     },
     onCreate: (props) => {
       provider.setAwarenessField("editingId", todo.id);

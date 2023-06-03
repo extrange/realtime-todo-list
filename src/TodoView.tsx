@@ -23,7 +23,7 @@ import {
 import { useMediaQuery } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
 import { EditTodo } from "./EditTodo";
@@ -44,6 +44,12 @@ export const TodoView = () => {
   const scrollPositions = useRef<ScrollPosition>({});
   const theme = useMantineTheme();
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`);
+  const [, forceUpdate] = useReducer((c) => c + 1, 0);
+
+  useEffect(() => {
+    document.addEventListener('markAllRead', forceUpdate)
+    return () => void document.removeEventListener('markAllRead', forceUpdate)
+  })
 
   const todos = useSyncedStore((s) => s.todos);
 

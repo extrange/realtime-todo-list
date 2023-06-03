@@ -78,9 +78,8 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 ### UI - Misc
 
-- [ ] Fix pwa erroring out
 - [ ] Attempt reconnection on network status change
-- [ ] Show toggle for aside on mobile
+- [x] Show toggle for aside on mobile
 - [ ] Prompt for username on launch
 - [x] Don't edit modified date if task is just opened for viewing
 - [ ] Don't show html tags in preview

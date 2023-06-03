@@ -107,6 +107,7 @@ export const Task = ({ todo, dragging, setEditingId }: InputProps) => {
 
   const completeTodo = () => {
     todo.modified = Date.now();
+    todo.by = USER_ID;
     todo.completed = !todo.completed;
   };
 
@@ -137,7 +138,7 @@ export const Task = ({ todo, dragging, setEditingId }: InputProps) => {
           <div>
             <Text>
               Modified <TimeAgo live={false} date={todo.modified} /> by{" "}
-              {byUser && byUser.name}
+              {todo.by && todo.by === USER_ID ? "you" : byUser && byUser.name}
             </Text>
             <Text>
               Created <TimeAgo live={false} date={todo.created} />

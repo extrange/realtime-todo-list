@@ -5,7 +5,7 @@ import { useAwareness } from "./useAwareness";
 
 export const AppFooter = () => {
   const awareness = useAwareness();
-  const storedUsers = useSyncedStore((s) => s.storedUsers);
+  const storedUsers = useSyncedStore((s) => s.storedUsers, 300);
   const { onlineUsers } = getUserStatus(awareness, storedUsers);
 
   return (

@@ -71,7 +71,6 @@ export const EditUser = () => {
       >
         <Text color={userData.user.color}>{userData.user.name}</Text>
       </Button>
-      <Text>Lists will appear here</Text>
     </>
   );
 };
