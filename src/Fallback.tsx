@@ -1,4 +1,12 @@
-import { Accordion, Alert, Button, Code, Modal, Stack } from "@mantine/core";
+import {
+  Accordion,
+  Alert,
+  Button,
+  Code,
+  Modal,
+  ScrollArea,
+  Stack,
+} from "@mantine/core";
 import { IconAlertCircle, IconAlertTriangle } from "@tabler/icons-react";
 import { useState } from "react";
 import { FallbackProps } from "react-error-boundary";
@@ -9,7 +17,7 @@ export const Fallback = ({ error, resetErrorBoundary }: FallbackProps) => {
   const [debug, setDebug] = useState(false);
 
   return (
-    <Modal opened onClose={() => void 0} withCloseButton={false}>
+    <Modal opened onClose={() => void 0} withCloseButton={false} size="xl">
       <Alert
         icon={<IconAlertCircle />}
         title="Oops, encountered an error"
@@ -21,6 +29,17 @@ export const Fallback = ({ error, resetErrorBoundary }: FallbackProps) => {
       </Alert>
 
       <Accordion>
+        <Accordion.Item value="stacktrace">
+          <Accordion.Control>Stack Trace</Accordion.Control>
+          <Accordion.Panel>
+            <ScrollArea h={300}>
+              <Code block sx={{ whiteSpace: "pre-wrap" }}>
+                {error.stack}
+              </Code>
+            </ScrollArea>
+          </Accordion.Panel>
+        </Accordion.Item>
+
         <Accordion.Item value="debugging">
           <Accordion.Control>Debugging</Accordion.Control>
           <Accordion.Panel>
@@ -33,6 +52,7 @@ export const Fallback = ({ error, resetErrorBoundary }: FallbackProps) => {
                   leftIcon={<IconAlertTriangle />}
                   variant="subtle"
                   onClick={() => setDebug(true)}
+                  color={"yellow"}
                 >
                   Enable debugging tools (dangerous!)
                 </Button>

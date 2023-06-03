@@ -23,7 +23,14 @@ import {
 import { useMediaQuery } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
 import { EditTodo } from "./EditTodo";
@@ -47,17 +54,21 @@ export const TodoView = () => {
   const [, forceUpdate] = useReducer((c) => c + 1, 0);
 
   useEffect(() => {
-    document.addEventListener('markAllRead', forceUpdate)
-    return () => void document.removeEventListener('markAllRead', forceUpdate)
-  })
+    document.addEventListener("markAllRead", forceUpdate);
+    return () => void document.removeEventListener("markAllRead", forceUpdate);
+  });
 
-  const todos = useSyncedStore((s) => s.todos);
+  const [todosReadOnly] = useSyncedStore((s) => s.todos);
 
-  // TODO Memoize once syncedStore issue is fixed
-  // https://github.com/YousefED/SyncedStore/issues/105
-  const sortedTodos = todos.slice().sort(todoComparator);
+  const sortedTodos = useMemo(
+    () => todosReadOnly && store.todos.slice().sort(todoComparator),
+    [todosReadOnly]
+  );
 
-  const todoIds = sortedTodos.map((t) => t.id);
+  const todoIds = useMemo(
+    () => sortedTodos.map((t: { id: string }) => t.id),
+    [sortedTodos]
+  );
 
   const editingTodo = useMemo(
     // Must use store.todos here since this is passod to EditTodo
@@ -183,17 +194,12 @@ export const TodoView = () => {
             items={todoIds}
             strategy={verticalListSortingStrategy}
           >
-            {sortedTodos.map((todo) => (
-              <Task todo={todo} key={todo.id} setEditingId={setEditingId} />
+            {todoIds.map((id) => (
+              <Task todoId={id} key={id} setEditingId={setEditingId} />
             ))}
           </SortableContext>
           <DragOverlay>
-            {activeId && (
-              <Task
-                dragging
-                todo={store.todos.find((t) => t.id === activeId) as Todo}
-              />
-            )}
+            {activeId && <Task dragging todoId={activeId} />}
           </DragOverlay>
         </DndContext>
       </Container>

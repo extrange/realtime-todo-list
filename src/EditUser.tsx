@@ -1,16 +1,15 @@
 import {
-    Button,
-    Center,
-    ColorPicker,
-    Container,
-    Modal,
-    Text,
-    TextInput
+  Button,
+  Center,
+  ColorPicker,
+  Container,
+  Modal,
+  TextInput,
 } from "@mantine/core";
 import { IconPencil } from "@tabler/icons-react";
 import React, { useState } from "react";
+import { UserBadge } from "./UserBadge";
 import { colors } from "./constants";
-import "./editor.css";
 import { useUserData } from "./useUserData";
 
 export const EditUser = () => {
@@ -33,18 +32,7 @@ export const EditUser = () => {
       <Modal opened={edit} onClose={() => setEdit(false)} returnFocus={false}>
         <Container>
           <Center sx={{ paddingBottom: "10px" }}>
-            <Text
-              className={"collaboration-cursor__label"}
-              style={{
-                position: "inherit",
-                fontSize: "initial",
-                display: "inline-block",
-              }}
-              bg={userData.user.color}
-              ta={"center"}
-            >
-              {userData.user.name}
-            </Text>
+            <UserBadge name={userData.user.name} color={userData.user.color} />
           </Center>
           <TextInput
             value={userData.user.name}
@@ -69,7 +57,7 @@ export const EditUser = () => {
         variant={"subtle"}
         onClick={() => setEdit(true)}
       >
-        <Text color={userData.user.color}>{userData.user.name}</Text>
+        <UserBadge name={userData.user.name} color={userData.user.color} />
       </Button>
     </>
   );

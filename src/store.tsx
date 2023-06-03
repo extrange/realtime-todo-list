@@ -1,9 +1,15 @@
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { notifications } from "@mantine/notifications";
-import { getYjsDoc, observeDeep, syncedStore } from "@syncedstore/core";
+import {
+  getYjsDoc,
+  getYjsValue,
+  observeDeep,
+  syncedStore,
+} from "@syncedstore/core";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import { debounce } from "lodash";
 import { useEffect, useState } from "react";
+import { DeepReadonly } from "ts-essentials";
 import { v4 as uuidv4 } from "uuid";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { XmlFragment } from "yjs";
@@ -91,29 +97,37 @@ provider.on("sync", () => provider.setAwarenessField("userId", USER_ID));
  * Selectively subscribe to changes in the store.
  * Optionally uses a debounce for performance.
  *
- * Returned values are not suitable for memoization.
+ * The first value is immutable and can be used for memoization.
  *
- * Note: selector function must return an observable slice of the
+ * To mutate values, use the returned mutable type.
+ *
+ * Note:
+ * - Selector function must return an observable slice of the
  * original store, as its result is used by observeDeep.
+ * - Selector function should be memoized to prevent renders
+ *
+ * @returns `toJSON` representation of the observed Yjs type, and the mutable
+ * type itself.
  */
 export const useSyncedStore = <T,>(
   selector: (s: MappedTypeDescription<Store>) => T,
   debounceMs = 0
-) => {
-  const [state, setState] = useState({ value: selector(store) });
+): [DeepReadonly<T>, T] => {
+  const [state, setState] = useState(getYjsValue(selector(store))?.toJSON());
 
   useEffect(() => {
     const onUpdate = () => {
-      setState({ value: selector(store) });
+      setState(getYjsValue(selector(store))?.toJSON());
     };
 
     const debouncedUpdate = debounceMs
       ? debounce(onUpdate, debounceMs, { maxWait: debounceMs })
       : onUpdate;
+
     return observeDeep(selector ? selector(store) : store, debouncedUpdate);
   }, [debounceMs, selector]);
 
-  return state.value;
+  return [state, selector(store)];
 };
 
 // Check if IndexedDB is supported, then sync

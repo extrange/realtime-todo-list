@@ -13,16 +13,23 @@ type InputProps =
       userData: OfflineUser;
     };
 
+const CONSIDERED_IDLE_MS = 5000;
+const REFRESH_INTERVAL = 5000;
+
 export const UserStatus = ({ online, userData }: InputProps) => {
+  /* This is necessary so that calculation of idle users is updated */
   const [time, setTime] = useState<number>(Date.now());
 
-  /* User considered idle idle for > 30s */
   useEffect(() => {
-    const intervalId = setInterval(() => setTime(Date.now()), 5000);
+    const intervalId = setInterval(() => setTime(Date.now()), REFRESH_INTERVAL);
     return () => clearInterval(intervalId);
   }, []);
+
   const isIdle = useMemo(
-    () => (userData.lastActive ? time - userData.lastActive > 5_000 : false),
+    () =>
+      userData.lastActive
+        ? time - userData.lastActive > CONSIDERED_IDLE_MS
+        : false,
     [userData.lastActive, time]
   );
 
