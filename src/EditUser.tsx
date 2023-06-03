@@ -29,7 +29,12 @@ export const EditUser = () => {
 
   return (
     <>
-      <Modal opened={edit} onClose={() => setEdit(false)} returnFocus={false}>
+      <Modal
+        opened={edit}
+        onClose={() => setEdit(false)}
+        returnFocus={false}
+        styles={{ overlay: { backdropFilter: "blur(2px)" } }}
+      >
         <Container>
           <Center sx={{ paddingBottom: "10px" }}>
             <UserBadge name={userData.user.name} color={userData.user.color} />

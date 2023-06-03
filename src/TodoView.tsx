@@ -7,7 +7,7 @@ import {
   TouchSensor,
   closestCenter,
   useSensor,
-  useSensors
+  useSensors,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -172,6 +172,7 @@ export const TodoView = () => {
         onClose={onDialogClose}
         fullScreen={isMobile}
         size={"min(70%, 800px)"} // Not applied if fullScreen=True
+        styles={{ overlay: { backdropFilter: "blur(2px)" } }}
       >
         <Modal.Overlay />
         <Modal.Content ref={dialogRef}>

@@ -59,6 +59,7 @@ export const AppHeader = ({
         opened={showInfo}
         onClose={() => setShowInfo(false)}
         withCloseButton={false}
+        styles={{ overlay: { backdropFilter: "blur(2px)" } }}
       >
         <Table>
           <tbody>
