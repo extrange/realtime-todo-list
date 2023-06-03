@@ -3,10 +3,11 @@ import {
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   closestCenter,
   useSensor,
-  useSensors,
+  useSensors
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -58,7 +59,8 @@ export const TodoView = () => {
     return () => void document.removeEventListener("markAllRead", forceUpdate);
   });
 
-  const [todosReadOnly] = useSyncedStore((s) => s.todos);
+  /* Can't debounce, otherwise the old sort order will flash on dragging end. */
+  const [todosReadOnly] = useSyncedStore((s) => s.todos, 0);
 
   const sortedTodos = useMemo(
     () => todosReadOnly && store.todos.slice().sort(todoComparator),
@@ -76,8 +78,15 @@ export const TodoView = () => {
     [editingId]
   );
 
+  /* PointerSensor causes drag-to-refresh on mobile Chrome */
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
+    useSensor(MouseSensor, {
       activationConstraint: {
         delay: 250,
         tolerance: 5,

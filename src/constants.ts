@@ -8,7 +8,7 @@ export const colors = [
   "#B9F18D",
 ];
 
-export const RELEASE_DATE = parseInt(import.meta.env.VITE_COMMIT_DATE);
+export const RELEASE_DATE = new Date(import.meta.env.VITE_COMMIT_DATE);
 
 export const COMMIT_HASH = import.meta.env.VITE_COMMIT_HASH;
 

@@ -225,15 +225,13 @@ export const Task = React.memo((props: InputProps) => {
     transition,
 
     // isDragging: the 'shadow' of the active item (follows overlay)
-    ...(isDragging && { opacity: 0.5 }),
+    ...(isDragging && { opacity: 0.5, cursor: "grab" }),
 
     // dragging: the overlay of the dragged thing
     ...(dragging && {
       "--scale": 1.05,
       backgroundColor: "rgb(44, 46, 51)",
-      curser: "grab",
     }),
-    touchAction: "none",
   } as React.CSSProperties;
 
   return (

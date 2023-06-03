@@ -1,0 +1,14 @@
+/* For Firefox Mobile.
+https://stackoverflow.com/questions/12046315/prevent-overscrolling-of-web-page
+For Chrome, DndKit's TouchSensor works.
+*/
+
+html {
+  overflow: hidden;
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  overflow: auto;
+}

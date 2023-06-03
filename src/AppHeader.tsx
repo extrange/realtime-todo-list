@@ -67,7 +67,10 @@ export const AppHeader = ({
                 <Text>Commit hash:</Text>
               </td>
               <td>
-                <Code block sx={{ whiteSpace: "pre-wrap" }}>
+                <Code
+                  block
+                  sx={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
+                >
                   {COMMIT_HASH}
                 </Code>
               </td>
@@ -87,7 +90,10 @@ export const AppHeader = ({
             <tr>
               <td>Changes:</td>
               <td>
-                <Code block sx={{ whiteSpace: "pre-wrap" }}>
+                <Code
+                  block
+                  sx={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
+                >
                   {COMMIT_MSG}
                 </Code>
               </td>

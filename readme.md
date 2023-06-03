@@ -88,9 +88,8 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 - [ ] Show document outline on desktop in application sidebar
 - [x] Move to useLocalStorage (sync settings across browser tabs)
 - [ ] Strip newlines on saving
-- [ ] Show IndexedDB notification
+- [x] Show IndexedDB notification
 - [x] Show connection status indicator
-  - [ ] Connection status show appear when back online for 3s, then fade
 - [x] Markdown support (live editor style)
 - [ ] RTF Editor (Mantine)
 - [ ] Add background changing daily
@@ -99,7 +98,7 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 ### Authentication
 
-- [ ] Support multiple users
+- [ ] Support username/password logon
 
 ### Undo/Snapshots
 
@@ -108,14 +107,14 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 ### Non-urgent
 
-- [ ] Improve Task.tsx rendering - subscribe to User object changes
-- [ ] useSyncedStore to accept selector and then only rerender on that selector change
-- [ ] Rewrite reactivity layer (for performance, also using store doesn't cause re-renders selectively)
+- [x] Improve Task.tsx rendering - subscribe to User object changes
+- [x] useSyncedStore to accept selector and then only rerender on that selector change
+- [x] Rewrite reactivity layer (for performance, also using store doesn't cause re-renders selectively)
 - [ ] Get pushed commits as an array (using [`toJSON](https://docs.github.com/en/actions/learn-github-actions/expressions#tojson)), and thus show all commits that were pushed, not just the most recent
 - [ ] Fix disjoint on grabend
 - [ ] Animation on delete
-- [ ] Perf: wrap items in React.memo
-- [ ] Perf: don't deep equals in useAwareness
+- [x] Perf: wrap items in React.memo
+- [x] Perf: don't deep equals in useAwareness
 
 ## Todo After Implementation
 
