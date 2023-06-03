@@ -1,6 +1,6 @@
 import { Button } from "@mantine/core";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Store, USER_ID, useSyncedStore } from "./store";
 
 type MarkAllRead = "markAllRead";
@@ -23,22 +23,26 @@ export const MarkAllRead = React.memo(() => {
     (s: MappedTypeDescription<Store>) => s.todos,
     []
   );
-  const [todosReadonly] = useSyncedStore(memoizedSelect);
+  const [todosReadonly] = useSyncedStore(memoizedSelect, 1000);
+
+  /* Necessary because only localStorage is updated and there is no way to listen to localStorage. */
+  const [render, forceRender] = useState({});
 
   const noUnreadTodos = useMemo(
     () =>
+      render &&
       todosReadonly.every((t) => {
         const lastOpened = localStorage.getItem(t.id);
 
         /* For a todo to have been read, it must
-    - have been opened, ever
-    - be opened after the latest modified OR
-    - was modified by this user */
+        - have been opened, ever
+        - be opened after the latest modified OR
+        - was modified by this user */
         return (
           lastOpened && (parseInt(lastOpened) >= t.modified || t.by === USER_ID)
         );
       }),
-    [todosReadonly]
+    [todosReadonly, render]
   );
 
   const markAllRead = useCallback(() => {
@@ -46,6 +50,7 @@ export const MarkAllRead = React.memo(() => {
       localStorage.setItem(t.id, Date.now().toString())
     );
     document.dispatchEvent(new Event("markAllRead"));
+    forceRender({});
   }, [todosReadonly]);
 
   return (
