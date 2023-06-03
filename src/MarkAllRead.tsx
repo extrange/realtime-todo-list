@@ -23,7 +23,7 @@ export const MarkAllRead = React.memo(() => {
     (s: MappedTypeDescription<Store>) => s.todos,
     []
   );
-  const [todosReadonly] = useSyncedStore(memoizedSelect, 1000);
+  const [todosReadonly] = useSyncedStore(memoizedSelect);
 
   const noUnreadTodos = useMemo(
     () =>

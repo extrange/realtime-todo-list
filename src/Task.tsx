@@ -126,7 +126,10 @@ const TaskInternal = React.memo(
               userSelect: "none",
             }}
           >
-            {todoReadOnly.content as unknown as string}
+            {(todoReadOnly.content as unknown as string).replace(
+              /(<([^>]+)>)/gi,
+              ""
+            )}
           </Text>
         ) : (
           <Text
@@ -177,6 +180,7 @@ const TaskInternal = React.memo(
         </Tooltip>
         {showAvatar && (
           <Avatar
+            size={"sm"}
             styles={{
               placeholder: {
                 background: theme.fn.darken(byUser?.color || "#000000", 0.3),

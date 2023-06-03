@@ -11,7 +11,7 @@ type InputProps = {
 };
 
 export const EditTodo = ({ todo, onCreate }: InputProps) => {
-  const user = useSyncedStore((s) => s.storedUsers[USER_ID]?.user, 300) as User;
+  const user = useSyncedStore((s) => s.storedUsers[USER_ID]?.user) as User;
   const edited = useRef(false);
 
   const editor = useEditor({

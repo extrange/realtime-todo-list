@@ -95,7 +95,7 @@ provider.on("sync", () => provider.setAwarenessField("userId", USER_ID));
 
 /**
  * Selectively subscribe to changes in the store.
- * Optionally uses a debounce for performance.
+ * Uses a debounce by default for performance.
  *
  * The first value is immutable and can be used for memoization.
  *
@@ -111,7 +111,7 @@ provider.on("sync", () => provider.setAwarenessField("userId", USER_ID));
  */
 export const useSyncedStore = <T,>(
   selector: (s: MappedTypeDescription<Store>) => T,
-  debounceMs = 0
+  debounceMs = 300
 ): [DeepReadonly<T>, T] => {
   const [state, setState] = useState(getYjsValue(selector(store))?.toJSON());
 
