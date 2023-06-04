@@ -57,148 +57,147 @@ type InputProps =
       setEditingId?: never;
     };
 
-const TaskInternal = React.memo(
-  ({ todoId, dragging, setEditingId }: InputProps) => {
-    const memoizedSelect = useCallback(
-      (s: MappedTypeDescription<Store>) => s.todos.find((t) => t.id === todoId),
-      [todoId]
-    );
+const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
+  const memoizedSelect = useCallback(
+    (s: MappedTypeDescription<Store>) => s.todos.find((t) => t.id === todoId),
+    [todoId]
+  );
 
-    const [todoReadOnly, todo] = useSyncedStore(memoizedSelect, 100);
-    const theme = useMantineTheme();
-    const [showAvatar, setShowAvatar] = useState(false);
+  const [todoReadOnly, todo] = useSyncedStore(memoizedSelect, 100);
+  const theme = useMantineTheme();
+  const [showAvatar, setShowAvatar] = useState(false);
 
-    if (!todoReadOnly || !todo) {
-      throw Error(`Couldn't find Todo with ID ${todoId}`);
-    }
+  if (!todoReadOnly || !todo) {
+    throw Error(`Couldn't find Todo with ID ${todoId}`);
+  }
 
-    const byUser = todoReadOnly.by
-      ? store.storedUsers[todoReadOnly.by]?.user
-      : undefined;
+  const byUser = todoReadOnly.by
+    ? store.storedUsers[todoReadOnly.by]?.user
+    : undefined;
 
-    useEffect(() => {
-      const handleMarkAllRead = () => {
-        const lastOpenedStr = localStorage.getItem(todoReadOnly.id);
-        const lastOpened = lastOpenedStr ? parseInt(lastOpenedStr) : undefined;
+  /* Listen to markAllRead event and rerender avatar status, checking localStorage */
+  useEffect(() => {
+    const handleMarkAllRead = () => {
+      const lastOpenedStr = localStorage.getItem(todoReadOnly.id);
+      const lastOpened = lastOpenedStr ? parseInt(lastOpenedStr) : undefined;
 
-        /* Show avatar if all are true:
+      /* Show avatar if all are true:
         - todo.by exists and is not the current user
         - there is no lastOpened, or lastOpened < todo.modified */
-        const shouldShowAvatar =
-          todoReadOnly.by &&
-          todoReadOnly.by !== USER_ID &&
-          (!lastOpened || lastOpened < todoReadOnly.modified);
+      const shouldShowAvatar =
+        todoReadOnly.by &&
+        todoReadOnly.by !== USER_ID &&
+        (!lastOpened || lastOpened < todoReadOnly.modified);
 
-        setShowAvatar(!!shouldShowAvatar);
-      };
-      // Run once on initial render
-      handleMarkAllRead();
-
-      document.addEventListener("markAllRead", handleMarkAllRead);
-      return () =>
-        document.removeEventListener("markAllRead", handleMarkAllRead);
-    }, [todoReadOnly]);
-
-    const deleteTodo = useCallback(
-      () =>
-        confirm("Are you sure?") &&
-        store.todos.splice(
-          store.todos.findIndex((t) => t.id === todoReadOnly.id),
-          1
-        ),
-      [todoReadOnly]
-    );
-
-    const completeTodo = () => {
-      todo.modified = Date.now();
-      todo.by = USER_ID;
-      todo.completed = !todoReadOnly.completed;
+      setShowAvatar(!!shouldShowAvatar);
     };
+    // Run once on initial render
+    handleMarkAllRead();
 
-    const textContent = useMemo(
-      () =>
-        todoReadOnly.content ? (
-          <Text
-            lineClamp={2}
-            style={{
-              overflowWrap: "anywhere",
-              cursor: "default",
-              userSelect: "none",
-            }}
-          >
-            {/* https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/ */}
-            {(todoReadOnly.content as unknown as string).replace(
-              /(<([^>]+)>)/gi,
-              ""
-            )}
-          </Text>
-        ) : (
-          <Text
-            italic
-            c={"dimmed"}
-            style={{ cursor: "default", userSelect: "none" }}
-          >
-            (empty)
-          </Text>
-        ),
-      [todoReadOnly.content]
-    );
+    document.addEventListener("markAllRead", handleMarkAllRead);
+    return () => document.removeEventListener("markAllRead", handleMarkAllRead);
+  }, [todoReadOnly.by, todoReadOnly.id, todoReadOnly.modified]);
 
-    return (
-      <>
-        <ActionIcon onClick={completeTodo}>
-          {todoReadOnly.completed ? (
-            <IconCheckbox color={theme.colors.gray[6]} />
-          ) : (
-            <IconSquare color={theme.colors.gray[6]} />
-          )}
-        </ActionIcon>
-        <Tooltip
-          openDelay={500}
-          multiline
-          position={"bottom"}
-          label={
-            <div>
-              <Text>
-                Modified <TimeAgo live={false} date={todoReadOnly.modified} />{" "}
-                by{" "}
-                {todoReadOnly.by && todoReadOnly.by === USER_ID
-                  ? "you"
-                  : byUser && byUser.name}
-              </Text>
-              <Text>
-                Created <TimeAgo live={false} date={todoReadOnly.created} />
-              </Text>
-              <Text>sortOrder: {todoReadOnly.sortOrder ?? "N/A"}</Text>
-            </div>
-          }
+  const deleteTodo = useCallback(
+    () =>
+      confirm("Are you sure?") &&
+      store.todos.splice(
+        store.todos.findIndex((t) => t.id === todoReadOnly.id),
+        1
+      ),
+    [todoReadOnly]
+  );
+
+  const completeTodo = () => {
+    todo.modified = Date.now();
+    todo.by = USER_ID;
+    todo.completed = !todoReadOnly.completed;
+  };
+
+  /* Mark todo as read on open */
+  const onOpenTodo = () => {
+    setShowAvatar(false);
+    setEditingId?.(todoReadOnly.id);
+  };
+
+  const textContent = useMemo(
+    () =>
+      todoReadOnly.content ? (
+        <Text
+          lineClamp={2}
+          style={{
+            overflowWrap: "anywhere",
+            cursor: "default",
+            userSelect: "none",
+          }}
         >
-          <StyledTextDiv
-            onClick={() => !dragging && setEditingId(todoReadOnly.id)}
-          >
-            {textContent}
-          </StyledTextDiv>
-        </Tooltip>
-        {showAvatar && (
-          <Avatar
-            size={"sm"}
-            styles={{
-              placeholder: {
-                background: theme.fn.darken(byUser?.color || "#000000", 0.3),
-                color: theme.fn.lighten(byUser?.color || "#FFFFFF", 0.5),
-              },
-            }}
-          >
-            {byUser?.name?.charAt(0).toUpperCase() || "?"}
-          </Avatar>
+          {/* https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/ */}
+          {(todoReadOnly.content as unknown as string).replace(
+            /(<([^>]+)>)/gi,
+            ""
+          )}
+        </Text>
+      ) : (
+        <Text
+          italic
+          c={"dimmed"}
+          style={{ cursor: "default", userSelect: "none" }}
+        >
+          (empty)
+        </Text>
+      ),
+    [todoReadOnly.content]
+  );
+
+  return (
+    <>
+      <ActionIcon onClick={completeTodo}>
+        {todoReadOnly.completed ? (
+          <IconCheckbox color={theme.colors.gray[6]} />
+        ) : (
+          <IconSquare color={theme.colors.gray[6]} />
         )}
-        <ActionIcon onClick={deleteTodo}>
-          <IconTrash color={theme.colors.gray[6]} />
-        </ActionIcon>
-      </>
-    );
-  }
-);
+      </ActionIcon>
+      <Tooltip
+        openDelay={500}
+        multiline
+        position={"bottom"}
+        label={
+          <div>
+            <Text>
+              Modified <TimeAgo live={false} date={todoReadOnly.modified} /> by{" "}
+              {todoReadOnly.by && todoReadOnly.by === USER_ID
+                ? "you"
+                : byUser && byUser.name}
+            </Text>
+            <Text>
+              Created <TimeAgo live={false} date={todoReadOnly.created} />
+            </Text>
+            <Text>sortOrder: {todoReadOnly.sortOrder ?? "N/A"}</Text>
+          </div>
+        }
+      >
+        <StyledTextDiv onClick={onOpenTodo}>{textContent}</StyledTextDiv>
+      </Tooltip>
+      {showAvatar && (
+        <Avatar
+          size={"sm"}
+          styles={{
+            placeholder: {
+              background: theme.fn.darken(byUser?.color || "#000000", 0.3),
+              color: theme.fn.lighten(byUser?.color || "#FFFFFF", 0.5),
+            },
+          }}
+        >
+          {byUser?.name?.charAt(0).toUpperCase() || "?"}
+        </Avatar>
+      )}
+      <ActionIcon onClick={deleteTodo}>
+        <IconTrash color={theme.colors.gray[6]} />
+      </ActionIcon>
+    </>
+  );
+});
 
 /**
  * This component is separated into 2 because of this issue.
