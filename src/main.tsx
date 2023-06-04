@@ -9,6 +9,9 @@ import { App } from "./App.tsx";
 import { ErrorBoundary } from "react-error-boundary";
 import { Fallback } from "./Fallback.tsx";
 import { IdleDetect } from "./IdleDetect.tsx";
+import { Login } from "./Login.tsx";
+import { RoomProvider } from "./RoomProvider.tsx";
+import { StoreProvider } from "./StoreProvider.tsx";
 import "./app.css";
 import { ReloadPrompt } from "./reloadPrompt.tsx";
 
@@ -30,10 +33,17 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       >
         <ReloadPrompt />
         <Notifications />
-        <ErrorBoundary FallbackComponent={Fallback}>
-          <IdleDetect />
-          <App />
-        </ErrorBoundary>
+        <RoomProvider>
+          <StoreProvider>
+            <Login>
+              {/* This uses the provider */}
+              <ErrorBoundary FallbackComponent={Fallback}>
+                <IdleDetect />
+                <App />
+              </ErrorBoundary>
+            </Login>
+          </StoreProvider>
+        </RoomProvider>
       </MantineProvider>
     </ErrorBoundary>
   </React.StrictMode>

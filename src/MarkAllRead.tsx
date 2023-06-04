@@ -1,7 +1,8 @@
 import { Button } from "@mantine/core";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import React, { useCallback, useMemo, useState } from "react";
-import { Store, USER_ID, useSyncedStore } from "./store";
+import { USER_ID } from "./constants";
+import { Store, useSyncedStore } from "./useSyncedStore";
 
 type MarkAllRead = "markAllRead";
 
@@ -23,7 +24,7 @@ export const MarkAllRead = React.memo(() => {
     (s: MappedTypeDescription<Store>) => s.todos,
     []
   );
-  const [todosReadonly] = useSyncedStore(memoizedSelect, 1000);
+  const todosReadonly = useSyncedStore(memoizedSelect, 1000);
 
   /* Necessary because only localStorage is updated and there is no way to listen to localStorage. */
   const [render, forceRender] = useState({});

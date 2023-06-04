@@ -13,7 +13,9 @@ import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import { IconCheckbox, IconSquare, IconTrash } from "@tabler/icons-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import TimeAgo from "react-timeago";
-import { Store, USER_ID, store, useSyncedStore } from "./store";
+import { USER_ID } from "./constants";
+import { useStore } from "./useStore";
+import { Store, useSyncedStore } from "./useSyncedStore";
 
 const StyledTextDiv = styled.div`
   height: 100%;
@@ -63,7 +65,9 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
     [todoId]
   );
 
-  const [todoReadOnly, todo] = useSyncedStore(memoizedSelect, 100);
+  const store = useStore();
+  const todoReadOnly = useSyncedStore(memoizedSelect, 100);
+  const todo = useMemo(() => memoizedSelect(store), [memoizedSelect, store]);
   const theme = useMantineTheme();
   const [showAvatar, setShowAvatar] = useState(false);
 
@@ -105,7 +109,7 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
         store.todos.findIndex((t) => t.id === todoReadOnly.id),
         1
       ),
-    [todoReadOnly]
+    [todoReadOnly, store]
   );
 
   const completeTodo = () => {

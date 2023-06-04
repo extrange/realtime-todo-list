@@ -1,6 +1,7 @@
 import { useIdle } from "@mantine/hooks";
 import { useEffect, useRef } from "react";
-import { USER_ID, store } from "./store";
+import { USER_ID } from "./constants";
+import { useStore } from "./useStore";
 import { useUserData } from "./useUserData";
 
 /**How long before user is considered idle */
@@ -11,6 +12,7 @@ const UPDATE_INTERVAL = 5000;
 
 /**Update storedUser.lastActive when not idle. */
 export const IdleDetect = () => {
+  const store = useStore();
   const idle = useIdle(IDLE_TIMEOUT);
   const [user, setUser] = useUserData();
   const handlerId = useRef<number>();
@@ -39,7 +41,7 @@ export const IdleDetect = () => {
   useEffect(() => {
     const storedUser = store.storedUsers[USER_ID];
     storedUser && (storedUser.lastActive = Date.now());
-  }, [user]);
+  }, [user, store]);
 
   return null;
 };

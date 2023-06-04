@@ -5,6 +5,7 @@ import {
   Button,
   CloseButton,
   Code,
+  CopyButton,
   Flex,
   Header,
   MediaQuery,
@@ -12,11 +13,14 @@ import {
   Stack,
   Table,
   Text,
-  useMantineTheme,
+  useMantineTheme
 } from "@mantine/core";
+import { useLocalStorage } from "@mantine/hooks";
 import {
   IconAlertTriangle,
   IconBrandGithub,
+  IconCheck,
+  IconCopy,
   IconInfoCircle,
   IconUsers,
 } from "@tabler/icons-react";
@@ -24,7 +28,7 @@ import React, { useEffect, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import TimeAgo from "react-timeago";
 import { DebugTools } from "./DebugTools";
-import { COMMIT_HASH, COMMIT_MSG, RELEASE_DATE } from "./constants";
+import { COMMIT_HASH, COMMIT_MSG, CURRENT_ROOM_LOCALSTORAGE_KEY, RELEASE_DATE } from "./constants";
 import { formatBytes } from "./util";
 
 type InputProps = {
@@ -45,6 +49,7 @@ export const AppHeader = ({
     StorageEstimate | undefined
   >();
   const theme = useMantineTheme();
+  const [roomId] = useLocalStorage({key: CURRENT_ROOM_LOCALSTORAGE_KEY})
 
   const { showBoundary } = useErrorBoundary();
 
@@ -63,6 +68,26 @@ export const AppHeader = ({
       >
         <Table>
           <tbody>
+            <tr>
+              <td>Room ID:</td>
+              <td>
+                <Flex align={"center"}>
+                  <Code
+                    block
+                    sx={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
+                  >
+                    {roomId}
+                  </Code>
+                  <CopyButton value={roomId}>
+                    {({ copied, copy }) => (
+                      <ActionIcon onClick={copy} mx={10}>
+                        {copied ? <IconCheck /> : <IconCopy />}
+                      </ActionIcon>
+                    )}
+                  </CopyButton>
+                </Flex>
+              </td>
+            </tr>
             <tr>
               <td>
                 <Text>Commit hash:</Text>

@@ -1,6 +1,8 @@
 import { useLocalStorage } from "@mantine/hooks";
 import { useEffect } from "react";
-import { USER_ID, UserData, store } from "./store";
+import { USER_ID } from "./constants";
+import { useStore } from "./useStore";
+import { UserData } from "./useSyncedStore";
 import { generateUser } from "./util";
 
 const defaultUser: Required<UserData> = {
@@ -8,17 +10,20 @@ const defaultUser: Required<UserData> = {
   user: generateUser(),
 };
 
-/** Use userData in localStorage (source of truth). */
+/** UserData in localStorage is the source of truth.
+ * Changes to userData are synced to the shared storedUsers object.
+ */
 export const useUserData = () => {
+  const store = useStore();
   const [user, setUser] = useLocalStorage<Required<UserData>>({
     key: "user",
     defaultValue: defaultUser,
   });
 
-  /* Sync changes with syncedStore */
+  /* Sync changes with syncedStore, whenever user is modified */
   useEffect(() => {
     store.storedUsers[USER_ID] = user;
-  }, [user]);
+  }, [user, store]);
 
   return [user, setUser] as const;
 };

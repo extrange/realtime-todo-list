@@ -1,21 +1,61 @@
 import { Editor } from "@tiptap/core";
+import { Document } from "@tiptap/extension-document";
+import { Heading } from "@tiptap/extension-heading";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { useEffect, useRef } from "react";
 import { User } from "./App";
-import { getExtensions } from "./getExtensions";
-import { Todo, USER_ID, provider, useSyncedStore } from "./store";
+import { Todo, useSyncedStore } from "./useSyncedStore";
+
+import Collaboration from "@tiptap/extension-collaboration";
+import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
+import Placeholder from "@tiptap/extension-placeholder";
+import TaskItem from "@tiptap/extension-task-item";
+import TaskList from "@tiptap/extension-task-list";
+import StarterKit from "@tiptap/starter-kit";
+import { USER_ID } from "./constants";
+import { useProvider } from "./useProvider";
 
 type InputProps = {
   todo: Todo;
   onCreate: (props: { editor: Editor }) => void;
 };
 
+const Title = Heading.configure({ levels: [2] });
+Title.name = "title";
+
 export const EditTodo = ({ todo, onCreate }: InputProps) => {
   const user = useSyncedStore((s) => s.storedUsers[USER_ID]?.user) as User;
+  const provider = useProvider();
   const edited = useRef(false);
 
   const editor = useEditor({
-    extensions: getExtensions({ todo, user }),
+    extensions: [
+      TaskItem.configure({ nested: true }),
+      TaskList,
+      StarterKit.configure({
+        history: false,
+        document: false,
+      }),
+      Title,
+      Document.extend({ content: "title block*" }),
+      ...(todo ? [Collaboration.configure({ fragment: todo.content })] : []),
+      ...(user
+        ? // Uses user.name and user.color for rendering
+          [CollaborationCursor.configure({ provider: provider, user })]
+        : []),
+      Placeholder.configure({
+        placeholder: ({ node }) => {
+          if (node.type.name === "title") {
+            return "Title";
+          }
+
+          return "Notes";
+        },
+        showOnlyCurrent: false,
+        includeChildren: false,
+      }),
+    ],
+
     onUpdate: () => {
       if (!edited.current) {
         // This is to disregard the initial onUpdate, which is fired on focus

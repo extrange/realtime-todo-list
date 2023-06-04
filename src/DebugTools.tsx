@@ -1,9 +1,10 @@
 import { Button } from "@mantine/core";
+import { useLocalStorage } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { getYjsDoc } from "@syncedstore/core";
 import { Doc } from "yjs";
-import { DOCUMENT_NAME } from "./constants";
-import { store } from "./store";
+import { CURRENT_ROOM_LOCALSTORAGE_KEY } from "./constants";
+import { useStore } from "./useStore";
 
 declare global {
   interface Window {
@@ -13,8 +14,13 @@ declare global {
 
 /**Some helpful utilities for debugging syncedStore and Yjs.
  * Returns a list of buttons.
+ *
+ * Uses StoreProviderContext.
  */
 export const DebugTools = () => {
+  const [roomId] = useLocalStorage({ key: CURRENT_ROOM_LOCALSTORAGE_KEY });
+  const store = useStore();
+
   const clearStoredUsers = () => {
     try {
       Object.keys(store.storedUsers).forEach(
@@ -39,7 +45,7 @@ export const DebugTools = () => {
 
   const clearIndexedDb = () => {
     try {
-      window.indexedDB.deleteDatabase(DOCUMENT_NAME);
+      roomId && window.indexedDB.deleteDatabase(roomId);
       notifications.show({ message: "IndexedDB cleared successfully" });
     } catch (e) {
       notifications.show({
@@ -57,18 +63,28 @@ export const DebugTools = () => {
     });
   };
 
+  const dumpStoredUsers = () => {
+    alert(JSON.stringify(store.storedUsers, undefined, 2));
+  };
+
+  const dumpLocalStorage = () => {
+    alert(JSON.stringify(Object.entries(localStorage), undefined, 2));
+  };
+
   return (
     <>
       {[
         [clearStoredUsers, "Clear storedUsers (affects all users)"] as const,
         [clearLocalStorage, "Clear localStorage (will reload)"] as const,
-        [clearIndexedDb, "Clear IndexedDB"] as const,
+        [clearIndexedDb, `Clear IndexedDB for this room`] as const,
         [
           makeYdocAvailableInWindow,
           "Make YDoc available (as window.YDoc)",
         ] as const,
+        [dumpStoredUsers, "Dump storedUsers"] as const,
+        [dumpLocalStorage, "Dump localStorage"] as const,
       ].map(([handler, title]) => (
-        <Button variant="subtle" onClick={handler}>
+        <Button key={title} variant="subtle" onClick={handler}>
           {title}
         </Button>
       ))}

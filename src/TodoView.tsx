@@ -29,7 +29,8 @@ import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
 import { EditTodo } from "./EditTodo";
 import { Task } from "./Task";
-import { Todo, store, useSyncedStore } from "./store";
+import { useStore } from "./useStore";
+import { Todo, useSyncedStore } from "./useSyncedStore";
 import {
   generateKeyBetweenSafe,
   getMaxSortOrder,
@@ -39,6 +40,7 @@ import {
 type ScrollPosition = Record<string, number>;
 
 export const TodoView = () => {
+  const store = useStore();
   const [activeId, setActiveId] = useState<string>();
   const [editingId, setEditingId] = useState<string>();
   const dialogRef = useRef<HTMLElement | null>(null);
@@ -47,11 +49,11 @@ export const TodoView = () => {
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`);
 
   /* Can't debounce, otherwise the old sort order will flash on dragging end. */
-  const [todosReadOnly] = useSyncedStore((s) => s.todos, 0);
+  const todosReadOnly = useSyncedStore((s) => s.todos, 0);
 
   const sortedTodos = useMemo(
     () => todosReadOnly && store.todos.slice().sort(todoComparator),
-    [todosReadOnly]
+    [todosReadOnly, store]
   );
 
   const todoIds = useMemo(
@@ -62,7 +64,7 @@ export const TodoView = () => {
   const editingTodo = useMemo(
     // Must use store.todos here since this is passod to EditTodo
     () => store.todos.find((t) => t.id === editingId),
-    [editingId]
+    [editingId, store]
   );
 
   /* PointerSensor causes drag-to-refresh on mobile Chrome */

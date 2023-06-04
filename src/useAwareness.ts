@@ -1,6 +1,6 @@
 import { debounce } from "lodash";
 import { useEffect, useState } from "react";
-import { provider } from "./store";
+import { useProvider } from "./useProvider";
 
 export interface AwarenessState {
   /**This is only used by the editor.
@@ -28,10 +28,11 @@ export type AwarenessMap = Map<number, AwarenessState>;
  * Fires on change in awareness. Debounced.
  *
  * Awareness disappears on desktop browser close, or after ~30s of closing browser on mobile.
- * 
+ *
  * Not (yet) suitable for use in dependency arrays.
  */
 export const useAwareness = () => {
+  const provider = useProvider();
   const [state, setState] = useState<{ value: AwarenessMap }>({
     value: provider.awareness.states,
   });

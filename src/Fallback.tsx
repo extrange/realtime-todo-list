@@ -12,6 +12,7 @@ import { useState } from "react";
 import { FallbackProps } from "react-error-boundary";
 import { DebugTools } from "./DebugTools";
 
+/**This component requires StoreProvider (due to debug tools) */
 export const Fallback = ({ error, resetErrorBoundary }: FallbackProps) => {
   // Don't render DebugTools by default, in case it is the source of app crashes.
   const [debug, setDebug] = useState(false);

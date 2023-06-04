@@ -14,17 +14,19 @@ export const AppAside = ({ asideOpen }: InputProps) => {
   const theme = useMantineTheme();
   const isDesktop = useMediaQuery(`(min-width: ${theme.breakpoints.sm})`);
 
-  const render = (styles?: CSSProperties) => (
+  const jsx = (styles?: CSSProperties) => (
     <Aside style={styles} p="md" width={{ sm: 200, lg: 300 }}>
+      {/* Show as avatar groups, with text 'xx users online', on click show
+      dialog with user status */}
       <OnlineUsers />
     </Aside>
   );
 
   return isDesktop ? (
-    render()
+    jsx()
   ) : (
     <Transition mounted={isDesktop || !!asideOpen} transition="slide-left">
-      {render}
+      {jsx}
     </Transition>
   );
 };

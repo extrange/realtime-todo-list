@@ -1,5 +1,6 @@
-import { Store, USER_ID, UserData } from "./store";
+import { USER_ID } from "./constants";
 import { AwarenessMap, AwarenessState } from "./useAwareness";
+import { Store, UserData } from "./useSyncedStore";
 
 /**
  * Represents the state of the current user, with certain (possibly)

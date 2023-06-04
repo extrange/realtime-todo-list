@@ -2,7 +2,7 @@ import { notifications } from "@mantine/notifications";
 import { generateKeyBetween } from "fractional-indexing";
 import { v4 as uuidv4 } from "uuid";
 import { colors } from "./constants";
-import { Todo } from "./store";
+import { Todo } from "./useSyncedStore";
 
 /**
  * Generate keys for all objects in an array, which don't already have keys.
@@ -129,3 +129,12 @@ export const formatBytes = (bytes: number, decimals = 2) => {
 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 };
+
+/**Identity function for memoization. */
+export const identity = <T>(s: T): T => s;
+
+/**Matches lowercase UUIDs. */
+export const validateUuid = (uuid: string) =>
+  !!uuid.match(
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+  );

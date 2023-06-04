@@ -13,7 +13,10 @@ type InputProps =
       userData: OfflineUser;
     };
 
-const CONSIDERED_IDLE_MS = 5000;
+/**How long since lastActive a user is considered to be idle */
+const CONSIDERED_IDLE_MS = 30000;
+
+/**Display refresh rate */
 const REFRESH_INTERVAL = 5000;
 
 export const UserStatus = ({ online, userData }: InputProps) => {
