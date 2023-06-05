@@ -7,7 +7,10 @@ import ReactDOM from "react-dom/client";
 import { App } from "./App.tsx";
 
 import { ErrorBoundary } from "react-error-boundary";
-import { Fallback } from "./Fallback.tsx";
+import {
+  Fallback,
+  FallbackWithoutDebugTools
+} from "./Fallback.tsx";
 import { IdleDetect } from "./IdleDetect.tsx";
 import { Login } from "./Login.tsx";
 import { RoomProvider } from "./RoomProvider.tsx";
@@ -33,17 +36,19 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       >
         <ReloadPrompt />
         <Notifications />
-        <RoomProvider>
-          <StoreProvider>
-            <Login>
-              {/* This uses the provider */}
-              <ErrorBoundary FallbackComponent={Fallback}>
-                <IdleDetect />
-                <App />
-              </ErrorBoundary>
-            </Login>
-          </StoreProvider>
-        </RoomProvider>
+        <ErrorBoundary FallbackComponent={FallbackWithoutDebugTools}>
+          <RoomProvider>
+            <StoreProvider>
+              <Login>
+                {/* There may be no provider available (e.g. if user has not selected a room) */}
+                <ErrorBoundary FallbackComponent={Fallback}>
+                  <IdleDetect />
+                  <App />
+                </ErrorBoundary>
+              </Login>
+            </StoreProvider>
+          </RoomProvider>
+        </ErrorBoundary>
       </MantineProvider>
     </ErrorBoundary>
   </React.StrictMode>

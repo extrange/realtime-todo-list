@@ -12,11 +12,19 @@ import { useState } from "react";
 import { FallbackProps } from "react-error-boundary";
 import { DebugTools } from "./DebugTools";
 
-/**This component requires StoreProvider (due to debug tools) */
-export const Fallback = ({ error, resetErrorBoundary }: FallbackProps) => {
+type InputProps = {
+  /**Whether to use DebugTools (will require StoreProvider to supply
+   * context higher up in the tree) */
+  withDebugTools?: boolean;
+};
+
+const FallbackBase = ({
+  error,
+  resetErrorBoundary,
+  withDebugTools,
+}: FallbackProps & InputProps) => {
   // Don't render DebugTools by default, in case it is the source of app crashes.
   const [debug, setDebug] = useState(false);
-
   return (
     <Modal opened onClose={() => void 0} withCloseButton={false} size="xl">
       <Alert
@@ -48,7 +56,7 @@ export const Fallback = ({ error, resetErrorBoundary }: FallbackProps) => {
               <Button variant="subtle" onClick={resetErrorBoundary}>
                 Reset Error Boundary
               </Button>
-              {!debug && (
+              {withDebugTools && !debug && (
                 <Button
                   leftIcon={<IconAlertTriangle />}
                   variant="subtle"
@@ -66,3 +74,11 @@ export const Fallback = ({ error, resetErrorBoundary }: FallbackProps) => {
     </Modal>
   );
 };
+
+export const Fallback = (props: FallbackProps) => {
+  return <FallbackBase withDebugTools {...props} />;
+};
+
+export const FallbackWithoutDebugTools = (props: FallbackProps) => (
+  <FallbackBase {...props} />
+);

@@ -94,8 +94,8 @@ export const StoreProvider = ({ children }: React.PropsWithChildren) => {
     return () => {
       _provider.destroy();
       indexeddbPersistence?.destroy();
-      setStore(undefined)
-      setProvider(undefined)
+      setStore(undefined);
+      setProvider(undefined);
     };
   }, [roomContext]);
 
