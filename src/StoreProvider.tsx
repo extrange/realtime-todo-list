@@ -38,7 +38,10 @@ export const StoreProvider = ({ children }: React.PropsWithChildren) => {
 
     //Then connect store and provider
     setStore(
-      syncedStore<Store>({ todos: [], storedUsers: {}, room: {} }, yDoc.current)
+      syncedStore<Store>(
+        { todos: [], storedUsers: {}, meta: {}, lists: [] },
+        yDoc.current
+      )
     );
     const _provider = new HocuspocusProvider({
       url: "wss://tasks-server.nicholaslyz.com",

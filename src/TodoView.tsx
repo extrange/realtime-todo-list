@@ -16,8 +16,9 @@ import {
 import {
   ActionIcon,
   Affix,
+  Center,
   Modal,
-  ScrollArea,
+  Text,
   rem,
   useMantineTheme,
 } from "@mantine/core";
@@ -29,31 +30,45 @@ import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
 import { EditTodo } from "./EditTodo";
 import { Task } from "./Task";
+import { USER_ID } from "./constants";
+import { useCurrentList } from "./useCurrentList";
 import { useStore } from "./useStore";
-import { Todo, useSyncedStore } from "./useSyncedStore";
+import { Todo, selectTodos, useSyncedStore } from "./useSyncedStore";
 import {
   generateKeyBetweenSafe,
   getMaxSortOrder,
-  todoComparator,
+  itemComparator,
 } from "./util";
 
 type ScrollPosition = Record<string, number>;
 
 export const TodoView = () => {
   const store = useStore();
+
+  /* The todo currently being dragged, if any */
   const [activeId, setActiveId] = useState<string>();
+
   const [editingId, setEditingId] = useState<string>();
+
+  const [currentList] = useCurrentList();
+
   const dialogRef = useRef<HTMLElement | null>(null);
   const scrollPositions = useRef<ScrollPosition>({});
   const theme = useMantineTheme();
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`);
 
   /* Can't debounce, otherwise the old sort order will flash on dragging end. */
-  const todosReadOnly = useSyncedStore((s) => s.todos, 0);
+  const todos = useSyncedStore(selectTodos, 0);
+
+  /* Determine Todos to show based on current list */
+  const todosInCurrentList = useMemo(
+    () => todos.filter((t) => t.listId === currentList),
+    [currentList, todos]
+  );
 
   const sortedTodos = useMemo(
-    () => todosReadOnly && store.todos.slice().sort(todoComparator),
-    [todosReadOnly, store]
+    () => todosInCurrentList.slice().sort(itemComparator),
+    [todosInCurrentList]
   );
 
   const todoIds = useMemo(
@@ -86,7 +101,7 @@ export const TodoView = () => {
   const createTodo = () => {
     const now = Date.now();
     const sortOrder = generateKeyBetween(
-      getMaxSortOrder(store.todos),
+      getMaxSortOrder(todosInCurrentList),
       undefined
     );
 
@@ -96,7 +111,9 @@ export const TodoView = () => {
       content: new XmlFragment(),
       created: now,
       modified: now,
+      listId: currentList,
       sortOrder,
+      by: USER_ID,
     };
     setEditingId(newTodo.id);
     store.todos.unshift(newTodo);
@@ -189,7 +206,7 @@ export const TodoView = () => {
       </Affix>
 
       {/* Visible content starts here */}
-      <ScrollArea>
+      {todosInCurrentList.length ? (
         <DndContext
           sensors={sensors}
           onDragEnd={handleDragEnd}
@@ -208,7 +225,17 @@ export const TodoView = () => {
             {activeId && <Task dragging todoId={activeId} />}
           </DragOverlay>
         </DndContext>
-      </ScrollArea>
+      ) : (
+        <Center sx={{ flexGrow: 1 }}>
+          <Text
+            italic
+            c={"dimmed"}
+            style={{ cursor: "default", userSelect: "none" }}
+          >
+            No todos yet
+          </Text>
+        </Center>
+      )}
     </>
   );
 };

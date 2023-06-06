@@ -5,17 +5,24 @@ import {
   ActionIcon,
   Avatar,
   Flex,
+  Menu,
   Text,
   Tooltip,
-  useMantineTheme,
+  useMantineTheme
 } from "@mantine/core";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
-import { IconCheckbox, IconSquare, IconTrash } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconCheckbox,
+  IconDotsVertical,
+  IconSquare,
+  IconTrash,
+} from "@tabler/icons-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import TimeAgo from "react-timeago";
 import { USER_ID } from "./constants";
 import { useStore } from "./useStore";
-import { Store, useSyncedStore } from "./useSyncedStore";
+import { Store, selectLists, useSyncedStore } from "./useSyncedStore";
 
 const StyledTextDiv = styled.div`
   height: 100%;
@@ -70,6 +77,7 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
   const todo = useMemo(() => memoizedSelect(store), [memoizedSelect, store]);
   const theme = useMantineTheme();
   const [showAvatar, setShowAvatar] = useState(false);
+  const lists = useSyncedStore(selectLists);
 
   if (!todoReadOnly || !todo) {
     throw Error(`Couldn't find Todo with ID ${todoId}`);
@@ -78,6 +86,13 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
   const byUser = todoReadOnly.by
     ? store.storedUsers[todoReadOnly.by]?.user
     : undefined;
+
+  const moveToList = useCallback(
+    (listId?: string) => {
+      todo.listId = listId;
+    },
+    [todo]
+  );
 
   /* Listen to markAllRead event and rerender avatar status, checking localStorage */
   useEffect(() => {
@@ -196,9 +211,33 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
           {byUser?.name?.charAt(0).toUpperCase() || "?"}
         </Avatar>
       )}
-      <ActionIcon onClick={deleteTodo}>
-        <IconTrash color={theme.colors.gray[6]} />
-      </ActionIcon>
+      <Menu>
+        <Menu.Target>
+          <ActionIcon>
+            <IconDotsVertical color={theme.colors.gray[6]} />
+          </ActionIcon>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Item icon={<IconTrash />} onClick={deleteTodo}>
+            Delete
+          </Menu.Item>
+          <Menu.Divider />
+          <Menu.Item
+            onClick={() => moveToList(undefined)}
+            icon={!todo.listId && <IconCheck size={16} />}
+          >
+            Uncategorized
+          </Menu.Item>
+          {lists.map((l) => (
+            <Menu.Item
+              onClick={() => moveToList(l.id)}
+              icon={todo.listId === l.id && <IconCheck size={16} />}
+            >
+              {l.name}
+            </Menu.Item>
+          ))}
+        </Menu.Dropdown>
+      </Menu>
     </>
   );
 });
@@ -207,7 +246,10 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
  * This component is separated into 2 because of this issue.
  * https://github.com/clauderic/dnd-kit/issues/389#issuecomment-1013324147
  *
- * Essentially, some renders are wasted on the Draggable component.
+ * Essentially, when dragging, all the Sortables re-render unnecessarily.
+ *
+ * Heavy memoization helps somewhat, as the contents of the Todo don't rerender
+ * (even if the container of the Todo does).
  */
 export const Task = React.memo((props: InputProps) => {
   const { dragging, todoId } = props;

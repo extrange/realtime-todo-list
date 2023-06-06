@@ -13,7 +13,7 @@ import { colors } from "./constants";
 import { useUserData } from "./useUserData";
 
 /** */
-export const EditUser = () => {
+export const EditUser = React.memo(() => {
   const [edit, setEdit] = useState<boolean>(false);
   const [userData, setUserData] = useUserData();
 
@@ -67,4 +67,4 @@ export const EditUser = () => {
       </Button>
     </>
   );
-};
+});

@@ -13,7 +13,7 @@ import {
   Stack,
   Table,
   Text,
-  useMantineTheme
+  useMantineTheme,
 } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
 import {
@@ -24,11 +24,18 @@ import {
   IconInfoCircle,
   IconUsers,
 } from "@tabler/icons-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import TimeAgo from "react-timeago";
 import { DebugTools } from "./DebugTools";
-import { COMMIT_HASH, COMMIT_MSG, CURRENT_ROOM_LOCALSTORAGE_KEY, RELEASE_DATE } from "./constants";
+import {
+  COMMIT_HASH,
+  COMMIT_MSG,
+  CURRENT_ROOM_LOCALSTORAGE_KEY,
+  RELEASE_DATE,
+} from "./constants";
+import { useCurrentList } from "./useCurrentList";
+import { useStore } from "./useStore";
 import { formatBytes } from "./util";
 
 type InputProps = {
@@ -49,7 +56,15 @@ export const AppHeader = ({
     StorageEstimate | undefined
   >();
   const theme = useMantineTheme();
-  const [roomId] = useLocalStorage({key: CURRENT_ROOM_LOCALSTORAGE_KEY})
+  const [roomId] = useLocalStorage({ key: CURRENT_ROOM_LOCALSTORAGE_KEY });
+
+  const store = useStore();
+  const [currentList] = useCurrentList();
+  const currentListName = useMemo(
+    () =>
+      store.lists.find((l) => l.id === currentList)?.name ?? "Uncategorized",
+    [currentList, store]
+  );
 
   const { showBoundary } = useErrorBoundary();
 
@@ -186,7 +201,7 @@ export const AppHeader = ({
           </MediaQuery>
           <Flex justify={"center"} align={"center"} sx={{ flexGrow: 1 }}>
             <Text fz={"xl"} ta={"center"}>
-              Tasks
+              {currentListName}
             </Text>
             <ActionIcon mx={5} onClick={() => setShowInfo(true)}>
               <IconInfoCircle color={"grey"} />

@@ -1,12 +1,12 @@
 import { Flex, Footer } from "@mantine/core";
 import { UserBadge } from "./UserBadge";
 import { getUserStatus } from "./getUserStatus";
-import { useSyncedStore } from "./useSyncedStore";
 import { useAwareness } from "./useAwareness";
+import { selectStoredUsers, useSyncedStore } from "./useSyncedStore";
 
 export const AppFooter = () => {
   const awareness = useAwareness();
-  const storedUsersReadOnly = useSyncedStore((s) => s.storedUsers);
+  const storedUsersReadOnly = useSyncedStore(selectStoredUsers);
   const { onlineUsers } = getUserStatus(awareness, storedUsersReadOnly);
 
   return (

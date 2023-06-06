@@ -2,10 +2,11 @@ import { Editor } from "@tiptap/core";
 import { Document } from "@tiptap/extension-document";
 import { Heading } from "@tiptap/extension-heading";
 import { EditorContent, useEditor } from "@tiptap/react";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { User } from "./App";
-import { Todo, useSyncedStore } from "./useSyncedStore";
+import { Store, Todo, useSyncedStore } from "./useSyncedStore";
 
+import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -24,7 +25,11 @@ const Title = Heading.configure({ levels: [2] });
 Title.name = "title";
 
 export const EditTodo = ({ todo, onCreate }: InputProps) => {
-  const user = useSyncedStore((s) => s.storedUsers[USER_ID]?.user) as User;
+  const selectOwnUser = useCallback(
+    (s: MappedTypeDescription<Store>) => s.storedUsers[USER_ID]?.user,
+    []
+  );
+  const user = useSyncedStore(selectOwnUser) as User;
   const provider = useProvider();
   const edited = useRef(false);
 

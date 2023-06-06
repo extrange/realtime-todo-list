@@ -1,32 +1,35 @@
 import { notifications } from "@mantine/notifications";
 import { generateKeyBetween } from "fractional-indexing";
 import { v4 as uuidv4 } from "uuid";
+import { User } from "./App";
 import { colors } from "./constants";
-import { Todo } from "./useSyncedStore";
+import { List, Todo } from "./useSyncedStore";
+
+type Sortable = Pick<Todo | List, "sortOrder">;
 
 /**
  * Generate keys for all objects in an array, which don't already have keys.
  */
-export const generateKeys = (todoArray: Todo[]) =>
+export const generateKeys = (todoOrListArray: Array<Partial<Sortable>>) =>
   // TODO: Sort array
-  todoArray.forEach((todo, idx, arr) => {
+  todoOrListArray.forEach((item, idx, arr) => {
     // In this method, todos may not yet have a sort order
-    if (todo.sortOrder) return;
+    if (item.sortOrder) return;
 
     try {
       // First item, without key
       if (idx == 0) {
-        todo.sortOrder = generateKeyBetween(null, arr[idx + 1]?.sortOrder);
+        item.sortOrder = generateKeyBetween(null, arr[idx + 1]?.sortOrder);
         return;
       }
 
       // Last item, without key
-      if (idx == todoArray.length) {
-        todo.sortOrder = generateKeyBetween(arr[idx - 1]?.sortOrder, null);
+      if (idx == todoOrListArray.length) {
+        item.sortOrder = generateKeyBetween(arr[idx - 1]?.sortOrder, null);
         return;
       }
 
-      todo.sortOrder = generateKeyBetween(
+      item.sortOrder = generateKeyBetween(
         arr[idx - 1]?.sortOrder,
         arr[idx + 1]?.sortOrder
       );
@@ -48,11 +51,9 @@ export const generateKeys = (todoArray: Todo[]) =>
  *
  * This scenario should hopefully be rare.
  *
- * TODO Suboptimal, but works.
- * @param a
- * @param b
+ * Suboptimal, but works.
  */
-export const generateKeyBetweenSafe = (a?: Todo, b?: Todo) => {
+export const generateKeyBetweenSafe = (a?: Sortable, b?: Sortable) => {
   try {
     return generateKeyBetween(a?.sortOrder, b?.sortOrder);
   } catch (e) {
@@ -74,7 +75,7 @@ export const generateKeyBetweenSafe = (a?: Todo, b?: Todo) => {
  *
  * Todos without sortOrder will be compared equal.
  */
-export const todoComparator = (a: Todo, b: Todo) => {
+export const itemComparator = <T extends Sortable>(a: T, b: T) => {
   if (!(a.sortOrder && b.sortOrder)) return 0;
 
   if (a.sortOrder > b.sortOrder) return -1;
@@ -83,9 +84,9 @@ export const todoComparator = (a: Todo, b: Todo) => {
 };
 
 /**
- * Get the maximum sortOrder of a Todo[].
+ * Get the maximum sortOrder of a List or Todo array.
  */
-export const getMaxSortOrder = (arr: Todo[]) => {
+export const getMaxSortOrder = (arr: Array<Sortable>) => {
   let max: string | undefined = undefined;
 
   arr
@@ -98,9 +99,9 @@ export const getMaxSortOrder = (arr: Todo[]) => {
 };
 
 /**
- * Generate a random user if not initialized.
+ * Generate a random User.
  */
-export const generateUser = () => ({
+export const generateUser = (): User => ({
   name: `User ${uuidv4().slice(0, 6)}`,
   color: colors[Math.floor(Math.random() * colors.length)],
 });

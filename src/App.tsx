@@ -15,7 +15,7 @@ export const App = () => {
   const [navOpen, setNavOpen] = useState(false);
   const [asideOpen, setAsideOpen] = useState(false);
 
-  /* Don't allow both the NavBar and Aside to be open */
+  /* For AppHeader: Don't allow both the NavBar and Aside to be open */
   const _setNavOpen = useCallback((open: SetStateAction<boolean>) => {
     setNavOpen(open);
     open && setAsideOpen(false);
@@ -37,11 +37,13 @@ export const App = () => {
             theme.colorScheme === "dark"
               ? theme.colors.dark[8]
               : theme.colors.gray[0],
+          display: "flex",
+          flexDirection: "column",
         },
       }}
       navbarOffsetBreakpoint="sm"
       asideOffsetBreakpoint="sm"
-      navbar={<AppNavbar navOpen={navOpen} />}
+      navbar={<AppNavbar navOpen={navOpen} setNavOpen={setNavOpen} />}
       header={
         <AppHeader
           navOpen={navOpen}

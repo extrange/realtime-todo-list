@@ -71,6 +71,10 @@ export const DebugTools = () => {
     alert(JSON.stringify(Object.entries(localStorage), undefined, 2));
   };
 
+  const dumpStore = () => {
+    alert(JSON.stringify(store, undefined, 2));
+  };
+
   return (
     <>
       {[
@@ -83,6 +87,7 @@ export const DebugTools = () => {
         ] as const,
         [dumpStoredUsers, "Dump storedUsers"] as const,
         [dumpLocalStorage, "Dump localStorage"] as const,
+        [dumpStore, "Dump entire store"] as const,
       ].map(([handler, title]) => (
         <Button key={title} variant="subtle" onClick={handler}>
           {title}

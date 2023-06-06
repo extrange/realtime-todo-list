@@ -1,12 +1,12 @@
 import { ScrollArea } from "@mantine/core";
 import { UserStatus } from "./UserStatus";
 import { getUserStatus } from "./getUserStatus";
-import { useSyncedStore } from "./useSyncedStore";
 import { useAwareness } from "./useAwareness";
+import { selectStoredUsers, useSyncedStore } from "./useSyncedStore";
 
 export const OnlineUsers = () => {
   const awareness = useAwareness();
-  const storedUsers = useSyncedStore((s) => s.storedUsers);
+  const storedUsers = useSyncedStore(selectStoredUsers);
 
   const { onlineUsers, offlineUsers } = getUserStatus(awareness, storedUsers);
 

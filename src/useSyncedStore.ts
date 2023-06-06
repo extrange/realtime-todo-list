@@ -8,23 +8,49 @@ import { User } from "./App";
 import { useStore } from "./useStore";
 
 export type Todo = {
+  /**The content of the task, used by the TipTap editor. */
   content: XmlFragment;
+
+  /**Whether the task is completed or not */
   completed: boolean;
+
+  /**UTC timestamp of the last modification. This includes
+   * marking the task as completed. */
   modified: number;
 
-  /**UserID */
-  by?: string;
+  /**userId of the user who last modified this task. */
+  by: string;
+
+  /**UTC timestamp of when this todo was created. */
   created: number;
+
+  id: string;
+
+  /**A string used for lexicographical (fractional) sorting.
+   * https://observablehq.com/@dgreensp/implementing-fractional-indexing
+   */
+  sortOrder: string;
+
+  /**Whether this task should be in the 'Focus' view.*/
+  focus?: boolean;
+
+  /**UUID of the list this todo belongs to. */
+  listId?: string;
+};
+
+export type List = {
+  name: string;
   id: string;
   sortOrder: string;
 };
 
-/** The master copy is stored in localStorage, and changes
+/**The master copy is stored in localStorage, and changes
  * are synced to this object via useUser. Values could be undefined
  * if store is in the progress of updating. */
 export type UserData = {
   user?: User;
-  /** The last time the user was non-idle.
+
+  /**The last time the user was non-idle.
    * Updated even if the user was offline.
    */
   lastActive?: number;
@@ -39,13 +65,18 @@ export type Store = {
     [id: string]: UserData;
   };
 
-  /**Name of the room. The roomId is the name of the backing
-   *Y Doc. */
-  room: { name?: string };
+  /**Room-specific properties. */
+  meta: {
+    /**Name of the room. The roomId is the name of the backing
+     * Y Doc. */
+    roomName?: string;
+  };
+
+  lists: List[];
 };
 
 /**
- * Reactively subscribe to changes in the store.
+ * Reactively subscribe to changes in a slice of the store.
  * Uses a debounce by default for performance.
  *
  * Returns an immutable snapshot of the store that can be used for memoization.
@@ -78,3 +109,10 @@ export const useSyncedStore = <T>(
 
   return state;
 };
+
+/* Selectors for memoization */
+export const selectStore = (s: MappedTypeDescription<Store>) => s;
+export const selectTodos = (s: MappedTypeDescription<Store>) => s.todos;
+export const selectLists = (s: MappedTypeDescription<Store>) => s.lists;
+export const selectStoredUsers = (s: MappedTypeDescription<Store>) =>
+  s.storedUsers;

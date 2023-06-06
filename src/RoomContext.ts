@@ -5,6 +5,3 @@ export type IRoomContext = {
   setRoomId: React.Dispatch<SetStateAction<string|undefined>>;
 };
 export const RoomContext = createContext<IRoomContext | undefined>(undefined);
-/** Get/set the name of the current room.
- * Also the name of the underlying Yjs document.
- */
