@@ -1,5 +1,5 @@
 import { Button } from "@mantine/core";
-import React, { SetStateAction, useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { USER_ID } from "./constants";
 import { selectTodos, useSyncedStore } from "./useSyncedStore";
 
@@ -19,7 +19,7 @@ declare global {
 }
 
 export const MarkAllRead = React.memo(
-  ({ setNavOpen }: { setNavOpen: React.Dispatch<SetStateAction<boolean>> }) => {
+  ({ closeNav }: { closeNav: () => void }) => {
     const todosReadonly = useSyncedStore(selectTodos, 1000);
 
     /* Necessary because only localStorage is updated and there is no way to listen to localStorage. */
@@ -49,8 +49,8 @@ export const MarkAllRead = React.memo(
       );
       document.dispatchEvent(new Event("markAllRead"));
       forceRender({});
-      setNavOpen(false);
-    }, [todosReadonly, setNavOpen]);
+      closeNav();
+    }, [todosReadonly, closeNav]);
 
     return (
       <Button disabled={noUnreadTodos} variant="outline" onClick={markAllRead}>

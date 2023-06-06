@@ -26,6 +26,8 @@ export const App = () => {
     open && setNavOpen(false);
   }, []);
 
+  const closeNav = useCallback(() => setNavOpen(false), [setNavOpen]);
+
   const theme = useMantineTheme();
 
   return (
@@ -43,7 +45,7 @@ export const App = () => {
       }}
       navbarOffsetBreakpoint="sm"
       asideOffsetBreakpoint="sm"
-      navbar={<AppNavbar navOpen={navOpen} setNavOpen={setNavOpen} />}
+      navbar={<AppNavbar navOpen={navOpen} closeNav={closeNav} />}
       header={
         <AppHeader
           navOpen={navOpen}

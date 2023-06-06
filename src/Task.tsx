@@ -7,8 +7,10 @@ import {
   Flex,
   Menu,
   Text,
+  TextProps,
   Tooltip,
-  useMantineTheme
+  createPolymorphicComponent,
+  useMantineTheme,
 } from "@mantine/core";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import {
@@ -18,19 +20,27 @@ import {
   IconSquare,
   IconTrash,
 } from "@tabler/icons-react";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import TimeAgo from "react-timeago";
 import { USER_ID } from "./constants";
 import { useStore } from "./useStore";
 import { Store, selectLists, useSyncedStore } from "./useSyncedStore";
 
-const StyledTextDiv = styled.div`
-  height: 100%;
-  display: flex;
-  align-items: center;
-  flex: 1;
-  padding-left: 10px;
+const _StyledText = styled(Text)`
+  flex-grow: 1;
+  overflow: hidden;
+  cursor: default;
+  user-select: none;
 `;
+
+//https://mantine.dev/styles/styled/#polymorphic-components
+const StyledText = createPolymorphicComponent<"div", TextProps>(_StyledText);
 
 const StyledFlex = styled(Flex)`
   @keyframes pop {
@@ -45,8 +55,6 @@ const StyledFlex = styled(Flex)`
   }
   animation: pop 200ms cubic-bezier(0.18, 0.67, 0.6, 1.22);
   transform: scale(var(--scale));
-  padding: 0;
-  padding: 10px 0;
   border-bottom: 0.0625rem solid rgb(55, 58, 64);
 
   :hover {
@@ -78,17 +86,21 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
   const theme = useMantineTheme();
   const [showAvatar, setShowAvatar] = useState(false);
   const lists = useSyncedStore(selectLists);
+  const [menuOpened, setMenuOpened] = useState(false);
 
   if (!todoReadOnly || !todo) {
     throw Error(`Couldn't find Todo with ID ${todoId}`);
   }
 
-  const byUser = todoReadOnly.by
-    ? store.storedUsers[todoReadOnly.by]?.user
-    : undefined;
+  const byUser = useMemo(
+    () =>
+      todoReadOnly.by ? store.storedUsers[todoReadOnly.by]?.user : undefined,
+    [store, todoReadOnly.by]
+  );
 
   const moveToList = useCallback(
-    (listId?: string) => {
+    (e: SyntheticEvent, listId?: string) => {
+      e.stopPropagation();
       todo.listId = listId;
     },
     [todo]
@@ -118,65 +130,131 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
   }, [todoReadOnly.by, todoReadOnly.id, todoReadOnly.modified]);
 
   const deleteTodo = useCallback(
-    () =>
+    (e: SyntheticEvent) => {
+      e.stopPropagation();
       confirm("Are you sure?") &&
-      store.todos.splice(
-        store.todos.findIndex((t) => t.id === todoReadOnly.id),
-        1
-      ),
+        store.todos.splice(
+          store.todos.findIndex((t) => t.id === todoReadOnly.id),
+          1
+        );
+    },
     [todoReadOnly, store]
   );
 
-  const completeTodo = () => {
-    todo.modified = Date.now();
-    todo.by = USER_ID;
-    todo.completed = !todoReadOnly.completed;
-  };
-
-  /* Mark todo as read on open */
-  const onOpenTodo = () => {
-    setShowAvatar(false);
-    setEditingId?.(todoReadOnly.id);
-  };
-
-  const textContent = useMemo(
-    () =>
-      todoReadOnly.content ? (
-        <Text
-          lineClamp={2}
-          style={{
-            overflowWrap: "anywhere",
-            cursor: "default",
-            userSelect: "none",
-          }}
-        >
-          {/* https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/ */}
-          {(todoReadOnly.content as unknown as string).replace(
-            /(<([^>]+)>)/gi,
-            ""
-          )}
-        </Text>
-      ) : (
-        <Text
-          italic
-          c={"dimmed"}
-          style={{ cursor: "default", userSelect: "none" }}
-        >
-          (empty)
-        </Text>
-      ),
-    [todoReadOnly.content]
+  const completeTodo = useCallback(
+    (e: SyntheticEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      todo.modified = Date.now();
+      todo.by = USER_ID;
+      todo.completed = !todoReadOnly.completed;
+    },
+    [todo, todoReadOnly.completed]
   );
 
-  return (
-    <>
-      <ActionIcon onClick={completeTodo}>
+  /* Mark todo as read on open */
+  const onOpenTodo = useCallback(() => {
+    setShowAvatar(false);
+    setEditingId?.(todoReadOnly.id);
+  }, [setEditingId, todoReadOnly.id]);
+
+  const openMenu = useCallback((e: SyntheticEvent) => {
+    e.stopPropagation();
+    setMenuOpened(true);
+  }, []);
+
+  const checkbox = useMemo(
+    () => (
+      <ActionIcon onClick={completeTodo} mx={10}>
         {todoReadOnly.completed ? (
           <IconCheckbox color={theme.colors.gray[6]} />
         ) : (
           <IconSquare color={theme.colors.gray[6]} />
         )}
       </ActionIcon>
+    ),
+    [completeTodo, theme.colors.gray, todoReadOnly.completed]
+  );
+
+  const textContent = useMemo(
+    () =>
+      todoReadOnly.content ? (
+        <StyledText lineClamp={2}>
+          {/* https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/ */}
+          {(todoReadOnly.content as unknown as string).replace(
+            /(<([^>]+)>)/gi,
+            ""
+          )}
+        </StyledText>
+      ) : (
+        <StyledText italic c={"dimmed"}>
+          (empty)
+        </StyledText>
+      ),
+    [todoReadOnly.content]
+  );
+
+  const avatar = useMemo(
+    () =>
+      showAvatar && (
+        <Avatar
+          size={"sm"}
+          styles={{
+            placeholder: {
+              background: theme.fn.darken(byUser?.color || "#000000", 0.3),
+              color: theme.fn.lighten(byUser?.color || "#FFFFFF", 0.5),
+            },
+          }}
+        >
+          {byUser?.name?.charAt(0).toUpperCase() || "?"}
+        </Avatar>
+      ),
+    [byUser?.color, byUser?.name, showAvatar, theme.fn]
+  );
+
+  const menu = useMemo(
+    () => (
+      <Menu opened={menuOpened} onChange={setMenuOpened}>
+        <Menu.Target>
+          <ActionIcon onClick={openMenu}>
+            <IconDotsVertical color={theme.colors.gray[6]} />
+          </ActionIcon>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Item icon={<IconTrash size={16} />} onClick={deleteTodo}>
+            Delete
+          </Menu.Item>
+          <Menu.Divider />
+          <Menu.Item
+            onClick={(e) => moveToList(e, undefined)}
+            icon={!todo.listId && <IconCheck size={16} />}
+          >
+            Uncategorized
+          </Menu.Item>
+          {lists.map((l) => (
+            <Menu.Item
+              onClick={(e) => moveToList(e, l.id)}
+              icon={todo.listId === l.id && <IconCheck size={16} />}
+            >
+              {l.name}
+            </Menu.Item>
+          ))}
+        </Menu.Dropdown>
+      </Menu>
+    ),
+    [
+      deleteTodo,
+      lists,
+      menuOpened,
+      moveToList,
+      openMenu,
+      theme.colors.gray,
+      todo.listId,
+    ]
+  );
+
+  return (
+    <Flex onClick={onOpenTodo} py={10} w={"100%"} align={"center"}>
+      {checkbox}
       <Tooltip
         openDelay={500}
         multiline
@@ -196,49 +274,11 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
           </div>
         }
       >
-        <StyledTextDiv onClick={onOpenTodo}>{textContent}</StyledTextDiv>
+        {textContent}
       </Tooltip>
-      {showAvatar && (
-        <Avatar
-          size={"sm"}
-          styles={{
-            placeholder: {
-              background: theme.fn.darken(byUser?.color || "#000000", 0.3),
-              color: theme.fn.lighten(byUser?.color || "#FFFFFF", 0.5),
-            },
-          }}
-        >
-          {byUser?.name?.charAt(0).toUpperCase() || "?"}
-        </Avatar>
-      )}
-      <Menu>
-        <Menu.Target>
-          <ActionIcon>
-            <IconDotsVertical color={theme.colors.gray[6]} />
-          </ActionIcon>
-        </Menu.Target>
-        <Menu.Dropdown>
-          <Menu.Item icon={<IconTrash />} onClick={deleteTodo}>
-            Delete
-          </Menu.Item>
-          <Menu.Divider />
-          <Menu.Item
-            onClick={() => moveToList(undefined)}
-            icon={!todo.listId && <IconCheck size={16} />}
-          >
-            Uncategorized
-          </Menu.Item>
-          {lists.map((l) => (
-            <Menu.Item
-              onClick={() => moveToList(l.id)}
-              icon={todo.listId === l.id && <IconCheck size={16} />}
-            >
-              {l.name}
-            </Menu.Item>
-          ))}
-        </Menu.Dropdown>
-      </Menu>
-    </>
+      {avatar}
+      {menu}
+    </Flex>
   );
 });
 
