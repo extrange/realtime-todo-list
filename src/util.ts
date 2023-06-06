@@ -71,7 +71,7 @@ export const generateKeyBetweenSafe = (a?: Sortable, b?: Sortable) => {
 };
 
 /**
- * Sort an array of todos lexicographically, in descending order.
+ * Sort an array of todos by descending lexicographical sort order.
  *
  * Todos without sortOrder will be compared equal.
  */

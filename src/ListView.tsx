@@ -7,11 +7,11 @@ import {
   Text,
   TextProps,
   createPolymorphicComponent,
-  useMantineTheme
+  useMantineTheme,
 } from "@mantine/core";
 import { IconDotsVertical } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useCurrentList } from "./useCurrentList";
 import { useStore } from "./useStore";
@@ -81,6 +81,12 @@ export const ListView = ({ closeNav }: InputProps) => {
     closeNav();
   }, [closeNav, setCurrentList, store]);
 
+  /* Sort lists alphabetically */
+  const sortedLists = useMemo(
+    () => lists.slice().sort((a,b) => a.name.localeCompare(b.name)),
+    [lists]
+  );
+
   /* Deleting a list deletes all tasks the list, including completed tasks */
   const deleteList = useCallback(
     (listId: string) => {
@@ -125,48 +131,40 @@ export const ListView = ({ closeNav }: InputProps) => {
   );
 
   return (
-      <Flex direction="column" h="100%">
-        <Button my={10} onClick={createList}>
-          Create List
-        </Button>
-        <StyledFlex
-          pl={5}
-          onClick={() => selectList(undefined)}
-          selected={!currentList}
-        >
-          <StyledListContent fw={!currentList ? 700 : "normal"} italic>
-            Uncategorized
-          </StyledListContent>
-        </StyledFlex>
-        {lists.map((list) => (
-          <StyledFlex
-            selected={list.id === currentList}
-            align={"center"}
-            pl={5}
+    <Flex direction="column" h="100%">
+      <Button my={10} onClick={createList}>
+        Create List
+      </Button>
+      <StyledFlex
+        pl={5}
+        onClick={() => selectList(undefined)}
+        selected={!currentList}
+      >
+        <StyledListContent fw={!currentList ? 700 : "normal"} italic>
+          Uncategorized
+        </StyledListContent>
+      </StyledFlex>
+      {sortedLists.map((list) => (
+        <StyledFlex selected={list.id === currentList} align={"center"} pl={5}>
+          <StyledListContent
+            onClick={() => selectList(list.id)}
+            fw={list.id === currentList ? 700 : "normal"}
           >
-            <StyledListContent
-              onClick={() => selectList(list.id)}
-              fw={list.id === currentList ? 700 : "normal"}
-            >
-              {list.name}
-            </StyledListContent>
-            <Menu>
-              <Menu.Target>
-                <ActionIcon>
-                  <IconDotsVertical color={theme.colors.gray[6]} />
-                </ActionIcon>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Item onClick={() => deleteList(list.id)}>
-                  Delete
-                </Menu.Item>
-                <Menu.Item onClick={() => renameList(list.id)}>
-                  Rename
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-          </StyledFlex>
-        ))}
-      </Flex>
+            {list.name}
+          </StyledListContent>
+          <Menu>
+            <Menu.Target>
+              <ActionIcon>
+                <IconDotsVertical color={theme.colors.gray[6]} />
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item onClick={() => deleteList(list.id)}>Delete</Menu.Item>
+              <Menu.Item onClick={() => renameList(list.id)}>Rename</Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        </StyledFlex>
+      ))}
+    </Flex>
   );
 };
