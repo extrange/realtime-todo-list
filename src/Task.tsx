@@ -164,7 +164,7 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
 
   const checkbox = useMemo(
     () => (
-      <ActionIcon onClick={completeTodo} mx={10}>
+      <ActionIcon onClick={completeTodo} mr={10}>
         {todoReadOnly.completed ? (
           <IconCheckbox color={theme.colors.gray[6]} />
         ) : (
@@ -253,7 +253,7 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
   );
 
   return (
-    <Flex onClick={onOpenTodo} py={10} w={"100%"} align={"center"}>
+    <Flex onClick={onOpenTodo} py={10} px={5} w={"100%"} align={"center"}>
       {checkbox}
       <Tooltip
         openDelay={500}

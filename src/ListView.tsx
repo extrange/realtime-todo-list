@@ -1,13 +1,13 @@
 import styled from "@emotion/styled";
 import {
-    ActionIcon,
-    Button,
-    Flex,
-    Menu,
-    Text,
-    TextProps,
-    createPolymorphicComponent,
-    useMantineTheme,
+  ActionIcon,
+  Button,
+  Flex,
+  Menu,
+  Text,
+  TextProps,
+  createPolymorphicComponent,
+  useMantineTheme
 } from "@mantine/core";
 import { IconDotsVertical } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
@@ -18,6 +18,21 @@ import { useStore } from "./useStore";
 import { selectLists, selectTodos, useSyncedStore } from "./useSyncedStore";
 import { getMaxSortOrder } from "./util";
 
+type CurrentListNameChange = "currentListNameChange";
+
+declare global {
+  interface Document {
+    addEventListener<K extends CurrentListNameChange>(
+      type: K,
+      listener: (this: Document, ev: Event) => void
+    ): void;
+    removeEventListener<K extends CurrentListNameChange>(
+      type: K,
+      listener: (this: Document, ev: Event) => void
+    ): void;
+  }
+}
+
 type InputProps = {
   closeNav: () => void;
 };
@@ -27,6 +42,7 @@ type StyledProps = {
   selected?: boolean;
 };
 
+/**Div containing the StyledListContent */
 const StyledFlex = styled(Flex)<StyledProps>`
   ${({ selected }) => selected && "background-color: rgb(57, 57, 63)"};
 
@@ -62,7 +78,8 @@ export const ListView = ({ closeNav }: InputProps) => {
     const newListId = uuidv4();
     selectLists(store).push({ id: newListId, name: name, sortOrder });
     setCurrentList(newListId);
-  }, [setCurrentList, store]);
+    closeNav();
+  }, [closeNav, setCurrentList, store]);
 
   /* Deleting a list deletes all tasks the list, including completed tasks */
   const deleteList = useCallback(
@@ -94,6 +111,7 @@ export const ListView = ({ closeNav }: InputProps) => {
       if (!name) return;
       const list = store.lists.find((l) => l.id === listId);
       list && (list.name = name);
+      document.dispatchEvent(new Event("currentListNameChange"));
     },
     [store]
   );
@@ -107,40 +125,48 @@ export const ListView = ({ closeNav }: InputProps) => {
   );
 
   return (
-    <Flex direction="column" h="100%">
-      <Button my={10} onClick={createList}>
-        Create List
-      </Button>
-      <StyledFlex
-        px={10}
-        onClick={() => selectList(undefined)}
-        selected={!currentList}
-      >
-        <StyledListContent fw={!currentList ? 700 : "normal"} italic>
-          Uncategorized
-        </StyledListContent>
-      </StyledFlex>
-      {lists.map((list) => (
-        <StyledFlex selected={list.id === currentList} align={"center"} px={10}>
-          <StyledListContent
-            onClick={() => selectList(list.id)}
-            fw={list.id === currentList ? 700 : "normal"}
-          >
-            {list.name}
+      <Flex direction="column" h="100%">
+        <Button my={10} onClick={createList}>
+          Create List
+        </Button>
+        <StyledFlex
+          pl={5}
+          onClick={() => selectList(undefined)}
+          selected={!currentList}
+        >
+          <StyledListContent fw={!currentList ? 700 : "normal"} italic>
+            Uncategorized
           </StyledListContent>
-          <Menu>
-            <Menu.Target>
-              <ActionIcon>
-                <IconDotsVertical color={theme.colors.gray[6]} />
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item onClick={() => deleteList(list.id)}>Delete</Menu.Item>
-              <Menu.Item onClick={() => renameList(list.id)}>Rename</Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
         </StyledFlex>
-      ))}
-    </Flex>
+        {lists.map((list) => (
+          <StyledFlex
+            selected={list.id === currentList}
+            align={"center"}
+            pl={5}
+          >
+            <StyledListContent
+              onClick={() => selectList(list.id)}
+              fw={list.id === currentList ? 700 : "normal"}
+            >
+              {list.name}
+            </StyledListContent>
+            <Menu>
+              <Menu.Target>
+                <ActionIcon>
+                  <IconDotsVertical color={theme.colors.gray[6]} />
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item onClick={() => deleteList(list.id)}>
+                  Delete
+                </Menu.Item>
+                <Menu.Item onClick={() => renameList(list.id)}>
+                  Rename
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          </StyledFlex>
+        ))}
+      </Flex>
   );
 };

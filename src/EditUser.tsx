@@ -62,6 +62,7 @@ export const EditUser = React.memo(() => {
         rightIcon={<IconPencil color={"white"} />}
         variant={"subtle"}
         onClick={() => setEdit(true)}
+        fullWidth
       >
         <UserBadge name={userData.user.name} color={userData.user.color} />
       </Button>

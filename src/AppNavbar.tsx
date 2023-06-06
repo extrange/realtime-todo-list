@@ -3,6 +3,7 @@ import {
   Flex,
   Modal,
   Navbar,
+  ScrollArea,
   Transition,
   useMantineTheme,
 } from "@mantine/core";
@@ -31,7 +32,7 @@ export const AppNavbar = ({ navOpen, closeNav }: InputProps) => {
 
   const render = useCallback(
     (styles?: CSSProperties) => (
-      <Navbar style={styles} p="md" width={{ sm: 200, lg: 300 }}>
+      <Navbar style={styles} p="none" width={{ sm: 200, lg: 300 }} zIndex={200}>
         <Modal
           title="Leave the current room?"
           opened={confirmLeaveRoom}
@@ -39,19 +40,21 @@ export const AppNavbar = ({ navOpen, closeNav }: InputProps) => {
         >
           <Button onClick={() => setCurrentRoomId("")}>Yes</Button>
         </Modal>
-        <EditUser />
-        <ListView closeNav={closeNav} />
-        <Flex direction={"column"} justify={"flex-end"} >
-          <MarkAllRead closeNav={closeNav} />
-          <Button
-            leftIcon={<IconLogout />}
-            onClick={() => setConfirmLeaveRoom(true)}
-            variant="outline"
-            mt={10}
-          >
-            Change Room
-          </Button>
-        </Flex>
+        <ScrollArea px={15}>
+          <EditUser />
+          <ListView closeNav={closeNav} />
+          <Flex direction={"column"} justify={"flex-end"} mt={10}>
+            <MarkAllRead closeNav={closeNav} />
+            <Button
+              leftIcon={<IconLogout />}
+              onClick={() => setConfirmLeaveRoom(true)}
+              variant="outline"
+              mt={10}
+            >
+              Change Room
+            </Button>
+          </Flex>
+        </ScrollArea>
       </Navbar>
     ),
     [confirmLeaveRoom, closeNav, setCurrentRoomId]

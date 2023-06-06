@@ -5,6 +5,7 @@ import { getYjsDoc } from "@syncedstore/core";
 import { Doc } from "yjs";
 import { CURRENT_ROOM_LOCALSTORAGE_KEY } from "./constants";
 import { useStore } from "./useStore";
+import { selectLists, selectTodos, useSyncedStore } from "./useSyncedStore";
 
 declare global {
   interface Window {
@@ -20,6 +21,8 @@ declare global {
 export const DebugTools = () => {
   const [roomId] = useLocalStorage({ key: CURRENT_ROOM_LOCALSTORAGE_KEY });
   const store = useStore();
+  const lists = useSyncedStore(selectLists);
+  const todos = useSyncedStore(selectTodos);
 
   const clearStoredUsers = () => {
     try {
@@ -75,6 +78,15 @@ export const DebugTools = () => {
     alert(JSON.stringify(store, undefined, 2));
   };
 
+  /**Dump todos which have a listId of a non-existent list */
+  const dumpOrphanedTodos = () => {
+    const listIds = lists.map((l) => l.id);
+    const orphanedTodos = todos.filter(
+      (t) => t.listId && !listIds.includes(t.listId)
+    );
+    alert(JSON.stringify(orphanedTodos, undefined, 2));
+  };
+
   return (
     <>
       {[
@@ -88,6 +100,7 @@ export const DebugTools = () => {
         [dumpStoredUsers, "Dump storedUsers"] as const,
         [dumpLocalStorage, "Dump localStorage"] as const,
         [dumpStore, "Dump entire store"] as const,
+        [dumpOrphanedTodos, "Dump orphaned todos"] as const,
       ].map(([handler, title]) => (
         <Button key={title} variant="subtle" onClick={handler}>
           {title}

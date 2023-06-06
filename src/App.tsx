@@ -32,7 +32,7 @@ export const App = () => {
 
   return (
     <AppShell
-      padding="md"
+      padding={0}
       styles={{
         main: {
           background:

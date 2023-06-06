@@ -57,13 +57,15 @@ export const AppHeader = ({
   >();
   const theme = useMantineTheme();
   const [roomId] = useLocalStorage({ key: CURRENT_ROOM_LOCALSTORAGE_KEY });
+  const [update, forceUpdate] = useState({});
 
   const store = useStore();
   const [currentList] = useCurrentList();
   const currentListName = useMemo(
     () =>
-      store.lists.find((l) => l.id === currentList)?.name ?? "Uncategorized",
-    [currentList, store]
+      (update && store.lists.find((l) => l.id === currentList)?.name) ??
+      "Uncategorized",
+    [currentList, store, update]
   );
 
   const { showBoundary } = useErrorBoundary();
@@ -72,6 +74,17 @@ export const AppHeader = ({
     () => void navigator.storage?.estimate().then(setStorageEstimate),
     []
   );
+
+  /* Listen to changes in the current list name */
+  useEffect(() => {
+    const handleListNameChange = () => forceUpdate({});
+    document.addEventListener("currentListNameChange", handleListNameChange);
+    return () =>
+      document.removeEventListener(
+        "currentListNameChange",
+        handleListNameChange
+      );
+  }, []);
 
   return (
     <>
