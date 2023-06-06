@@ -6,6 +6,7 @@ import {
   Avatar,
   Flex,
   Menu,
+  ScrollArea,
   Text,
   TextProps,
   Tooltip,
@@ -220,24 +221,27 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
           </ActionIcon>
         </Menu.Target>
         <Menu.Dropdown>
-          <Menu.Item icon={<IconTrash size={16} />} onClick={deleteTodo}>
-            Delete
-          </Menu.Item>
-          <Menu.Divider />
-          <Menu.Item
-            onClick={(e) => moveToList(e, undefined)}
-            icon={!todo.listId && <IconCheck size={16} />}
-          >
-            Uncategorized
-          </Menu.Item>
-          {lists.map((l) => (
-            <Menu.Item
-              onClick={(e) => moveToList(e, l.id)}
-              icon={todo.listId === l.id && <IconCheck size={16} />}
-            >
-              {l.name}
+            <Menu.Item icon={<IconTrash size={16} />} onClick={deleteTodo}>
+              Delete
             </Menu.Item>
-          ))}
+            <Menu.Divider />
+          <ScrollArea h={250}>
+            <Menu.Item
+              onClick={(e) => moveToList(e, undefined)}
+              icon={!todo.listId && <IconCheck size={16} />}
+              fs={"italic"}
+            >
+              Uncategorized
+            </Menu.Item>
+            {lists.map((l) => (
+              <Menu.Item
+                onClick={(e) => moveToList(e, l.id)}
+                icon={todo.listId === l.id && <IconCheck size={16} />}
+              >
+                {l.name}
+              </Menu.Item>
+            ))}
+          </ScrollArea>
         </Menu.Dropdown>
       </Menu>
     ),
