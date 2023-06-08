@@ -34,7 +34,15 @@
 }
 
 /* Basic Styles */
+
+.ProseMirror-focused {
+  /* Remove blue border on selecting the editor */
+  outline: none;
+}
+
+/* The 'notes' portion */
 .ProseMirror > * + * {
+  /* Add some space between title and notes */
   margin-top: 0.75em;
 }
 
