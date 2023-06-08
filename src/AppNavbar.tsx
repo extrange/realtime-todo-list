@@ -32,7 +32,7 @@ export const AppNavbar = ({ navOpen, closeNav }: InputProps) => {
 
   const render = useCallback(
     (styles?: CSSProperties) => (
-      <Navbar style={styles} p="none" width={{ sm: 200, lg: 300 }} zIndex={200}>
+      <Navbar style={styles} p="none" width={{ sm: 200, lg: 300 }}>
         <Modal
           title="Leave the current room?"
           opened={confirmLeaveRoom}

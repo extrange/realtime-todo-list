@@ -1,11 +1,20 @@
 import { Button } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { getYjsDoc } from "@syncedstore/core";
+import { Y, getYjsDoc } from "@syncedstore/core";
+import { generateKeyBetween } from "fractional-indexing";
+import { v4 as uuidv4 } from "uuid";
 import { Doc } from "yjs";
-import { CURRENT_ROOM_LOCALSTORAGE_KEY } from "./constants";
+import { DebugArmedButton } from "./DebugArmedButton";
+import { CURRENT_ROOM_LOCALSTORAGE_KEY, USER_ID } from "./constants";
 import { useStore } from "./useStore";
-import { selectLists, selectTodos, useSyncedStore } from "./useSyncedStore";
+import {
+  List,
+  selectLists,
+  selectTodos,
+  useSyncedStore,
+} from "./useSyncedStore";
+import { getMaxSortOrder } from "./util";
 
 declare global {
   interface Window {
@@ -87,12 +96,79 @@ export const DebugTools = () => {
     alert(JSON.stringify(orphanedTodos, undefined, 2));
   };
 
+  const deleteAllTodos = () => {
+    store.todos.forEach((t) =>
+      store.todos.splice(
+        store.todos.findIndex((t2) => t2.id === t.id),
+        1
+      )
+    );
+    notifications.show({ message: "Deleted all todos" });
+  };
+
+  const deleteAllLists = () => {
+    store.lists.forEach((t) =>
+      store.lists.splice(
+        store.lists.findIndex((t2) => t2.id === t.id),
+        1
+      )
+    );
+    notifications.show({ message: "Deleted all lists" });
+  };
+
+  /**Generate 10 lists containing n (10 by default) todos each */
+  const generateTodos = (n = 10) => {
+    const lists: Array<List> = [...Array(10)].map(() => {
+      const id = uuidv4();
+      const sortOrder = generateKeyBetween(
+        getMaxSortOrder(store.lists),
+        undefined
+      );
+
+      const generatedList = {
+        id,
+        name: `${id} sortOrder=${sortOrder}`,
+        sortOrder,
+      };
+      store.lists.push(generatedList);
+
+      return generatedList;
+    });
+
+    lists.forEach((l) => {
+      [...Array(n)].forEach(() => {
+        const id = uuidv4();
+        const now = Date.now();
+        const sortOrder = generateKeyBetween(
+          getMaxSortOrder(store.todos.filter((t) => t.id === l.id)),
+          undefined
+        );
+        const content = new Y.XmlElement("title");
+        content.insert(0, [new Y.XmlText(`${id}, sortOrder=${sortOrder}`)]);
+        store.todos.push({
+          id,
+          sortOrder,
+          content,
+          completed: false,
+          by: USER_ID,
+          created: now,
+          modified: now,
+          listId: l.id,
+        });
+      });
+    });
+  };
+
   return (
     <>
       {[
-        [clearStoredUsers, "Clear storedUsers (affects all users)"] as const,
-        [clearLocalStorage, "Clear localStorage (will reload)"] as const,
-        [clearIndexedDb, `Clear IndexedDB for this room`] as const,
+        [
+          clearStoredUsers,
+          "Clear storedUsers (affects all users)",
+          true,
+        ] as const,
+        [clearLocalStorage, "Clear localStorage (will reload)", true] as const,
+        [clearIndexedDb, `Clear IndexedDB for this room`, true] as const,
         [
           makeYdocAvailableInWindow,
           "Make YDoc available (as window.YDoc)",
@@ -101,11 +177,29 @@ export const DebugTools = () => {
         [dumpLocalStorage, "Dump localStorage"] as const,
         [dumpStore, "Dump entire store"] as const,
         [dumpOrphanedTodos, "Dump orphaned todos"] as const,
-      ].map(([handler, title]) => (
-        <Button key={title} variant="subtle" onClick={handler}>
-          {title}
-        </Button>
-      ))}
+        [deleteAllTodos, "DELETE ALL TODOS", true] as const,
+        [deleteAllLists, "DELETE ALL LISTS", true] as const,
+        [
+          () => generateTodos(),
+          "Generate 10 todos in 10 new lists",
+          true,
+        ] as const,
+        [
+          () => generateTodos(100),
+          "Generate 100 todos in 10 new lists (slow)",
+          true,
+        ] as const,
+      ].map(([handler, title, requireArm = false]) =>
+        requireArm ? (
+          <DebugArmedButton key={title} variant="filled" onClick={handler}>
+            {title}
+          </DebugArmedButton>
+        ) : (
+          <Button key={title} variant="filled" onClick={handler}>
+            {title}
+          </Button>
+        )
+      )}
     </>
   );
 };

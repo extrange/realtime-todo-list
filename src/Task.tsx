@@ -6,6 +6,8 @@ import {
   Avatar,
   Flex,
   Menu,
+  Overlay,
+  Portal,
   ScrollArea,
   Text,
   TextProps,
@@ -29,6 +31,7 @@ import React, {
   useState,
 } from "react";
 import TimeAgo from "react-timeago";
+import sanitizeHtml from "sanitize-html";
 import { USER_ID } from "./constants";
 import { useStore } from "./useStore";
 import { Store, selectLists, useSyncedStore } from "./useSyncedStore";
@@ -176,23 +179,46 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
     [completeTodo, theme.colors.gray, todoReadOnly.completed]
   );
 
-  const textContent = useMemo(
-    () =>
-      todoReadOnly.content ? (
-        <StyledText lineClamp={2}>
-          {/* https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/ */}
-          {(todoReadOnly.content as unknown as string).replace(
-            /(<([^>]+)>)/gi,
-            ""
-          )}
-        </StyledText>
-      ) : (
+  /* The YXmlFragment can be viewed as an array.
+  
+  The title is the 0th element, and any notes are from index 1 onward.
+
+  The `toJSON` representation of the YXmlFragment however, could contain
+  XML tags such as <title> even if empty (such as a todo which is created,
+  then subsequently cleared). It is therefore not reliable to check if
+  todoReadOnly.content is empty, when determining if the fragment is empty.
+
+  So, to check if it is empty, we check the length of the YXmlFragment.
+
+  To check for the title, we check if there is a first element. The first element will always be the title, even if it is blank.*/
+  const textContent = useMemo(() => {
+    /* Empty todo. todoReadOnly.content could be non-empty, even
+    if the Todo is really empty.*/
+    if (!todoReadOnly.content || !todo.content.length)
+      return (
         <StyledText italic c={"dimmed"}>
           (empty)
         </StyledText>
-      ),
-    [todoReadOnly.content]
-  );
+      );
+
+    /* Note: both title and notes will count spaces as non-empty */
+    const title = sanitizeHtml(todo.content.get(0).toString());
+
+    /* Take at most the next 3 lines of the todo's notes */
+    const notes = todo.content
+      .slice(1, 3)
+      .map((e) => sanitizeHtml(e.toString()))
+      .join(" ");
+
+    return (
+      <StyledText lineClamp={2}>
+        {title}
+        <Text fz={theme.fontSizes.sm} italic c={"dimmed"}>
+          {notes}
+        </Text>
+      </StyledText>
+    );
+  }, [todoReadOnly.content, todo, theme.fontSizes.sm]);
 
   const avatar = useMemo(
     () =>
@@ -214,18 +240,19 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
 
   const menu = useMemo(
     () => (
-      <Menu opened={menuOpened} onChange={setMenuOpened}>
+      <Menu opened={menuOpened} onChange={setMenuOpened} withinPortal>
+        <Portal>{menuOpened && <Overlay opacity={0} />}</Portal>
         <Menu.Target>
           <ActionIcon onClick={openMenu}>
             <IconDotsVertical color={theme.colors.gray[6]} />
           </ActionIcon>
         </Menu.Target>
         <Menu.Dropdown>
-            <Menu.Item icon={<IconTrash size={16} />} onClick={deleteTodo}>
-              Delete
-            </Menu.Item>
-            <Menu.Divider />
-          <ScrollArea h={250}>
+          <Menu.Item icon={<IconTrash size={16} />} onClick={deleteTodo}>
+            Delete
+          </Menu.Item>
+          <Menu.Divider />
+          <ScrollArea h={250} type="auto">
             <Menu.Item
               onClick={(e) => moveToList(e, undefined)}
               icon={!todo.listId && <IconCheck size={16} />}

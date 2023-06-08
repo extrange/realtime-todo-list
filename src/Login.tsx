@@ -102,6 +102,14 @@ export const Login = ({ children }: React.PropsWithChildren) => {
             <Button onClick={createRoom}>Create a New Room</Button>
           </Stack>
         </form>
+        {import.meta.env.VITE_TEST_ROOM && (
+          <Button
+            onClick={() => setCurrentRoomId(import.meta.env.VITE_TEST_ROOM)}
+            fullWidth
+          >
+            Test Room
+          </Button>
+        )}
       </Modal>
     )
   ) /* Without this TS gives errors on main.tsx */ as JSX.Element;

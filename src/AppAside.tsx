@@ -15,7 +15,7 @@ export const AppAside = ({ asideOpen }: InputProps) => {
   const isDesktop = useMediaQuery(`(min-width: ${theme.breakpoints.sm})`);
 
   const jsx = (styles?: CSSProperties) => (
-    <Aside style={styles} p="md" width={{ sm: 200, lg: 300 }} zIndex={isDesktop ? 100 : 200}>
+    <Aside style={styles} p="md" width={{ sm: 200, lg: 300 }}>
       {/* Show as avatar groups, with text 'xx users online', on click show
       dialog with user status */}
       <OnlineUsers />

@@ -1,18 +1,9 @@
-import styled from "@emotion/styled";
-import {
-  ActionIcon,
-  Button,
-  Flex,
-  Menu,
-  Text,
-  TextProps,
-  createPolymorphicComponent,
-  useMantineTheme,
-} from "@mantine/core";
-import { IconDotsVertical } from "@tabler/icons-react";
+import { Button, Flex } from "@mantine/core";
+
 import { generateKeyBetween } from "fractional-indexing";
 import { useCallback, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { ListItem } from "./ListItem";
 import { useCurrentList } from "./useCurrentList";
 import { useStore } from "./useStore";
 import { selectLists, selectTodos, useSyncedStore } from "./useSyncedStore";
@@ -37,42 +28,16 @@ type InputProps = {
   closeNav: () => void;
 };
 
-type StyledProps = {
-  /**Whether this is the currently selected list */
-  selected?: boolean;
-};
-
-/**Div containing the StyledListContent */
-const StyledFlex = styled(Flex)<StyledProps>`
-  ${({ selected }) => selected && "background-color: rgb(57, 57, 63)"};
-
-  :hover {
-    background-color: rgb(44, 46, 51);
-  }
-`;
-
-const _StyledListContent = styled(Text)`
-  width: 100%;
-  padding: 10px 0 10px 0px;
-  user-select: none;
-  cursor: default;
-`;
-
-const StyledListContent = createPolymorphicComponent<"div", TextProps>(
-  _StyledListContent
-);
-
 export const ListView = ({ closeNav }: InputProps) => {
   const store = useStore();
   const lists = useSyncedStore(selectLists);
   const [currentList, setCurrentList] = useCurrentList();
-  const theme = useMantineTheme();
 
   const createList = useCallback(() => {
     const name = prompt("Enter list name:");
     if (!name) return;
     const sortOrder = generateKeyBetween(
-      getMaxSortOrder(store.todos),
+      getMaxSortOrder(store.lists),
       undefined
     );
     const newListId = uuidv4();
@@ -83,8 +48,16 @@ export const ListView = ({ closeNav }: InputProps) => {
 
   /* Sort lists alphabetically */
   const sortedLists = useMemo(
-    () => lists.slice().sort((a,b) => a.name.localeCompare(b.name)),
+    () => lists.slice().sort((a, b) => a.name.localeCompare(b.name)),
     [lists]
+  );
+
+  const selectList = useCallback(
+    (listId?: string) => {
+      setCurrentList(listId);
+      closeNav();
+    },
+    [closeNav, setCurrentList]
   );
 
   /* Deleting a list deletes all tasks the list, including completed tasks */
@@ -122,48 +95,30 @@ export const ListView = ({ closeNav }: InputProps) => {
     [store]
   );
 
-  const selectList = useCallback(
-    (listId?: string) => {
-      setCurrentList(listId);
-      closeNav();
-    },
-    [closeNav, setCurrentList]
-  );
-
   return (
     <Flex direction="column" h="100%">
       <Button my={10} onClick={createList}>
         Create List
       </Button>
-      <StyledFlex
-        pl={5}
-        onClick={() => selectList(undefined)}
+
+      {/* Uncategorized tasks */}
+      <ListItem
+        editable={false}
         selected={!currentList}
-      >
-        <StyledListContent fw={!currentList ? 700 : "normal"} italic>
-          Uncategorized
-        </StyledListContent>
-      </StyledFlex>
+        selectList={selectList}
+      />
+
       {sortedLists.map((list) => (
-        <StyledFlex selected={list.id === currentList} align={"center"} pl={5}>
-          <StyledListContent
-            onClick={() => selectList(list.id)}
-            fw={list.id === currentList ? 700 : "normal"}
-          >
-            {list.name}
-          </StyledListContent>
-          <Menu>
-            <Menu.Target>
-              <ActionIcon>
-                <IconDotsVertical color={theme.colors.gray[6]} />
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item onClick={() => deleteList(list.id)}>Delete</Menu.Item>
-              <Menu.Item onClick={() => renameList(list.id)}>Rename</Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </StyledFlex>
+        <ListItem
+          key={list.id}
+          editable
+          selected={list.id === currentList}
+          listId={list.id}
+          listName={list.name}
+          renameList={renameList}
+          deleteList={deleteList}
+          selectList={selectList}
+        />
       ))}
     </Flex>
   );

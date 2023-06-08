@@ -194,7 +194,7 @@ export const TodoView = () => {
         </Modal.Content>
       </Modal.Root>
       {/* Modal zIndex is 200 */}
-      <Affix position={{ bottom: rem(40), right: rem(20) }} zIndex={100}>
+      <Affix position={{ bottom: rem(40), right: rem(20) }} zIndex={50}>
         <ActionIcon
           color={theme.primaryColor}
           variant="filled"

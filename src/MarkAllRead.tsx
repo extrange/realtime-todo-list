@@ -52,7 +52,7 @@ export const MarkAllRead = React.memo(
       closeNav();
     }, [todosReadonly, closeNav]);
 
-    return (
+    return noUnreadTodos ? null : (
       <Button disabled={noUnreadTodos} variant="outline" onClick={markAllRead}>
         Mark all as read
       </Button>
