@@ -195,46 +195,60 @@ export const AppHeader = ({
       </Modal>
 
       {/* Main content */}
-      <Header height={48} sx={{ display: "flex", justifyContent: "center" }}>
+      <Header
+        height={48}
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+        px={theme.spacing.xs}
+      >
+        <MediaQuery largerThan="sm" styles={{ visibility: "hidden" }}>
+          <Burger
+            opened={navOpen}
+            onClick={() => setNavOpen((o) => !o)}
+            size="sm"
+            color={theme.colors.gray[6]}
+          />
+        </MediaQuery>
         <Flex
           justify={"center"}
           align={"center"}
-          sx={{ height: "100%", width: "100%" }}
-          mx={10}
+          sx={{ flex: "1 1" }}
+          /* https://stackoverflow.com/questions/43934648/how-to-make-flexbox-items-shrink-correctly-when-in-a-nested-container */
+          miw={0}
+          px={"xs"}
         >
-          <MediaQuery largerThan="sm" styles={{ display: "none" }}>
-            <Burger
-              opened={navOpen}
-              onClick={() => setNavOpen((o) => !o)}
-              size="sm"
-              color={theme.colors.gray[6]}
-              mr="xl"
-              sx={{ flexGrow: 0 }}
-            />
-          </MediaQuery>
-          <Flex justify={"center"} align={"center"} sx={{ flexGrow: 1 }}>
-            <Text fz={"xl"} ta={"center"}>
-              {currentListName}
-            </Text>
-            <ActionIcon mx={5} onClick={() => setShowInfo(true)}>
-              <IconInfoCircle color={"grey"} />
-            </ActionIcon>
-          </Flex>
-          <MediaQuery largerThan="sm" styles={{ display: "none" }}>
-            {asideOpen ? (
-              <CloseButton
-                variant="subtle"
-                c={theme.colors.gray[6]}
-                onClick={() => setAsideOpen(false)}
-                size="md"
-              />
-            ) : (
-              <ActionIcon onClick={() => setAsideOpen((o) => !o)}>
-                <IconUsers color={theme.colors.gray[6]} />
-              </ActionIcon>
-            )}
-          </MediaQuery>
+          <Text
+            fz={"xl"}
+            ta={"center"}
+            sx={{
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {currentListName}
+          </Text>
+          <ActionIcon mx={5} onClick={() => setShowInfo(true)}>
+            <IconInfoCircle color={"grey"} />
+          </ActionIcon>
         </Flex>
+        <MediaQuery largerThan="sm" styles={{ visibility: "hidden" }}>
+          {asideOpen ? (
+            <CloseButton
+              variant="subtle"
+              c={theme.colors.gray[6]}
+              onClick={() => setAsideOpen(false)}
+              size="md"
+            />
+          ) : (
+            <ActionIcon onClick={() => setAsideOpen((o) => !o)}>
+              <IconUsers color={theme.colors.gray[6]} />
+            </ActionIcon>
+          )}
+        </MediaQuery>
       </Header>
     </>
   );
