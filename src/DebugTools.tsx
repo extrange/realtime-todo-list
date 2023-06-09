@@ -4,6 +4,7 @@ import { useLocalStorage } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { Y, getYjsDoc } from "@syncedstore/core";
 import { generateKeyBetween } from "fractional-indexing";
+import { Suspense, lazy, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Doc } from "yjs";
 import { DebugArmedButton } from "./DebugArmedButton";
@@ -23,6 +24,8 @@ declare global {
   }
 }
 
+const LazyDevTools = lazy(() => import("./DevTools"));
+
 /**Some helpful utilities for debugging syncedStore and Yjs.
  * Returns a list of buttons.
  *
@@ -33,6 +36,7 @@ export const DebugTools = () => {
   const store = useStore();
   const lists = useSyncedStore(selectLists);
   const todos = useSyncedStore(selectTodos);
+  const [devToolsEnabled, setDevToolsEnabled] = useState(false);
 
   const clearStoredUsers = () => {
     try {
@@ -178,6 +182,8 @@ export const DebugTools = () => {
     });
   };
 
+  const enableDevTools = () => setDevToolsEnabled(true);
+
   return (
     <>
       {[
@@ -208,6 +214,7 @@ export const DebugTools = () => {
           "Generate 100 todos in 10 new lists (slow)",
           true,
         ] as const,
+        [enableDevTools, "Enable dev tools"] as const,
       ].map(([handler, title, requireArm = false]) =>
         requireArm ? (
           <DebugArmedButton key={title} variant="filled" onClick={handler}>
@@ -218,6 +225,11 @@ export const DebugTools = () => {
             {title}
           </Button>
         )
+      )}
+      {devToolsEnabled && (
+        <Suspense fallback="loading">
+          <LazyDevTools />
+        </Suspense>
       )}
     </>
   );
