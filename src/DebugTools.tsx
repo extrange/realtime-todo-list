@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import { Button } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -143,8 +144,26 @@ export const DebugTools = () => {
           getMaxSortOrder(store.todos.filter((t) => t.id === l.id)),
           undefined
         );
-        const content = new Y.XmlElement("title");
-        content.insert(0, [new Y.XmlText(`${id}, sortOrder=${sortOrder}`)]);
+        const content = new Y.XmlFragment();
+        const title = new Y.XmlElement("title");
+        title.setAttribute("level", "1");
+        title.insert(0, [
+          new Y.XmlText(faker.lorem.words({ min: 3, max: 30 })),
+        ]);
+        content.insert(0, [title]);
+
+        if (Math.random() > 0.3) {
+          const sentences = faker.lorem.sentences({ min: 1, max: 5 }, "\n");
+          content.insert(
+            1,
+            sentences.split("\n").map((s) => {
+              const paragraph = new Y.XmlElement("paragraph");
+              paragraph.insert(0, [new Y.XmlText(s)]);
+              return paragraph;
+            })
+          );
+        }
+
         store.todos.push({
           id,
           sortOrder,
