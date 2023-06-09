@@ -25,7 +25,7 @@ import {
 import { useMediaQuery } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
-import { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
 import { EditTodo } from "./EditTodo";
@@ -42,7 +42,7 @@ import {
 
 type ScrollPosition = Record<string, number>;
 
-export const TodoView = () => {
+export const TodoView = React.memo(() => {
   const store = useStore();
 
   /* The todo currently being dragged, if any */
@@ -193,17 +193,33 @@ export const TodoView = () => {
           </Modal.Body>
         </Modal.Content>
       </Modal.Root>
-      {/* Modal zIndex is 200 */}
-      <Affix position={{ bottom: rem(40), right: rem(20) }} zIndex={50}>
-        <ActionIcon
-          color={theme.primaryColor}
-          variant="filled"
-          size={"xl"}
-          onClick={createTodo}
+
+      {/* This is a hack to make the affix stay within the scrollArea */}
+      <div
+        style={{
+          position: "absolute",
+          height: "100%",
+          width: "100%",
+          pointerEvents: "none",
+        }}
+      >
+        {/* Modal zIndex is 200 */}
+        <Affix
+          withinPortal={false}
+          sx={{ position: "absolute", pointerEvents: "auto" }}
+          position={{ bottom: rem(20), right: rem(20) }}
+          zIndex={50}
         >
-          <IconPlus />
-        </ActionIcon>
-      </Affix>
+          <ActionIcon
+            color={theme.primaryColor}
+            variant="filled"
+            size={"xl"}
+            onClick={createTodo}
+          >
+            <IconPlus />
+          </ActionIcon>
+        </Affix>
+      </div>
 
       {/* Visible content starts here */}
       {todosInCurrentList.length ? (
@@ -238,4 +254,4 @@ export const TodoView = () => {
       )}
     </>
   );
-};
+});

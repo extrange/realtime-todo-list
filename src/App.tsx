@@ -1,4 +1,5 @@
-import { AppShell, useMantineTheme } from "@mantine/core";
+import { AppShell, ScrollArea, useMantineTheme } from "@mantine/core";
+import { useViewportSize } from "@mantine/hooks";
 import { SetStateAction, useCallback, useState } from "react";
 import { AppAside } from "./AppAside";
 import { AppFooter } from "./AppFooter";
@@ -14,6 +15,7 @@ export type User = {
 export const App = () => {
   const [navOpen, setNavOpen] = useState(false);
   const [asideOpen, setAsideOpen] = useState(false);
+  const { height } = useViewportSize();
 
   /* For AppHeader: Don't allow both the NavBar and Aside to be open */
   const _setNavOpen = useCallback((open: SetStateAction<boolean>) => {
@@ -57,7 +59,11 @@ export const App = () => {
       footer={<AppFooter />}
       aside={<AppAside asideOpen={asideOpen} />}
     >
-      <TodoView />
+      <ScrollArea
+        h={`calc(${height}px - var(--mantine-footer-height) - var(--mantine-header-height))`}
+      >
+        <TodoView />
+      </ScrollArea>
     </AppShell>
   );
 };
