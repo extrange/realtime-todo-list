@@ -47,32 +47,15 @@ export const StoreProvider = ({ children }: React.PropsWithChildren) => {
       url: "wss://tasks-server.nicholaslyz.com",
       document: yDoc.current,
       name: roomId,
-
-      // TESTING
-      /* State diagram:
-  onConnect -> onSynced: {state: true} -> onDisconnect ->
-  onSynced: {state: false} -> onConnect ... */
-      onConnect: () => notifications.show({ message: "onConnect" }),
-      onSynced: (data) =>
-        notifications.show({
-          title: "onSynced",
-          message: JSON.stringify(data),
-        }),
-      onDisconnect: (data) =>
-        notifications.show({
-          title: "onDisconnect",
-          message: JSON.stringify(data),
-        }),
     });
 
     setProvider(_provider);
 
-    /**Propagate userID (local GUID) to awareness object */
+    /* Propagate userID (local GUID) to awareness object */
     _provider.on("sync", () => _provider.setAwarenessField("userId", USER_ID));
 
-    let indexeddbPersistence: IndexeddbPersistence | undefined;
-
     // Check if IndexedDB is supported, then sync
+    let indexeddbPersistence: IndexeddbPersistence | undefined;
     new Promise<IDBDatabase>((resolve) => {
       const request = indexedDB.open("test-" + Math.random());
       request.onsuccess = () => resolve(request.result);

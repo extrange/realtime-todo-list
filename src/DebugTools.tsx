@@ -1,4 +1,5 @@
 import { faker } from "@faker-js/faker";
+import { HocuspocusProvider } from "@hocuspocus/provider";
 import { Button } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -9,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Doc } from "yjs";
 import { DebugArmedButton } from "./DebugArmedButton";
 import { CURRENT_ROOM_LOCALSTORAGE_KEY, USER_ID } from "./constants";
+import { useProvider } from "./useProvider";
 import { useStore } from "./useStore";
 import {
   List,
@@ -21,6 +23,7 @@ import { getMaxSortOrder } from "./util";
 declare global {
   interface Window {
     YDoc: Doc;
+    provider: HocuspocusProvider;
   }
 }
 
@@ -34,6 +37,7 @@ const LazyDevTools = lazy(() => import("./DevTools"));
 export const DebugTools = () => {
   const [roomId] = useLocalStorage({ key: CURRENT_ROOM_LOCALSTORAGE_KEY });
   const store = useStore();
+  const provider = useProvider();
   const lists = useSyncedStore(selectLists);
   const todos = useSyncedStore(selectTodos);
   const [devToolsEnabled, setDevToolsEnabled] = useState(false);
@@ -77,6 +81,13 @@ export const DebugTools = () => {
     window.YDoc = getYjsDoc(store);
     notifications.show({
       message: "YDoc now available in window",
+    });
+  };
+
+  const makeProviderAvailableInWindow = () => {
+    window.provider = provider;
+    notifications.show({
+      message: "provider now available in window",
     });
   };
 
@@ -215,6 +226,10 @@ export const DebugTools = () => {
           true,
         ] as const,
         [enableDevTools, "Enable dev tools"] as const,
+        [
+          makeProviderAvailableInWindow,
+          "Make provider available in window",
+        ] as const,
       ].map(([handler, title, requireArm = false]) =>
         requireArm ? (
           <DebugArmedButton key={title} variant="filled" onClick={handler}>

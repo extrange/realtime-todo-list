@@ -1,11 +1,9 @@
 import { useIdle } from "@mantine/hooks";
 import { useEffect, useRef } from "react";
-import { USER_ID } from "./constants";
+import { IDLE_TIMEOUT, USER_ID } from "./constants";
 import { useStore } from "./useStore";
 import { useUserData } from "./useUserData";
 
-/**How long before user is considered idle */
-const IDLE_TIMEOUT = 5000;
 
 /** How often to update lastActive when not idle */
 const UPDATE_INTERVAL = 5000;

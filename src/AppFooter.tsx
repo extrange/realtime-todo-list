@@ -1,4 +1,5 @@
 import { Flex, Footer } from "@mantine/core";
+import { NetworkOverlay } from "./NetworkOverlay";
 import { UserBadge } from "./UserBadge";
 import { getUserStatus } from "./getUserStatus";
 import { useAwareness } from "./useAwareness";
@@ -16,6 +17,7 @@ export const AppFooter = () => {
           <UserBadge small name={v.user?.name} color={v.user?.color} />
         ))}
       </Flex>
+      <NetworkOverlay />
     </Footer>
   );
 };
