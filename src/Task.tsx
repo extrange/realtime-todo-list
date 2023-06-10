@@ -35,6 +35,7 @@ import sanitizeHtml from "sanitize-html";
 import { USER_ID } from "./constants";
 import { useStore } from "./useStore";
 import { Store, selectLists, useSyncedStore } from "./useSyncedStore";
+import { getTodoTitle } from "./util";
 
 const _StyledText = styled(Text)`
   flex-grow: 1;
@@ -192,17 +193,14 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
 
   To check for the title, we check if there is a first element. The first element will always be the title, even if it is blank.*/
   const textContent = useMemo(() => {
-    /* Empty todo. todoReadOnly.content could be non-empty, even
-    if the Todo is really empty.*/
-    if (!todoReadOnly.content || !todo.content.length)
+    /* todoReadOnly.content needs to be here to force rerenders */
+    const title = todoReadOnly.content && getTodoTitle(todo);
+    if (!title)
       return (
         <StyledText italic c={"dimmed"}>
           (empty)
         </StyledText>
       );
-
-    /* Note: both title and notes will count spaces as non-empty */
-    const title = sanitizeHtml(todo.content.get(0).toString());
 
     /* Take at most the next 3 lines of the todo's notes */
     const notes = todo.content
@@ -262,6 +260,7 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
             </Menu.Item>
             {lists.map((l) => (
               <Menu.Item
+                key={l.id}
                 onClick={(e) => moveToList(e, l.id)}
                 icon={todo.listId === l.id && <IconCheck size={16} />}
               >

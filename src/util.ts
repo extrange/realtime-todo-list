@@ -1,5 +1,6 @@
 import { notifications } from "@mantine/notifications";
 import { generateKeyBetween } from "fractional-indexing";
+import sanitizeHtml from "sanitize-html";
 import { v4 as uuidv4 } from "uuid";
 import { User } from "./App";
 import { colors } from "./constants";
@@ -139,3 +140,13 @@ export const validateUuid = (uuid: string) =>
   !!uuid.match(
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
   );
+
+/**Get the title of the todo, or undefined if none */
+export const getTodoTitle = (todo: Todo) => {
+  /* Empty todo. todoReadOnly.content could be non-empty, even
+  if the Todo is really empty.*/
+  if (!todo.content || !todo.content.length) return undefined;
+
+  /* Note: both title and notes will count spaces as non-empty */
+  return sanitizeHtml(todo.content.get(0).toString());
+};

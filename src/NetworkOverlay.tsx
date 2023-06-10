@@ -1,8 +1,7 @@
 import { Badge, Center, Loader, Overlay, Transition } from "@mantine/core";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useIsConnected } from "./useIsConnected";
 import { useReconnect } from "./useReconnect";
-import React from "react";
 
 /**Handles reconnection, and shows an overlay.
  *

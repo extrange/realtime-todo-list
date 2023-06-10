@@ -23,14 +23,7 @@ export const useReconnect = (interval = 3000): boolean => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const reconnect = useCallback(
-    debounce(
-      () => {
-        console.log("attempt");
-        provider.connect();
-      },
-      interval,
-      { maxWait: interval }
-    ),
+    debounce(() => provider.connect(), interval, { maxWait: interval }),
     [provider, interval]
   );
 
