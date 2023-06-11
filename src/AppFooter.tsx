@@ -1,22 +1,19 @@
-import { Flex, Footer } from "@mantine/core";
+import { Center, Footer, Text } from "@mantine/core";
 import { NetworkOverlay } from "./NetworkOverlay";
-import { UserBadge } from "./UserBadge";
-import { getUserStatus } from "./getUserStatus";
-import { useAwareness } from "./useAwareness";
-import { selectStoredUsers, useSyncedStore } from "./useSyncedStore";
+import { selectLists, selectTodos, useSyncedStore } from "./useSyncedStore";
 
 export const AppFooter = () => {
-  const awareness = useAwareness();
-  const storedUsersReadOnly = useSyncedStore(selectStoredUsers);
-  const { onlineUsers } = getUserStatus(awareness, storedUsersReadOnly);
+  const todos = useSyncedStore(selectTodos, 5000);
+  const lists = useSyncedStore(selectLists, 5000);
 
   return (
     <Footer height={30}>
-      <Flex align={"center"} mx={10}>
-        {[...onlineUsers.values()].map((v) => (
-          <UserBadge small name={v.user?.name} color={v.user?.color} />
-        ))}
-      </Flex>
+      <Center h="100%">
+        <Text c="dimmed" fz="sm">
+          {todos.length} todo{todos.length !== 1 && "s"} in {lists.length + 1}{" "}
+          list{lists.length + 1 !== 1 && "s"}
+        </Text>
+      </Center>
       <NetworkOverlay />
     </Footer>
   );
