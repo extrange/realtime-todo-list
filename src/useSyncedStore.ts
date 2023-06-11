@@ -85,6 +85,7 @@ export type Store = {
  * - Selector function must return an observable slice of the
  * original store, as its result is used by observeDeep.
  * - Selector function should be memoized to prevent renders
+ * - Doesn't work with `.filter` (yet)
  *
  * @returns `toJSON` representation of the observed Yjs type
  */

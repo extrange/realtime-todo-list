@@ -37,7 +37,7 @@ export const OnlineUsers = () => {
   return (
     <>
       {onlineUsersPanel}
-      <Accordion styles={{ label: { padding: 0 }, control: { height: 30 } }}>
+      <Accordion styles={{ label: { padding: 0 }, control: { height: 30 }, content: {padding: 0} }}>
         <Accordion.Item value="offline">
           <Accordion.Control>Offline ({offlineUsers.size})</Accordion.Control>
           <Accordion.Panel>{offlineUsersPanel}</Accordion.Panel>

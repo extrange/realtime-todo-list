@@ -28,6 +28,7 @@ import { generateKeyBetween } from "fractional-indexing";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
+import { CompletedTodos } from "./CompletedTodos";
 import { EditTodo } from "./EditTodo";
 import { Task } from "./Task";
 import { USER_ID } from "./constants";
@@ -62,7 +63,7 @@ export const TodoView = React.memo(() => {
 
   /* Determine Todos to show based on current list */
   const todosInCurrentList = useMemo(
-    () => todos.filter((t) => t.listId === currentList),
+    () => todos.filter((t) => t.listId === currentList && !t.completed),
     [currentList, todos]
   );
 
@@ -71,10 +72,7 @@ export const TodoView = React.memo(() => {
     [todosInCurrentList]
   );
 
-  const todoIds = useMemo(
-    () => sortedTodos.map((t: { id: string }) => t.id),
-    [sortedTodos]
-  );
+  const todoIds = useMemo(() => sortedTodos.map((t) => t.id), [sortedTodos]);
 
   const editingTodo = useMemo(
     // Must use store.todos here since this is passod to EditTodo
@@ -98,7 +96,7 @@ export const TodoView = React.memo(() => {
     })
   );
 
-  const createTodo = () => {
+  const createTodo = useCallback(() => {
     const now = Date.now();
     const sortOrder = generateKeyBetween(
       getMaxSortOrder(todosInCurrentList),
@@ -117,37 +115,40 @@ export const TodoView = React.memo(() => {
     };
     setEditingId(newTodo.id);
     store.todos.unshift(newTodo);
-  };
+  }, [currentList, store, todosInCurrentList]);
 
-  const handleDragStart = (event: DragStartEvent) => {
+  const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveId(event.active.id.toString());
-  };
+  }, []);
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    setActiveId(undefined);
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      setActiveId(undefined);
 
-    if (over && active.id !== over.id) {
-      const activeTodo = store.todos.find((t) => t.id === active.id) as Todo;
-      const overTodo = store.todos.find((t) => t.id === over.id) as Todo;
+      if (over && active.id !== over.id) {
+        const activeTodo = store.todos.find((t) => t.id === active.id) as Todo;
+        const overTodo = store.todos.find((t) => t.id === over.id) as Todo;
 
-      /* If over's sortOrder > active's, user is moving the Todo to somewhere above it's original positition. In this case, we want to move the active Todo above the over Todo, and vice versa. */
-      // TODO: for now, I'm assuming all todos have sortOrders
-      if (overTodo?.sortOrder > activeTodo?.sortOrder) {
-        // Find the todo above the over todo, in the sorted array
-        const aboveTodo =
-          sortedTodos[sortedTodos.findIndex((t) => t.id === overTodo.id) - 1];
+        /* If over's sortOrder > active's, user is moving the Todo to somewhere above it's original positition. In this case, we want to move the active Todo above the over Todo, and vice versa. */
+        // TODO: for now, I'm assuming all todos have sortOrders
+        if (overTodo?.sortOrder > activeTodo?.sortOrder) {
+          // Find the todo above the over todo, in the sorted array
+          const aboveTodo =
+            sortedTodos[sortedTodos.findIndex((t) => t.id === overTodo.id) - 1];
 
-        activeTodo.sortOrder = generateKeyBetweenSafe(overTodo, aboveTodo);
-      } else {
-        // Find the todo below the over todo, in the sorted array
-        const belowTodo =
-          sortedTodos[sortedTodos.findIndex((t) => t.id === overTodo.id) + 1];
+          activeTodo.sortOrder = generateKeyBetweenSafe(overTodo, aboveTodo);
+        } else {
+          // Find the todo below the over todo, in the sorted array
+          const belowTodo =
+            sortedTodos[sortedTodos.findIndex((t) => t.id === overTodo.id) + 1];
 
-        activeTodo.sortOrder = generateKeyBetweenSafe(belowTodo, overTodo);
+          activeTodo.sortOrder = generateKeyBetweenSafe(belowTodo, overTodo);
+        }
       }
-    }
-  };
+    },
+    [sortedTodos, store]
+  );
 
   /* Editor has been created, so we can use scrollTo now
   Previously, using a ref callback would give the wrong height
@@ -160,7 +161,7 @@ export const TodoView = React.memo(() => {
     }
   }, [editingId]);
 
-  const onDialogClose = () => {
+  const onDialogClose = useCallback(() => {
     if (editingId && dialogRef.current) {
       scrollPositions.current[editingId] = dialogRef.current.scrollTop;
     }
@@ -169,7 +170,7 @@ export const TodoView = React.memo(() => {
     editingId && localStorage.setItem(editingId, Date.now().toString());
 
     setEditingId(undefined);
-  };
+  }, [editingId]);
 
   return (
     <>
@@ -242,13 +243,7 @@ export const TodoView = React.memo(() => {
           </DragOverlay>
         </DndContext>
       ) : (
-        <Center
-          sx={{
-            height: "100%",
-            position: "absolute",
-            width: "100%",
-          }}
-        >
+        <Center h={50}>
           <Text
             italic
             c={"dimmed"}
@@ -258,6 +253,7 @@ export const TodoView = React.memo(() => {
           </Text>
         </Center>
       )}
+      <CompletedTodos setEditingId={setEditingId} />
     </>
   );
 });

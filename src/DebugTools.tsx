@@ -10,14 +10,10 @@ import { v4 as uuidv4 } from "uuid";
 import { Doc } from "yjs";
 import { DebugArmedButton } from "./DebugArmedButton";
 import { CURRENT_ROOM_LOCALSTORAGE_KEY, USER_ID } from "./constants";
+import { useCurrentList } from "./useCurrentList";
 import { useProvider } from "./useProvider";
 import { useStore } from "./useStore";
-import {
-  List,
-  selectLists,
-  selectTodos,
-  useSyncedStore,
-} from "./useSyncedStore";
+import { selectLists, selectTodos, useSyncedStore } from "./useSyncedStore";
 import { getMaxSortOrder } from "./util";
 
 declare global {
@@ -41,6 +37,7 @@ export const DebugTools = () => {
   const lists = useSyncedStore(selectLists);
   const todos = useSyncedStore(selectTodos);
   const [devToolsEnabled, setDevToolsEnabled] = useState(false);
+  const [currentList] = useCurrentList();
 
   const clearStoredUsers = () => {
     try {
@@ -132,31 +129,42 @@ export const DebugTools = () => {
     notifications.show({ message: "Deleted all lists" });
   };
 
-  /**Generate 10 lists containing n (10 by default) todos each */
-  const generateTodos = (n = 10) => {
-    const lists: Array<List> = [...Array(10)].map(() => {
-      const id = uuidv4();
-      const sortOrder = generateKeyBetween(
-        getMaxSortOrder(store.lists),
-        undefined
-      );
+  /**Generate 10 lists containing n (10 by default) todos each
+   * @param n number of todos to generate per list
+   * @param inCurrentList whether to only generate in current list
+   */
+  const generateTodos = (n = 10, inCurrentList = false) => {
+    let lists: Array<string>;
 
-      const generatedList = {
-        id,
-        name: `${id} sortOrder=${sortOrder}`,
-        sortOrder,
-      };
-      store.lists.push(generatedList);
+    if (inCurrentList && currentList) {
+      lists = [currentList];
+    } else {
+      lists = [...Array(10)]
+        .map(() => {
+          const id = uuidv4();
+          const sortOrder = generateKeyBetween(
+            getMaxSortOrder(store.lists),
+            undefined
+          );
 
-      return generatedList;
-    });
+          const generatedList = {
+            id,
+            name: `${id} sortOrder=${sortOrder}`,
+            sortOrder,
+          };
+          store.lists.push(generatedList);
+
+          return generatedList;
+        })
+        .map((l) => l.id);
+    }
 
     lists.forEach((l) => {
       [...Array(n)].forEach(() => {
         const id = uuidv4();
         const now = Date.now();
         const sortOrder = generateKeyBetween(
-          getMaxSortOrder(store.todos.filter((t) => t.id === l.id)),
+          getMaxSortOrder(store.todos.filter((t) => t.id === l)),
           undefined
         );
         const content = new Y.XmlFragment();
@@ -187,10 +195,17 @@ export const DebugTools = () => {
           by: USER_ID,
           created: now,
           modified: now,
-          listId: l.id,
+          listId: l,
         });
       });
     });
+  };
+
+  const markAllCompleted = () => {
+    currentList &&
+      store.todos
+        .filter((t) => t.listId === currentList)
+        .forEach((t) => (t.completed = true));
   };
 
   const enableDevTools = () => setDevToolsEnabled(true);
@@ -232,12 +247,18 @@ export const DebugTools = () => {
           "Generate 100 todos in 10 new lists (slow)",
           true,
         ] as const,
+        [
+          () => generateTodos(100, true),
+          "Generate 100 todos in current list",
+          true,
+        ] as const,
         [enableDevTools, "Enable devtools in-browser"] as const,
         [
           makeProviderAvailableInWindow,
           "Make provider available in window",
         ] as const,
         [debugLayout, "Debug layout"] as const,
+        [markAllCompleted, "Complete all todos in current list", true] as const,
       ].map(([handler, title, requireArm = false]) =>
         requireArm ? (
           <DebugArmedButton key={title} variant="filled" onClick={handler}>

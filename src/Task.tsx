@@ -68,120 +68,125 @@ const StyledFlex = styled(Flex)`
   }
 `;
 
-type InputProps =
+type CommonProps = {
+  completed?: boolean;
+  todoId: string;
+};
+
+type DiscriminatedProps =
   | {
       dragging?: false;
-      todoId: string;
       setEditingId: React.Dispatch<React.SetStateAction<string | undefined>>;
     }
   | {
       dragging: true;
-      todoId: string;
       setEditingId?: never;
     };
 
-const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
-  const memoizedSelect = useCallback(
-    (s: MappedTypeDescription<Store>) => s.todos.find((t) => t.id === todoId),
-    [todoId]
-  );
+const TaskInternal = React.memo(
+  ({ todoId, setEditingId, completed }: DiscriminatedProps & CommonProps) => {
+    const memoizedSelect = useCallback(
+      (s: MappedTypeDescription<Store>) => s.todos.find((t) => t.id === todoId),
+      [todoId]
+    );
 
-  const store = useStore();
-  const todoReadOnly = useSyncedStore(memoizedSelect, 100);
-  const todo = useMemo(() => memoizedSelect(store), [memoizedSelect, store]);
-  const theme = useMantineTheme();
-  const [showAvatar, setShowAvatar] = useState(false);
-  const lists = useSyncedStore(selectLists);
-  const [menuOpened, setMenuOpened] = useState(false);
+    const store = useStore();
+    const todoReadOnly = useSyncedStore(memoizedSelect, 100);
+    const todo = useMemo(() => memoizedSelect(store), [memoizedSelect, store]);
+    const theme = useMantineTheme();
+    const [showAvatar, setShowAvatar] = useState(false);
+    const lists = useSyncedStore(selectLists);
+    const [menuOpened, setMenuOpened] = useState(false);
 
-  if (!todoReadOnly || !todo) {
-    throw Error(`Couldn't find Todo with ID ${todoId}`);
-  }
+    if (!todoReadOnly || !todo) {
+      throw Error(`Couldn't find Todo with ID ${todoId}`);
+    }
 
-  const byUser = useMemo(
-    () =>
-      todoReadOnly.by ? store.storedUsers[todoReadOnly.by]?.user : undefined,
-    [store, todoReadOnly.by]
-  );
+    const byUser = useMemo(
+      () =>
+        todoReadOnly.by ? store.storedUsers[todoReadOnly.by]?.user : undefined,
+      [store, todoReadOnly.by]
+    );
 
-  const moveToList = useCallback(
-    (e: SyntheticEvent, listId?: string) => {
-      e.stopPropagation();
-      todo.listId = listId;
-    },
-    [todo]
-  );
+    const moveToList = useCallback(
+      (e: SyntheticEvent, listId?: string) => {
+        e.stopPropagation();
+        todo.listId = listId;
+      },
+      [todo]
+    );
 
-  /* Listen to markAllRead event and rerender avatar status, checking localStorage */
-  useEffect(() => {
-    const handleMarkAllRead = () => {
-      const lastOpenedStr = localStorage.getItem(todoReadOnly.id);
-      const lastOpened = lastOpenedStr ? parseInt(lastOpenedStr) : undefined;
+    /* Listen to markAllRead event and rerender avatar status, checking localStorage */
+    useEffect(() => {
+      const handleMarkAllRead = () => {
+        const lastOpenedStr = localStorage.getItem(todoReadOnly.id);
+        const lastOpened = lastOpenedStr ? parseInt(lastOpenedStr) : undefined;
 
-      /* Show avatar if all are true:
+        /* Show avatar if all are true:
         - todo.by exists and is not the current user
         - there is no lastOpened, or lastOpened < todo.modified */
-      const shouldShowAvatar =
-        todoReadOnly.by &&
-        todoReadOnly.by !== USER_ID &&
-        (!lastOpened || lastOpened < todoReadOnly.modified);
+        const shouldShowAvatar =
+          todoReadOnly.by &&
+          todoReadOnly.by !== USER_ID &&
+          (!lastOpened || lastOpened < todoReadOnly.modified);
 
-      setShowAvatar(!!shouldShowAvatar);
-    };
-    // Run once on initial render
-    handleMarkAllRead();
+        setShowAvatar(!!shouldShowAvatar);
+      };
+      // Run once on initial render
+      handleMarkAllRead();
 
-    document.addEventListener("markAllRead", handleMarkAllRead);
-    return () => document.removeEventListener("markAllRead", handleMarkAllRead);
-  }, [todoReadOnly.by, todoReadOnly.id, todoReadOnly.modified]);
+      document.addEventListener("markAllRead", handleMarkAllRead);
+      return () =>
+        document.removeEventListener("markAllRead", handleMarkAllRead);
+    }, [todoReadOnly.by, todoReadOnly.id, todoReadOnly.modified]);
 
-  const deleteTodo = useCallback(
-    (e: SyntheticEvent) => {
+    const deleteTodo = useCallback(
+      (e: SyntheticEvent) => {
+        e.stopPropagation();
+        confirm("Are you sure?") &&
+          store.todos.splice(
+            store.todos.findIndex((t) => t.id === todoReadOnly.id),
+            1
+          );
+      },
+      [todoReadOnly, store]
+    );
+
+    const completeTodo = useCallback(
+      (e: SyntheticEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        todo.modified = Date.now();
+        todo.by = USER_ID;
+        todo.completed = !todoReadOnly.completed;
+      },
+      [todo, todoReadOnly.completed]
+    );
+
+    /* Mark todo as read on open */
+    const onOpenTodo = useCallback(() => {
+      setShowAvatar(false);
+      setEditingId?.(todoReadOnly.id);
+    }, [setEditingId, todoReadOnly.id]);
+
+    const openMenu = useCallback((e: SyntheticEvent) => {
       e.stopPropagation();
-      confirm("Are you sure?") &&
-        store.todos.splice(
-          store.todos.findIndex((t) => t.id === todoReadOnly.id),
-          1
-        );
-    },
-    [todoReadOnly, store]
-  );
+      setMenuOpened(true);
+    }, []);
 
-  const completeTodo = useCallback(
-    (e: SyntheticEvent<HTMLButtonElement>) => {
-      e.stopPropagation();
-      todo.modified = Date.now();
-      todo.by = USER_ID;
-      todo.completed = !todoReadOnly.completed;
-    },
-    [todo, todoReadOnly.completed]
-  );
+    const checkbox = useMemo(
+      () => (
+        <ActionIcon onClick={completeTodo} mr={10}>
+          {todoReadOnly.completed ? (
+            <IconCheckbox color={theme.colors.gray[6]} />
+          ) : (
+            <IconSquare color={theme.colors.gray[6]} />
+          )}
+        </ActionIcon>
+      ),
+      [completeTodo, theme.colors.gray, todoReadOnly.completed]
+    );
 
-  /* Mark todo as read on open */
-  const onOpenTodo = useCallback(() => {
-    setShowAvatar(false);
-    setEditingId?.(todoReadOnly.id);
-  }, [setEditingId, todoReadOnly.id]);
-
-  const openMenu = useCallback((e: SyntheticEvent) => {
-    e.stopPropagation();
-    setMenuOpened(true);
-  }, []);
-
-  const checkbox = useMemo(
-    () => (
-      <ActionIcon onClick={completeTodo} mr={10}>
-        {todoReadOnly.completed ? (
-          <IconCheckbox color={theme.colors.gray[6]} />
-        ) : (
-          <IconSquare color={theme.colors.gray[6]} />
-        )}
-      </ActionIcon>
-    ),
-    [completeTodo, theme.colors.gray, todoReadOnly.completed]
-  );
-
-  /* The YXmlFragment can be viewed as an array.
+    /* The YXmlFragment can be viewed as an array.
   
   The title is the 0th element, and any notes are from index 1 onward.
 
@@ -193,127 +198,129 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
   So, to check if it is empty, we check the length of the YXmlFragment.
 
   To check for the title, we check if there is a first element. The first element will always be the title, even if it is blank.*/
-  const textContent = useMemo(() => {
-    /* todoReadOnly.content needs to be here to force rerenders */
-    const title = todoReadOnly.content && getTodoTitle(todo);
-    if (!title)
+    const textContent = useMemo(() => {
+      /* todoReadOnly.content needs to be here to force rerenders */
+      const title = todoReadOnly.content && getTodoTitle(todo);
+      if (!title)
+        return (
+          <StyledText italic c={"dimmed"}>
+            (empty)
+          </StyledText>
+        );
+
+      /* Take at most the next 3 lines of the todo's notes */
+      const notes = todo.content
+        .slice(1, 3)
+        .map((e) => sanitizeHtml(e.toString()))
+        .join(" ");
+
       return (
-        <StyledText italic c={"dimmed"}>
-          (empty)
+        <StyledText lineClamp={2} c={completed ? "dimmed" : undefined}>
+          {title}
+          <Text fz={theme.fontSizes.sm} italic c={"dimmed"}>
+            {notes}
+          </Text>
         </StyledText>
       );
+    }, [todoReadOnly.content, todo, completed, theme.fontSizes.sm]);
 
-    /* Take at most the next 3 lines of the todo's notes */
-    const notes = todo.content
-      .slice(1, 3)
-      .map((e) => sanitizeHtml(e.toString()))
-      .join(" ");
+    const avatar = useMemo(
+      () =>
+        showAvatar && (
+          <Avatar
+            size={"sm"}
+            styles={{
+              placeholder: {
+                background: theme.fn.darken(byUser?.color || "#000000", 0.3),
+                color: theme.fn.lighten(byUser?.color || "#FFFFFF", 0.5),
+              },
+            }}
+          >
+            {byUser?.name?.charAt(0).toUpperCase() || "?"}
+          </Avatar>
+        ),
+      [byUser?.color, byUser?.name, showAvatar, theme.fn]
+    );
+
+    const menu = useMemo(
+      () => (
+        <Menu opened={menuOpened} onChange={setMenuOpened} withinPortal>
+          <Portal>{menuOpened && <Overlay opacity={0} />}</Portal>
+          <Menu.Target>
+            <ActionIcon onClick={openMenu}>
+              <IconDotsVertical color={theme.colors.gray[6]} />
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item icon={<IconTrash size={16} />} onClick={deleteTodo}>
+              Delete
+            </Menu.Item>
+            <Menu.Divider />
+            <ScrollArea h={250} type="auto">
+              <Menu.Item
+                onClick={(e) => moveToList(e, undefined)}
+                icon={!todo.listId && <IconCheck size={16} />}
+                fs={"italic"}
+              >
+                Uncategorized
+              </Menu.Item>
+              {lists.map((l) => (
+                <Menu.Item
+                  key={l.id}
+                  onClick={(e) => moveToList(e, l.id)}
+                  icon={todo.listId === l.id && <IconCheck size={16} />}
+                  maw={300}
+                  sx={{ overflowWrap: "anywhere" }}
+                >
+                  {l.name}
+                </Menu.Item>
+              ))}
+            </ScrollArea>
+          </Menu.Dropdown>
+        </Menu>
+      ),
+      [
+        deleteTodo,
+        lists,
+        menuOpened,
+        moveToList,
+        openMenu,
+        theme.colors.gray,
+        todo.listId,
+      ]
+    );
 
     return (
-      <StyledText lineClamp={2}>
-        {title}
-        <Text fz={theme.fontSizes.sm} italic c={"dimmed"}>
-          {notes}
-        </Text>
-      </StyledText>
-    );
-  }, [todoReadOnly.content, todo, theme.fontSizes.sm]);
-
-  const avatar = useMemo(
-    () =>
-      showAvatar && (
-        <Avatar
-          size={"sm"}
-          styles={{
-            placeholder: {
-              background: theme.fn.darken(byUser?.color || "#000000", 0.3),
-              color: theme.fn.lighten(byUser?.color || "#FFFFFF", 0.5),
-            },
-          }}
+      <Flex onClick={onOpenTodo} py={10} px={5} w={"100%"} align={"center"}>
+        {checkbox}
+        <Tooltip
+          openDelay={500}
+          multiline
+          position={"bottom"}
+          label={
+            <div>
+              <Text>
+                Modified <TimeAgo live={false} date={todoReadOnly.modified} />{" "}
+                by{" "}
+                {todoReadOnly.by && todoReadOnly.by === USER_ID
+                  ? "you"
+                  : byUser && byUser.name}
+              </Text>
+              <Text>
+                Created <TimeAgo live={false} date={todoReadOnly.created} />
+              </Text>
+              <Text>sortOrder: {todoReadOnly.sortOrder ?? "N/A"}</Text>
+            </div>
+          }
         >
-          {byUser?.name?.charAt(0).toUpperCase() || "?"}
-        </Avatar>
-      ),
-    [byUser?.color, byUser?.name, showAvatar, theme.fn]
-  );
-
-  const menu = useMemo(
-    () => (
-      <Menu opened={menuOpened} onChange={setMenuOpened} withinPortal>
-        <Portal>{menuOpened && <Overlay opacity={0} />}</Portal>
-        <Menu.Target>
-          <ActionIcon onClick={openMenu}>
-            <IconDotsVertical color={theme.colors.gray[6]} />
-          </ActionIcon>
-        </Menu.Target>
-        <Menu.Dropdown>
-          <Menu.Item icon={<IconTrash size={16} />} onClick={deleteTodo}>
-            Delete
-          </Menu.Item>
-          <Menu.Divider />
-          <ScrollArea h={250} type="auto">
-            <Menu.Item
-              onClick={(e) => moveToList(e, undefined)}
-              icon={!todo.listId && <IconCheck size={16} />}
-              fs={"italic"}
-            >
-              Uncategorized
-            </Menu.Item>
-            {lists.map((l) => (
-              <Menu.Item
-                key={l.id}
-                onClick={(e) => moveToList(e, l.id)}
-                icon={todo.listId === l.id && <IconCheck size={16} />}
-                maw={300}
-                sx={{overflowWrap: 'anywhere'}}
-              >
-                {l.name}
-              </Menu.Item>
-            ))}
-          </ScrollArea>
-        </Menu.Dropdown>
-      </Menu>
-    ),
-    [
-      deleteTodo,
-      lists,
-      menuOpened,
-      moveToList,
-      openMenu,
-      theme.colors.gray,
-      todo.listId,
-    ]
-  );
-
-  return (
-    <Flex onClick={onOpenTodo} py={10} px={5} w={"100%"} align={"center"}>
-      {checkbox}
-      <Tooltip
-        openDelay={500}
-        multiline
-        position={"bottom"}
-        label={
-          <div>
-            <Text>
-              Modified <TimeAgo live={false} date={todoReadOnly.modified} /> by{" "}
-              {todoReadOnly.by && todoReadOnly.by === USER_ID
-                ? "you"
-                : byUser && byUser.name}
-            </Text>
-            <Text>
-              Created <TimeAgo live={false} date={todoReadOnly.created} />
-            </Text>
-            <Text>sortOrder: {todoReadOnly.sortOrder ?? "N/A"}</Text>
-          </div>
-        }
-      >
-        {textContent}
-      </Tooltip>
-      {avatar}
-      {menu}
-    </Flex>
-  );
-});
+          {textContent}
+        </Tooltip>
+        {avatar}
+        {menu}
+      </Flex>
+    );
+  }
+);
 
 /**
  * This component is separated into 2 because of this issue.
@@ -324,7 +331,7 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
  * Heavy memoization helps somewhat, as the contents of the Todo don't rerender
  * (even if the container of the Todo does).
  */
-export const Task = React.memo((props: InputProps) => {
+export const Task = React.memo((props: DiscriminatedProps & CommonProps) => {
   const { dragging, todoId } = props;
 
   const {
