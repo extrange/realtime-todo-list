@@ -40,7 +40,7 @@ export const AppNavbar = ({ navOpen, closeNav }: InputProps) => {
         >
           <Button onClick={() => setCurrentRoomId("")}>Yes</Button>
         </Modal>
-        <ScrollArea px={15}>
+        <ScrollArea px={15} >
           <EditUser />
           <ListView closeNav={closeNav} />
           <Flex direction={"column"} justify={"flex-end"} mt={10}>

@@ -1,11 +1,10 @@
-import { Card, Flex, Indicator, Text } from "@mantine/core";
+import { Container, Flex, Indicator, Text } from "@mantine/core";
 import { IconPencil } from "@tabler/icons-react";
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import { UserBadge } from "./UserBadge";
 import { OfflineUser, OnlineUser } from "./getUserStatus";
 import { useStore } from "./useStore";
-import styles from "./userStatus.module.css";
 import { getTodoTitle } from "./util";
 
 type InputProps =
@@ -83,17 +82,9 @@ export const UserStatus = ({ online, userData }: InputProps) => {
         editingTodos.forEach((t) => {
           const title = getTodoTitle(t);
           items.push(
-            <Flex align={"center"}>
-              <IconPencil size={20} style={{ flexShrink: 0 }} />
-              <Text
-                sx={{
-                  textOverflow: "ellipsis",
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                  maxWidth: 150,
-                }}
-                fz={"sm"}
-              >
+            <Flex align={"center"} key={t.id}>
+              <IconPencil size={14} style={{ flexShrink: 0 }} />
+              <Text lineClamp={1} fz={"sm"}>
                 {title || (
                   <Text component="span" italic fz={"sm"}>
                     unnamed
@@ -107,14 +98,14 @@ export const UserStatus = ({ online, userData }: InputProps) => {
 
       if (isIdle && userData.lastActive) {
         items.push(
-          <Text c={"yellow"} fz={"sm"}>
+          <Text c={"yellow"} fz={"sm"} key="idle">
             Idle {formatDistanceToNow(userData.lastActive)}
           </Text>
         );
       }
     } else if (userData.lastActive) {
       items.push(
-        <Text c="dimmed" fz={"sm"}>
+        <Text c="dimmed" fz={"sm"} key="lastActive">
           Last active{" "}
           {formatDistanceToNow(userData.lastActive, {
             addSuffix: true,
@@ -127,11 +118,11 @@ export const UserStatus = ({ online, userData }: InputProps) => {
   }, [isIdle, online, store.todos, userData]);
 
   return (
-    <Card className={styles.userStatus} bg={"initial"}>
-      <Flex direction={"column"} m={"xs"}>
+    <Container sx={{ cursor: "default", userSelect: "none" }} p={"xs"}>
+      <Flex direction={"column"}>
         {badgeWithIndicator}
         {statusSection}
       </Flex>
-    </Card>
+    </Container>
   );
 };

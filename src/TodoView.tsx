@@ -242,7 +242,13 @@ export const TodoView = React.memo(() => {
           </DragOverlay>
         </DndContext>
       ) : (
-        <Center sx={{ flexGrow: 1 }}>
+        <Center
+          sx={{
+            height: "100%",
+            position: "absolute",
+            width: "100%",
+          }}
+        >
           <Text
             italic
             c={"dimmed"}

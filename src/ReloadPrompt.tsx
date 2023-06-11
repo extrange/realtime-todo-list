@@ -57,21 +57,11 @@ const _ReloadPrompt = () => {
                 );
               }
             })
-            .catch((e) =>
-              notifications.show({
-                title: "Error updating SW",
-                message: JSON.stringify(e),
-                color: "red",
-              })
-            );
+            .catch((e) => console.error("Error updating SW", e));
         }, UPDATE_INTERVAL);
     },
     onRegisterError(e) {
-      notifications.show({
-        title: "Error registering SW",
-        message: JSON.stringify(e),
-        color: "yellow",
-      });
+      console.warn("Error registering SW", e);
     },
   });
 

@@ -195,6 +195,13 @@ export const DebugTools = () => {
 
   const enableDevTools = () => setDevToolsEnabled(true);
 
+  const debugLayout = () =>
+    document.querySelectorAll<HTMLElement>("*").forEach((a) => {
+      // https://www.smashingmagazine.com/2021/04/css-overflow-issues/
+      a.style.outline =
+        "1px solid #" + (~~(Math.random() * (1 << 24))).toString(16);
+    });
+
   return (
     <>
       {[
@@ -225,11 +232,12 @@ export const DebugTools = () => {
           "Generate 100 todos in 10 new lists (slow)",
           true,
         ] as const,
-        [enableDevTools, "Enable dev tools"] as const,
+        [enableDevTools, "Enable devtools in-browser"] as const,
         [
           makeProviderAvailableInWindow,
           "Make provider available in window",
         ] as const,
+        [debugLayout, "Debug layout"] as const,
       ].map(([handler, title, requireArm = false]) =>
         requireArm ? (
           <DebugArmedButton key={title} variant="filled" onClick={handler}>

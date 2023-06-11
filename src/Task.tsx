@@ -42,6 +42,7 @@ const _StyledText = styled(Text)`
   overflow: hidden;
   cursor: default;
   user-select: none;
+  overflow-wrap: anywhere;
 `;
 
 //https://mantine.dev/styles/styled/#polymorphic-components
@@ -263,6 +264,8 @@ const TaskInternal = React.memo(({ todoId, setEditingId }: InputProps) => {
                 key={l.id}
                 onClick={(e) => moveToList(e, l.id)}
                 icon={todo.listId === l.id && <IconCheck size={16} />}
+                maw={300}
+                sx={{overflowWrap: 'anywhere'}}
               >
                 {l.name}
               </Menu.Item>

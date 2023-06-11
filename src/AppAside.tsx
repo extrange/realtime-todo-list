@@ -1,4 +1,4 @@
-import { Aside, Transition, useMantineTheme } from "@mantine/core";
+import { Aside, ScrollArea, Transition, useMantineTheme } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { CSSProperties } from "react";
 import { OnlineUsers } from "./OnlineUsers";
@@ -16,7 +16,9 @@ export const AppAside = ({ asideOpen }: InputProps) => {
 
   const jsx = (styles?: CSSProperties) => (
     <Aside style={styles} p="none" width={{ sm: 200, lg: 300 }}>
-      <OnlineUsers />
+      <ScrollArea>
+        <OnlineUsers />
+      </ScrollArea>
     </Aside>
   );
 

@@ -1,4 +1,4 @@
-import { Accordion, ScrollArea } from "@mantine/core";
+import { Accordion } from "@mantine/core";
 import { useMemo } from "react";
 import { UserStatus } from "./UserStatus";
 import { getUserStatus } from "./getUserStatus";
@@ -35,16 +35,14 @@ export const OnlineUsers = () => {
   );
 
   return (
-    <ScrollArea>
+    <>
       {onlineUsersPanel}
-      <Accordion
-        styles={{ content: { padding: 0 }, control: { height: 40 } }}
-      >
+      <Accordion styles={{ label: { padding: 0 }, control: { height: 30 } }}>
         <Accordion.Item value="offline">
           <Accordion.Control>Offline ({offlineUsers.size})</Accordion.Control>
           <Accordion.Panel>{offlineUsersPanel}</Accordion.Panel>
         </Accordion.Item>
       </Accordion>
-    </ScrollArea>
+    </>
   );
 };
