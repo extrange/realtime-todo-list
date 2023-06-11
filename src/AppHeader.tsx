@@ -8,6 +8,7 @@ import {
   CopyButton,
   Flex,
   Header,
+  Indicator,
   MediaQuery,
   Modal,
   Stack,
@@ -34,8 +35,11 @@ import {
   CURRENT_ROOM_LOCALSTORAGE_KEY,
   RELEASE_DATE,
 } from "./constants";
+import { getUserStatus } from "./getUserStatus";
+import { useAwareness } from "./useAwareness";
 import { useCurrentList } from "./useCurrentList";
 import { useStore } from "./useStore";
+import { selectStoredUsers, useSyncedStore } from "./useSyncedStore";
 import { formatBytes } from "./util";
 
 type InputProps = {
@@ -58,6 +62,11 @@ export const AppHeader = ({
   const theme = useMantineTheme();
   const [roomId] = useLocalStorage({ key: CURRENT_ROOM_LOCALSTORAGE_KEY });
   const [update, forceUpdate] = useState({});
+
+  const awareness = useAwareness();
+  const storedUsers = useSyncedStore(selectStoredUsers);
+  const { onlineUsers } = getUserStatus(awareness, storedUsers);
+  const numberOnline = useMemo(() => [...onlineUsers].length, [onlineUsers]);
 
   const store = useStore();
   const [currentList] = useCurrentList();
@@ -245,7 +254,9 @@ export const AppHeader = ({
             />
           ) : (
             <ActionIcon onClick={() => setAsideOpen((o) => !o)}>
-              <IconUsers color={theme.colors.gray[6]} />
+              <Indicator disabled={!numberOnline} inline label={numberOnline}>
+                <IconUsers color={theme.colors.gray[6]} />
+              </Indicator>
             </ActionIcon>
           )}
         </MediaQuery>
