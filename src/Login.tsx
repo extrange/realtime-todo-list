@@ -75,7 +75,11 @@ export const Login = ({ children }: React.PropsWithChildren) => {
 
   return (
     roomContext?.roomId ? (
-      store && provider ? (
+      store &&
+      provider &&
+      /* This check is necessary to ensure the old store and provider
+      are not passed down when the room is changed */
+      provider.configuration.name === roomContext.roomId ? (
         children
       ) : (
         <div>Loading</div>
@@ -128,7 +132,9 @@ export const Login = ({ children }: React.PropsWithChildren) => {
             <Button onClick={createRoom}>Create a New Room</Button>
           </Stack>
         </form>
-        <Text ta="center" c="dimmed" py={10}>Recent Rooms</Text>
+        <Text ta="center" c="dimmed" py={10}>
+          Recent Rooms
+        </Text>
         <SavedRoomsView />
       </Modal>
     )

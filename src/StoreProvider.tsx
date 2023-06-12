@@ -3,7 +3,6 @@ import { notifications } from "@mantine/notifications";
 import syncedStore from "@syncedstore/core";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { flushSync } from "react-dom";
 import { IndexeddbPersistence } from "y-indexeddb";
 import * as Y from "yjs";
 import { ProviderContext } from "./ProviderContext";
@@ -35,12 +34,6 @@ export const StoreProvider = ({ children }: React.PropsWithChildren) => {
     /* Don't attempt connection if no roomId is present */
     const roomId = roomContext?.roomId;
     if (!roomId) return;
-
-    /* This prevents any rerenders happening with the old store/provider */
-    flushSync(() => {
-      setStore(undefined);
-      setProvider(undefined);
-    });
 
     // First, generate the yDoc
     yDoc.current = new Y.Doc();
