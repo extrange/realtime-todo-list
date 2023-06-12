@@ -10,9 +10,11 @@ import {
 import { useLocalStorage, useMediaQuery } from "@mantine/hooks";
 import { IconLogout } from "@tabler/icons-react";
 import { CSSProperties, useCallback, useState } from "react";
+import { EditRoom } from "./EditRoom";
 import { EditUser } from "./EditUser";
 import { ListView } from "./ListView";
 import { MarkAllRead } from "./MarkAllRead";
+import { SavedRoomsView } from "./SavedRoomsView";
 import { CURRENT_ROOM_LOCALSTORAGE_KEY } from "./constants";
 import "./editor.css";
 
@@ -25,39 +27,44 @@ export const AppNavbar = ({ navOpen, closeNav }: InputProps) => {
   const theme = useMantineTheme();
   const isDesktop = useMediaQuery(`(min-width: ${theme.breakpoints.sm})`);
 
-  const [confirmLeaveRoom, setConfirmLeaveRoom] = useState(false);
+  const [changeRoom, setChangeRoom] = useState(false);
   const [, setCurrentRoomId] = useLocalStorage({
     key: CURRENT_ROOM_LOCALSTORAGE_KEY,
   });
 
   const render = useCallback(
     (styles?: CSSProperties) => (
-      <Navbar style={styles} p="none" width={{ sm: 200, lg: 300 }}>
+      <Navbar style={styles} p="xs" width={{ sm: 200, lg: 300 }}>
         <Modal
-          title="Leave the current room?"
-          opened={confirmLeaveRoom}
-          onClose={() => setConfirmLeaveRoom(false)}
+          title="Change Room"
+          opened={changeRoom}
+          onClose={() => setChangeRoom(false)}
         >
-          <Button onClick={() => setCurrentRoomId("")}>Yes</Button>
+          <SavedRoomsView onCloseHandler={() => setChangeRoom(false)} />
+          {/* A blank room string is used because...? */}
+          <Button onClick={() => setCurrentRoomId("")} mt={"md"}>
+            Leave Room
+          </Button>
         </Modal>
-        <ScrollArea px={15} >
-          <EditUser />
+        <EditRoom />
+        <EditUser />
+        <ScrollArea pt={5} offsetScrollbars>
           <ListView closeNav={closeNav} />
-          <Flex direction={"column"} justify={"flex-end"} mt={10}>
-            <MarkAllRead closeNav={closeNav} />
-            <Button
-              leftIcon={<IconLogout />}
-              onClick={() => setConfirmLeaveRoom(true)}
-              variant="outline"
-              mt={10}
-            >
-              Change Room
-            </Button>
-          </Flex>
         </ScrollArea>
+        <Flex direction={"column"} justify={"flex-end"} mt={10}>
+          <MarkAllRead closeNav={closeNav} />
+          <Button
+            leftIcon={<IconLogout />}
+            onClick={() => setChangeRoom(true)}
+            variant="outline"
+            mt={10}
+          >
+            Change Room
+          </Button>
+        </Flex>
       </Navbar>
     ),
-    [confirmLeaveRoom, closeNav, setCurrentRoomId]
+    [changeRoom, closeNav, setCurrentRoomId]
   );
 
   return isDesktop ? (

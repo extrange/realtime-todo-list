@@ -3,6 +3,7 @@ import { notifications } from "@mantine/notifications";
 import syncedStore from "@syncedstore/core";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import React, { useContext, useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { IndexeddbPersistence } from "y-indexeddb";
 import * as Y from "yjs";
 import { ProviderContext } from "./ProviderContext";
@@ -11,13 +12,13 @@ import { StoreContext } from "./StoreContext";
 import { USER_ID } from "./constants";
 import { Store } from "./useSyncedStore";
 
-/* Doc -> Both provider and store. But provider is used for awareness, while store is user for mutation. Room updates should be done at provider, which will then affect the store? */
 /**
- * Supplies contexts for Hocuspocus Provider and SyncedStore.
+ * Supplies contexts for Hocuspocus Provider and SyncedStore. Also updates
+ * the UUID:RoomName mapping in localstorage on changes in meta.
  *
- * Use the store context to modify the store.
- *
- * Use the provider context to update awareness and listen to events.
+ * Usage:
+ * - To modify the store, use useStore.
+ * - To update awareness and listen to events, use useProvider.
  */
 
 export const StoreProvider = ({ children }: React.PropsWithChildren) => {
@@ -28,10 +29,18 @@ export const StoreProvider = ({ children }: React.PropsWithChildren) => {
   const [store, setStore] = useState<MappedTypeDescription<Store>>();
   const [provider, setProvider] = useState<HocuspocusProvider>();
 
+  /* Initialize Y.Doc, setup listeners for awareness propagation,
+  setup IndexedDB */
   useEffect(() => {
     /* Don't attempt connection if no roomId is present */
     const roomId = roomContext?.roomId;
     if (!roomId) return;
+
+    /* This prevents any rerenders happening with the old store/provider */
+    flushSync(() => {
+      setStore(undefined);
+      setProvider(undefined);
+    });
 
     // First, generate the yDoc
     yDoc.current = new Y.Doc();

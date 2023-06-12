@@ -33,8 +33,8 @@ export const USER_ID = (() => {
   }
 })();
 
-/**Array of saved room UUIDs */
-export const SAVED_ROOMS_LOCALSTORAGE_KEY = 'savedRoomIds'
+/**Array of [uuid, roomName] */
+export const SAVED_ROOMS_LOCALSTORAGE_KEY = "savedRoomIds";
 
 /**ID of currently active room */
-export const CURRENT_ROOM_LOCALSTORAGE_KEY = 'currentRoomId'
+export const CURRENT_ROOM_LOCALSTORAGE_KEY = "currentRoomId";

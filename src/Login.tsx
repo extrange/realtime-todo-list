@@ -1,4 +1,12 @@
-import { Button, Center, Image, Modal, Stack, TextInput } from "@mantine/core";
+import {
+  Button,
+  Center,
+  Image,
+  Modal,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useLocalStorage } from "@mantine/hooks";
 import React, { FormEvent, useCallback, useContext } from "react";
@@ -6,13 +14,19 @@ import { TypeAnimation } from "react-type-animation";
 import { v4 as uuidv4 } from "uuid";
 import { ProviderContext } from "./ProviderContext";
 import { RoomContext } from "./RoomContext";
+import { SavedRoomsView } from "./SavedRoomsView";
 import { StoreContext } from "./StoreContext";
 import bugcat from "./assets/capoo-bugcat.gif";
 import { CURRENT_ROOM_LOCALSTORAGE_KEY } from "./constants";
 import { validateUuid } from "./util";
 
+/**Object with keys:value UUID:roomName */
+export type SavedRooms = Record<string, string | null>;
+
 /** This sits before the app, and will activate if either room or user
  * is not set, and prompt the user.
+ *
+ * Also shows the user's saved rooms (deletable).
  *
  * Attempts to load the user and roomId from localStorage. */
 export const Login = ({ children }: React.PropsWithChildren) => {
@@ -68,25 +82,37 @@ export const Login = ({ children }: React.PropsWithChildren) => {
       )
     ) : (
       <Modal opened onClose={() => void 0} withCloseButton={false}>
-        <h1 style={{ textAlign: "center" }}>Todo</h1>
-        <TypeAnimation
-          style={{ fontSize: "0.8rem" }}
-          sequence={[
-            "Remember what to buy",
-            1000,
-            "Remember places you want to visit",
-            1000,
-            "Remember movies you like",
-            1000,
-            "Remember food you want to try",
-            1000,
-            "Remember what someone said",
-            1000,
-            "Remember interesting things",
-            1000,
-          ]}
-          repeat={Infinity}
-        />
+        <h1 style={{ textAlign: "center", marginBottom: 10 }}>Todo</h1>
+        <div style={{ height: "2rem" }}>
+          <TypeAnimation
+            style={{ fontSize: "0.8rem" }}
+            sequence={[
+              "Stay organized and get things done!",
+              "Your to-do list, your way!",
+              "Your productivity assistant!",
+              "Plan your day and conquer it!",
+              "Never forget a task again!",
+              "Achieve your goals, one task at a time!",
+              "Get things done, effortlessly!",
+              "Create your to-do list, and let us handle the rest!",
+              "Make every day count with our app!",
+              "The easiest way to stay on top of your tasks!",
+              "Get more done in less time with our app!",
+              "Your to-do list, reimagined!",
+              "Take control of your tasks and stay productive!",
+              "Work smarter, not harder!",
+              "Organize your life and achieve your dreams!",
+              "Your personal assistant for productivity!",
+              "Simplify your life, one task at a time!",
+              "Boost your productivity with our app!",
+              "Don't just make plans, make progress!",
+              "Your ultimate productivity tool!",
+            ].flatMap((e) => [e, 700])}
+            speed={70}
+            omitDeletionAnimation
+            repeat={Infinity}
+          />
+        </div>
         <Center>
           <Image height={150} width={200} fit="contain" src={bugcat} />
         </Center>
@@ -102,14 +128,8 @@ export const Login = ({ children }: React.PropsWithChildren) => {
             <Button onClick={createRoom}>Create a New Room</Button>
           </Stack>
         </form>
-        {import.meta.env.VITE_TEST_ROOM && (
-          <Button
-            onClick={() => setCurrentRoomId(import.meta.env.VITE_TEST_ROOM)}
-            fullWidth
-          >
-            Test Room
-          </Button>
-        )}
+        <Text ta="center" c="dimmed" py={10}>Recent Rooms</Text>
+        <SavedRoomsView />
       </Modal>
     )
   ) /* Without this TS gives errors on main.tsx */ as JSX.Element;

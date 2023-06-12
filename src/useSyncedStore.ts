@@ -117,3 +117,4 @@ export const selectTodos = (s: MappedTypeDescription<Store>) => s.todos;
 export const selectLists = (s: MappedTypeDescription<Store>) => s.lists;
 export const selectStoredUsers = (s: MappedTypeDescription<Store>) =>
   s.storedUsers;
+export const selectMeta = (s: MappedTypeDescription<Store>) => s.meta;

@@ -14,6 +14,7 @@ import { Login } from "./Login.tsx";
 import { ReloadPrompt } from "./ReloadPrompt.tsx";
 import { RoomProvider } from "./RoomProvider.tsx";
 import { StoreProvider } from "./StoreProvider.tsx";
+import { UpdateStoredRoomName } from "./UpdateStoredRoomName.tsx";
 import "./app.css";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
@@ -41,6 +42,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                 {/* There may be no provider available (e.g. if user has not selected a room) */}
                 <ErrorBoundary FallbackComponent={Fallback}>
                   <ListProvider>
+                    <UpdateStoredRoomName />
                     <IdleDetect />
                     <App />
                   </ListProvider>

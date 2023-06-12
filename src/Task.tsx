@@ -99,6 +99,8 @@ const TaskInternal = React.memo(
     const [menuOpened, setMenuOpened] = useState(false);
 
     if (!todoReadOnly || !todo) {
+      console.log('store', JSON.parse(JSON.stringify(store)))
+      
       throw Error(`Couldn't find Todo with ID ${todoId}`);
     }
 
