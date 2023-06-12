@@ -21,8 +21,10 @@ import {
   IconCheckbox,
   IconDotsVertical,
   IconSquare,
+  IconTargetArrow,
   IconTrash,
 } from "@tabler/icons-react";
+import { generateKeyBetween } from "fractional-indexing";
 import React, {
   SyntheticEvent,
   useCallback,
@@ -35,7 +37,7 @@ import sanitizeHtml from "sanitize-html";
 import { USER_ID } from "./constants";
 import { useStore } from "./useStore";
 import { Store, selectLists, useSyncedStore } from "./useSyncedStore";
-import { getTodoTitle } from "./util";
+import { getMaxSortOrder, getTodoTitle } from "./util";
 
 const _StyledText = styled(Text)`
   flex-grow: 1;
@@ -99,8 +101,6 @@ const TaskInternal = React.memo(
     const [menuOpened, setMenuOpened] = useState(false);
 
     if (!todoReadOnly || !todo) {
-      console.log('store', JSON.parse(JSON.stringify(store)))
-      
       throw Error(`Couldn't find Todo with ID ${todoId}`);
     }
 
@@ -174,6 +174,17 @@ const TaskInternal = React.memo(
       e.stopPropagation();
       setMenuOpened(true);
     }, []);
+
+    const toggleFocus = useCallback(() => {
+      todo.focus = !todo.focus;
+      if (todo.focus && !todo.focusSortOrder) {
+        const maxSortOrder = getMaxSortOrder(
+          store.todos.filter((t) => t.focus && !t.completed),
+          "focusSortOrder"
+        );
+        todo.focusSortOrder = generateKeyBetween(maxSortOrder, undefined);
+      }
+    }, [store.todos, todo]);
 
     const checkbox = useMemo(
       () => (
@@ -253,7 +264,13 @@ const TaskInternal = React.memo(
               <IconDotsVertical color={theme.colors.gray[6]} />
             </ActionIcon>
           </Menu.Target>
-          <Menu.Dropdown>
+          <Menu.Dropdown onClick={(e) => e.stopPropagation()}>
+            <Menu.Item
+              icon={<IconTargetArrow size={16} />}
+              onClick={toggleFocus}
+            >
+              {todoReadOnly.focus ? "Remove from Focus" : "Add to Focus"}
+            </Menu.Item>
             <Menu.Item icon={<IconTrash size={16} />} onClick={deleteTodo}>
               Delete
             </Menu.Item>
@@ -289,12 +306,19 @@ const TaskInternal = React.memo(
         openMenu,
         theme.colors.gray,
         todo.listId,
+        todoReadOnly.focus,
+        toggleFocus,
       ]
     );
 
     return (
       <Flex onClick={onOpenTodo} py={10} px={5} w={"100%"} align={"center"}>
         {checkbox}
+        {todoReadOnly.focus && (
+          <Tooltip position="bottom" label="In Focus">
+            <IconTargetArrow style={{ marginRight: 10, flexShrink: 0 }} />
+          </Tooltip>
+        )}
         <Tooltip
           openDelay={500}
           multiline

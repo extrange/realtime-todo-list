@@ -4,9 +4,11 @@ import sanitizeHtml from "sanitize-html";
 import { v4 as uuidv4 } from "uuid";
 import { User } from "./App";
 import { colors } from "./constants";
-import { List, Todo } from "./useSyncedStore";
+import { Todo } from "./useSyncedStore";
 
-type Sortable = Pick<Todo | List, "sortOrder">;
+type Sortable = {
+  [T in keyof Pick<Todo, "focusSortOrder" | "sortOrder">]: string;
+};
 
 /**
  * Generate keys for all objects in an array, which don't already have keys.
@@ -54,16 +56,22 @@ export const generateKeys = (todoOrListArray: Array<Partial<Sortable>>) =>
  *
  * Suboptimal, but works.
  */
-export const generateKeyBetweenSafe = (a?: Sortable, b?: Sortable) => {
+export const generateKeyBetweenSafe = <T extends keyof Sortable>(
+  a: Sortable | undefined,
+  b: Sortable | undefined,
+  sortKey: T
+) => {
+  console.log("a", a?.[sortKey]);
+  console.log("b", b?.[sortKey]);
   try {
-    return generateKeyBetween(a?.sortOrder, b?.sortOrder);
+    return generateKeyBetween(a?.[sortKey], b?.[sortKey]);
   } catch (e) {
     // Only handle the case where the sortOrders are the same
     // The order looks weird because we sort by descending...
-    if (a?.sortOrder && b?.sortOrder && a.sortOrder === b.sortOrder) {
-      const upperKey = generateKeyBetween(b.sortOrder, undefined);
-      b.sortOrder = upperKey;
-      return generateKeyBetween(a.sortOrder, upperKey);
+    if (a?.[sortKey] && b?.[sortKey] && a[sortKey] === b[sortKey]) {
+      const upperKey = generateKeyBetween(b[sortKey], undefined);
+      b[sortKey] = upperKey;
+      return generateKeyBetween(a[sortKey], upperKey);
     }
 
     // Otherwise, throw
@@ -76,25 +84,32 @@ export const generateKeyBetweenSafe = (a?: Sortable, b?: Sortable) => {
  *
  * Todos without sortOrder will be compared equal.
  */
-export const itemComparator = <T extends Sortable>(a: T, b: T) => {
-  if (!(a.sortOrder && b.sortOrder)) return 0;
+export const itemComparator =
+  <T extends Sortable, K extends keyof Sortable>(sortKey: K) =>
+  (a: T, b: T) => {
+    const aSortKey = a[sortKey];
+    const bSortKey = b[sortKey];
+    if (!(aSortKey && bSortKey)) return 0;
 
-  if (a.sortOrder > b.sortOrder) return -1;
-  else if (a.sortOrder < b.sortOrder) return 1;
-  else return 0;
-};
+    if (aSortKey > bSortKey) return -1;
+    else if (aSortKey < bSortKey) return 1;
+    else return 0;
+  };
 
 /**
  * Get the maximum sortOrder of a List or Todo array.
  */
-export const getMaxSortOrder = (arr: Array<Sortable>) => {
+export const getMaxSortOrder = <T extends keyof Sortable>(
+  arr: Array<Sortable>,
+  sortKey: T
+) => {
   let max: string | undefined = undefined;
 
   arr
-    .filter((t) => t.sortOrder)
+    .filter((t) => t[sortKey])
     .forEach((t) => {
-      if (max === undefined) max = t.sortOrder;
-      else if ((t.sortOrder as string) > max) max = t.sortOrder;
+      if (max === undefined) max = t[sortKey];
+      else if ((t[sortKey] as string) > max) max = t[sortKey];
     });
   return max;
 };
@@ -150,3 +165,12 @@ export const getTodoTitle = (todo: Todo) => {
   /* Note: both title and notes will count spaces as non-empty */
   return sanitizeHtml(todo.content.get(0).toString());
 };
+
+/**Check if the Todo has a focus propert and focusSortOrder */
+export const isFocusTodo = (
+  todo: Todo
+): todo is WithRequired<Todo, "focus" | "focusSortOrder"> =>
+  !!todo.focus && !!todo.focusSortOrder;
+
+/**Return T with properties in K marked as required. */
+export type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };

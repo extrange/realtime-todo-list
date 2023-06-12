@@ -8,9 +8,9 @@ import {
   Text,
   TextProps,
   createPolymorphicComponent,
-  useMantineTheme
+  useMantineTheme,
 } from "@mantine/core";
-import { IconDotsVertical } from "@tabler/icons-react";
+import { IconDotsVertical, IconTargetArrow } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 
 type CommonProps = {
@@ -21,6 +21,7 @@ type CommonProps = {
 type OptionalProps =
   | {
       editable: true;
+      focus?: never;
       listId: string;
       listName?: string;
       deleteList: (id: string) => void;
@@ -29,6 +30,7 @@ type OptionalProps =
   | {
       /**Uncategorized */
       editable?: false;
+      focus?: boolean;
       listId?: never;
       listName?: never;
       deleteList?: never;
@@ -45,7 +47,7 @@ const StyledFlex = styled(Flex)<StyledProps>`
   ${({ selected }) => selected && "background-color: rgb(57, 57, 63)"};
 
   :hover {
-    background-color: rgb(44, 46, 51);
+    ${({ selected }) => !selected && "background-color: rgb(44, 46, 51)"}
   }
 `;
 
@@ -69,6 +71,7 @@ export const ListItem = ({
   renameList,
   selectList,
   editable,
+  focus,
 }: CommonProps & OptionalProps) => {
   const theme = useMantineTheme();
   const [menuOpened, setMenuOpened] = useState(false);
@@ -99,16 +102,17 @@ export const ListItem = ({
   const render = useMemo(
     () => (
       <StyledFlex selected={selected} align={"center"} pl={5}>
+        {focus && <IconTargetArrow style={{ marginRight: 5 }} />}
         <StyledListContent
           onClick={() => selectList(listId)}
           fw={selected ? 700 : "normal"}
         >
-          {listName || "Uncategorized"}
+          {listName || (focus ? "Focus" : "Uncategorized")}
         </StyledListContent>
         {menu}
       </StyledFlex>
     ),
-    [listId, listName, menu, selectList, selected]
+    [focus, listId, listName, menu, selectList, selected]
   );
 
   return render;

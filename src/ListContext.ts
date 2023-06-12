@@ -1,7 +1,11 @@
 import { SetStateAction, createContext } from "react";
 
-type IListContext = {
-  currentList?: string;
+export enum ListType {
+  Focus = "focus",
+}
+
+export type IListContext = {
+  currentList?: string | ListType;
   setCurrentList: React.Dispatch<SetStateAction<string | undefined>>;
 };
 

@@ -143,7 +143,7 @@ export const DebugTools = () => {
         .map(() => {
           const id = uuidv4();
           const sortOrder = generateKeyBetween(
-            getMaxSortOrder(store.lists),
+            getMaxSortOrder(store.lists, "sortOrder"),
             undefined
           );
 
@@ -164,7 +164,10 @@ export const DebugTools = () => {
         const id = uuidv4();
         const now = Date.now();
         const sortOrder = generateKeyBetween(
-          getMaxSortOrder(store.todos.filter((t) => t.id === l)),
+          getMaxSortOrder(
+            store.todos.filter((t) => t.id === l),
+            "sortOrder"
+          ),
           undefined
         );
         const content = new Y.XmlFragment();

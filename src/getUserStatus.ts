@@ -1,6 +1,7 @@
 import { USER_ID } from "./constants";
 import { AwarenessMap, AwarenessState } from "./useAwareness";
 import { Store, UserData } from "./useSyncedStore";
+import { WithRequired } from "./util";
 
 /**
  * Represents the state of the current user, with certain (possibly)
@@ -11,9 +12,6 @@ export type OnlineUser = UserData & {
 };
 
 export type OfflineUser = UserData;
-
-/**Return T with properties in K marked as required. */
-type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 /**
  * Looks up userIds in an AwarenessMap from storedUsers, separates users

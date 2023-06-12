@@ -34,6 +34,9 @@ export type Todo = {
   /**Whether this task should be in the 'Focus' view.*/
   focus?: boolean;
 
+  /**Sort order for this task in the 'Focus' view.*/
+  focusSortOrder?: string;
+
   /**UUID of the list this todo belongs to. */
   listId?: string;
 };

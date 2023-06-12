@@ -47,7 +47,7 @@ export const useAwareness = () => {
     provider.on("awarenessChange", debouncedUpdate);
 
     return () => void provider.off("awarenessChange", debouncedUpdate);
-  }, []);
+  }, [provider]);
 
   return state.value;
 };

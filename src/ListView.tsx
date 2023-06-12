@@ -3,6 +3,7 @@ import { Button, Flex } from "@mantine/core";
 import { generateKeyBetween } from "fractional-indexing";
 import { useCallback, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { ListType } from "./ListContext";
 import { ListItem } from "./ListItem";
 import { useCurrentList } from "./useCurrentList";
 import { useStore } from "./useStore";
@@ -37,7 +38,7 @@ export const ListView = ({ closeNav }: InputProps) => {
     const name = prompt("Enter list name:");
     if (!name) return;
     const sortOrder = generateKeyBetween(
-      getMaxSortOrder(store.lists),
+      getMaxSortOrder(store.lists, "sortOrder"),
       undefined
     );
     const newListId = uuidv4();
@@ -58,6 +59,11 @@ export const ListView = ({ closeNav }: InputProps) => {
       closeNav();
     },
     [closeNav, setCurrentList]
+  );
+
+  const selectFocus = useCallback(
+    () => setCurrentList(ListType.Focus),
+    [setCurrentList]
   );
 
   /* Deleting a list deletes all tasks the list, including completed tasks */
@@ -100,6 +106,14 @@ export const ListView = ({ closeNav }: InputProps) => {
       <Button my={10} onClick={createList}>
         Create List
       </Button>
+
+      {/* Focus tasks */}
+      <ListItem
+        editable={false}
+        focus
+        selected={currentList === ListType.Focus}
+        selectList={selectFocus}
+      />
 
       {/* Uncategorized tasks */}
       <ListItem

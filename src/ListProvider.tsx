@@ -1,12 +1,19 @@
 import React, { useMemo, useState } from "react";
-import { ListContext } from "./ListContext";
+import { IListContext, ListContext } from "./ListContext";
 
 export const ListProvider = ({ children }: React.PropsWithChildren) => {
-  const [currentList, setCurrentList] = useState<string>();
+  const [currentList, setCurrentList] = useState<
+    IListContext["currentList"] | undefined
+  >();
 
-  const providerValue = useMemo(() => ({currentList, setCurrentList}), [currentList])
+  const providerValue = useMemo(
+    () => ({ currentList, setCurrentList }),
+    [currentList]
+  );
 
   return (
-    <ListContext.Provider value={providerValue}>{children}</ListContext.Provider>
+    <ListContext.Provider value={providerValue}>
+      {children}
+    </ListContext.Provider>
   );
 };

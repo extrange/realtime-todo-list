@@ -29,6 +29,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import TimeAgo from "react-timeago";
 import { DebugTools } from "./DebugTools";
+import { ListType } from "./ListContext";
 import {
   COMMIT_HASH,
   COMMIT_MSG,
@@ -72,8 +73,10 @@ export const AppHeader = ({
   const [currentList] = useCurrentList();
   const currentListName = useMemo(
     () =>
-      (update && store.lists.find((l) => l.id === currentList)?.name) ??
-      "Uncategorized",
+      currentList === ListType.Focus
+        ? "Focus"
+        : (update && store.lists.find((l) => l.id === currentList)?.name) ??
+          "Uncategorized",
     [currentList, store, update]
   );
 

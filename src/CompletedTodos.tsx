@@ -1,5 +1,6 @@
 import { Accordion } from "@mantine/core";
 import React, { SetStateAction, useMemo, useState } from "react";
+import { ListType } from "./ListContext";
 import { Task } from "./Task";
 import { useCurrentList } from "./useCurrentList";
 import { selectTodos, useSyncedStore } from "./useSyncedStore";
@@ -27,7 +28,12 @@ export const CompletedTodos = React.memo(({ setEditingId }: InputProps) => {
   const todos = useSyncedStore(selectTodos);
 
   const todosInCurrentList = useMemo(
-    () => todos.filter((t) => t.listId === currentList && t.completed),
+    () =>
+      todos.filter(
+        (t) =>
+          t.completed &&
+          (currentList === ListType.Focus ? t.focus : t.listId === currentList)
+      ),
     [currentList, todos]
   );
 
@@ -47,7 +53,7 @@ export const CompletedTodos = React.memo(({ setEditingId }: InputProps) => {
       <Accordion.Item value="completed">
         <Accordion.Control>Completed ({todoIds.length})</Accordion.Control>
         <Accordion.Panel>
-            {/* Only render when open, to improve performance */}
+          {/* Only render when open, to improve performance */}
           {open &&
             todoIds.map((id) => (
               <Task
