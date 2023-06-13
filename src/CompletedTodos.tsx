@@ -49,6 +49,7 @@ export const CompletedTodos = React.memo(({ setEditingId }: InputProps) => {
       value={open}
       onChange={setOpen}
       styles={{ content: { padding: 0 } }}
+      chevronPosition="left"
     >
       <Accordion.Item value="completed">
         <Accordion.Control>Completed ({todoIds.length})</Accordion.Control>

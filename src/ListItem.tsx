@@ -12,6 +12,7 @@ import {
 } from "@mantine/core";
 import { IconDotsVertical, IconTargetArrow } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
+import { selectTodos, useSyncedStore } from "./useSyncedStore";
 
 type CommonProps = {
   selected?: boolean;
@@ -75,6 +76,13 @@ export const ListItem = ({
 }: CommonProps & OptionalProps) => {
   const theme = useMantineTheme();
   const [menuOpened, setMenuOpened] = useState(false);
+  const todos = useSyncedStore(selectTodos);
+  /* Show number of un-completed todos for Focus and Uncategorized */
+  const uncompletedTodos = useMemo(
+    () =>
+      todos.filter((t) => !t.completed && (focus ? t.focus : !t.listId)).length,
+    [focus, todos]
+  );
 
   const menu = useMemo(
     () =>
@@ -107,12 +115,15 @@ export const ListItem = ({
           onClick={() => selectList(listId)}
           fw={selected ? 700 : "normal"}
         >
-          {listName || (focus ? "Focus" : "Uncategorized")}
+          {listName ||
+            (focus
+              ? `Focus (${uncompletedTodos})`
+              : `Uncategorized (${uncompletedTodos})`)}
         </StyledListContent>
         {menu}
       </StyledFlex>
     ),
-    [focus, listId, listName, menu, selectList, selected]
+    [focus, listId, listName, menu, selectList, selected, uncompletedTodos]
   );
 
   return render;

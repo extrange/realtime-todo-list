@@ -61,6 +61,7 @@ export const App = () => {
     >
       <ScrollArea
         h={`calc(${height}px - var(--mantine-footer-height) - var(--mantine-header-height))`}
+        offsetScrollbars
       >
         <TodoView />
       </ScrollArea>
