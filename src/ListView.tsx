@@ -53,6 +53,7 @@ export const ListView = ({ closeNav }: InputProps) => {
     [lists]
   );
 
+  /* Select Uncategorized/other lists with IDs */
   const selectList = useCallback(
     (listId?: string) => {
       setCurrentList(listId);
@@ -61,10 +62,10 @@ export const ListView = ({ closeNav }: InputProps) => {
     [closeNav, setCurrentList]
   );
 
-  const selectFocus = useCallback(
-    () => setCurrentList(ListType.Focus),
-    [setCurrentList]
-  );
+  const selectFocus = useCallback(() => {
+    setCurrentList(ListType.Focus);
+    closeNav();
+  }, [closeNav, setCurrentList]);
 
   /* Deleting a list deletes all tasks the list, including completed tasks */
   const deleteList = useCallback(
