@@ -1,14 +1,18 @@
 import { Document } from "@tiptap/extension-document";
-import { EditorContent, useEditor } from "@tiptap/react";
+import { useEditor } from "@tiptap/react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
+import { RichTextEditor } from "@mantine/tiptap";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import { Heading } from "@tiptap/extension-heading";
+import Highlight from "@tiptap/extension-highlight";
+import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
+import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
 import React from "react";
 import { User } from "./App";
@@ -51,12 +55,15 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
     extensions: [
       TaskItem.configure({ nested: true }),
       TaskList,
+      Underline,
+      Link,
+      Highlight,
       StarterKit.configure({
         history: false,
         document: false,
       }),
       Title,
-      Document.extend({ content: "title block*" }),
+      Document.extend({ content: "title block+" }),
       ...(todo ? [Collaboration.configure({ fragment: todo.content })] : []),
       ...(user
         ? // Uses user.name and user.color for rendering
@@ -95,5 +102,46 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
     editor?.chain().updateUser(user).run();
   }, [user, editor]);
 
-  return <EditorContent editor={editor} />;
+  return (
+    <RichTextEditor editor={editor}>
+      <RichTextEditor.Toolbar sticky stickyOffset={60}>
+        <RichTextEditor.ControlsGroup>
+          <RichTextEditor.Bold />
+          <RichTextEditor.Italic />
+          <RichTextEditor.Underline />
+          <RichTextEditor.Strikethrough />
+          <RichTextEditor.ClearFormatting />
+          <RichTextEditor.Highlight />
+          <RichTextEditor.Code />
+        </RichTextEditor.ControlsGroup>
+
+        <RichTextEditor.ControlsGroup>
+          <RichTextEditor.H1 />
+          <RichTextEditor.H2 />
+          <RichTextEditor.H3 />
+          <RichTextEditor.H4 />
+        </RichTextEditor.ControlsGroup>
+
+        <RichTextEditor.ControlsGroup>
+          <RichTextEditor.Blockquote />
+          <RichTextEditor.BulletList />
+          <RichTextEditor.OrderedList />
+        </RichTextEditor.ControlsGroup>
+
+        <RichTextEditor.ControlsGroup>
+          <RichTextEditor.Link />
+          <RichTextEditor.Unlink />
+        </RichTextEditor.ControlsGroup>
+
+        <RichTextEditor.ControlsGroup>
+          <RichTextEditor.AlignLeft />
+          <RichTextEditor.AlignCenter />
+          <RichTextEditor.AlignJustify />
+          <RichTextEditor.AlignRight />
+        </RichTextEditor.ControlsGroup>
+      </RichTextEditor.Toolbar>
+
+      <RichTextEditor.Content />
+    </RichTextEditor>
+  );
 });
