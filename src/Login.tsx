@@ -47,7 +47,6 @@ export const Login = ({ children }: React.PropsWithChildren) => {
         return validateUuid(v) ? null : "Invalid room ID";
       },
     },
-    validateInputOnBlur: true,
   });
 
   const onSubmit = useCallback(

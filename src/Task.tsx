@@ -177,6 +177,8 @@ const TaskInternal = React.memo(
 
     const toggleFocus = useCallback(() => {
       todo.focus = !todo.focus;
+
+      /* Generate focusSortOrder if moving to focus list */
       if (todo.focus && !todo.focusSortOrder) {
         const maxSortOrder = getMaxSortOrder(
           store.todos.filter((t) => t.focus && !t.completed),

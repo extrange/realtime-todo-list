@@ -1,33 +1,31 @@
 import {
-    DndContext,
-    DragEndEvent,
-    DragOverlay,
-    DragStartEvent,
-    MouseSensor,
-    TouchSensor,
-    closestCenter,
-    useSensor,
-    useSensors,
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  MouseSensor,
+  TouchSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
 } from "@dnd-kit/core";
 import {
-    SortableContext,
-    verticalListSortingStrategy,
+  SortableContext,
+  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import {
-    ActionIcon,
-    Affix,
-    Center,
-    Modal,
-    Text,
-    rem,
-    useMantineTheme,
+  ActionIcon,
+  Affix,
+  Center,
+  Text,
+  rem,
+  useMantineTheme,
 } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { DeepReadonly } from "ts-essentials";
 import { CompletedTodos } from "./CompletedTodos";
-import { EditTodo } from "./EditTodo";
+import { EditTodoWrapper } from "./EditTodoWrapper";
 import { Task } from "./Task";
 import { useStore } from "./useStore";
 import { Todo } from "./useSyncedStore";
@@ -43,32 +41,20 @@ type InputProps = {
   createTodoFn: () => Todo;
 };
 
-type ScrollPosition = Record<string, number>;
-
 /**Takes a list of filtered, sorted todos and displays them.
  * Handles editor display.
  */
 export const TodoViewBase = React.memo(
   ({ todos, sortKey, createTodoFn }: InputProps) => {
+    const theme = useMantineTheme();
     const store = useStore();
 
     /* The todo currently being dragged, if any */
     const [activeId, setActiveId] = useState<string>();
-
-    const [editingId, setEditingId] = useState<string>();
-
-    const dialogRef = useRef<HTMLElement | null>(null);
-    const scrollPositions = useRef<ScrollPosition>({});
-    const theme = useMantineTheme();
-    const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`);
-
     const todoIds = useMemo(() => todos.map((t) => t.id), [todos]);
 
-    const editingTodo = useMemo(
-      // Must use store.todos here since this is passed to EditTodo
-      () => store.todos.find((t) => t.id === editingId),
-      [editingId, store]
-    );
+    /* The todo currently being edited */
+    const [editingId, setEditingId] = useState<string>();
 
     /* PointerSensor causes drag-to-refresh on mobile Chrome */
     const sensors = useSensors(
@@ -144,49 +130,9 @@ export const TodoViewBase = React.memo(
       [sortKey, store.todos, todos]
     );
 
-    /* Editor has been created, so we can use scrollTo now
-    Previously, using a ref callback would give the wrong height
-    as the editor had not loaded yet*/
-    const onEditorCreate = useCallback(() => {
-      if (editingId && dialogRef.current) {
-        const lastScrollPos = scrollPositions.current[editingId];
-        if (lastScrollPos) dialogRef.current.scroll(0, lastScrollPos);
-        else dialogRef.current.scroll(0, 0);
-      }
-    }, [editingId]);
-
-    const onDialogClose = useCallback(() => {
-      if (editingId && dialogRef.current) {
-        scrollPositions.current[editingId] = dialogRef.current.scrollTop;
-      }
-
-      // Update last opened
-      editingId && localStorage.setItem(editingId, Date.now().toString());
-
-      setEditingId(undefined);
-    }, [editingId]);
-
     return (
       <>
-        <Modal.Root
-          opened={!!editingId}
-          onClose={onDialogClose}
-          fullScreen={isMobile}
-          size={"min(70%, 800px)"} // Not applied if fullScreen=True
-          styles={{ overlay: { backdropFilter: "blur(2px)" } }}
-        >
-          <Modal.Overlay />
-          <Modal.Content ref={dialogRef}>
-            <Modal.Header>
-              <Modal.CloseButton />
-            </Modal.Header>
-            <Modal.Body>
-              {editingTodo && (
-                <EditTodo todo={editingTodo} onCreate={onEditorCreate} />
-              )}
-            </Modal.Body>
-          </Modal.Content>
-        </Modal.Root>
+        <EditTodoWrapper editingId={editingId} setEditingId={setEditingId} />
 
         {/* This is a hack to make the affix stay within the scrollArea */}
         <div

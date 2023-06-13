@@ -39,6 +39,14 @@ export type Todo = {
 
   /**UUID of the list this todo belongs to. */
   listId?: string;
+
+  /**Due date in ISO8601 (e.g. 2023-06-11)*/
+  dueDate?: string;
+
+  /**Number of days the next dueDate is set after, when todo is marked
+   * completed.
+   */
+  repeatDays?: number;
 };
 
 export type List = {
