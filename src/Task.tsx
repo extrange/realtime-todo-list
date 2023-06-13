@@ -4,6 +4,8 @@ import styled from "@emotion/styled";
 import {
   ActionIcon,
   Avatar,
+  Badge,
+  Center,
   Flex,
   Menu,
   Overlay,
@@ -19,11 +21,19 @@ import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import {
   IconCheck,
   IconCheckbox,
+  IconClockHour4,
   IconDotsVertical,
+  IconRepeat,
   IconSquare,
   IconTargetArrow,
   IconTrash,
 } from "@tabler/icons-react";
+import {
+  addDays,
+  differenceInCalendarDays,
+  formatISO,
+  isValid,
+} from "date-fns";
 import { generateKeyBetween } from "fractional-indexing";
 import React, {
   SyntheticEvent,
@@ -159,9 +169,19 @@ const TaskInternal = React.memo(
         e.stopPropagation();
         todo.modified = Date.now();
         todo.by = USER_ID;
-        todo.completed = !todoReadOnly.completed;
+
+        if (todoReadOnly.repeatDays && !todoReadOnly.completed) {
+          /* If this is a repeating task that was completed,
+          do not mark as completed, update due date */
+          todo.dueDate = formatISO(
+            addDays(new Date(), todoReadOnly.repeatDays),
+            { representation: "date" }
+          );
+        } else {
+          todo.completed = !todoReadOnly.completed;
+        }
       },
-      [todo, todoReadOnly.completed]
+      [todo, todoReadOnly.completed, todoReadOnly.repeatDays]
     );
 
     /* Mark todo as read on open */
@@ -200,6 +220,65 @@ const TaskInternal = React.memo(
       ),
       [completeTodo, theme.colors.gray, todoReadOnly.completed]
     );
+
+    const dueDateRepeat = useMemo(() => {
+      const daysToDue =
+        todoReadOnly.dueDate && isValid(Date.parse(todoReadOnly.dueDate))
+          ? differenceInCalendarDays(
+              Date.parse(todoReadOnly.dueDate),
+              new Date()
+            )
+          : undefined;
+
+      const dueDateString =
+        typeof daysToDue === "number" &&
+        (daysToDue === 0
+          ? "Today"
+          : daysToDue === 1
+          ? "Tomorrow"
+          : daysToDue < 1
+          ? `${Math.abs(daysToDue)} day${
+              Math.abs(daysToDue) > 1 ? "s" : ""
+            } ago`
+          : `In ${daysToDue} days`);
+
+      const color = daysToDue
+        ? daysToDue < 1
+          ? "red"
+          : daysToDue < 4
+          ? "yellow"
+          : "gray"
+        : undefined;
+
+      return (
+        <>
+          {todoReadOnly.dueDate && (
+            <Badge
+              color={color}
+              leftSection={
+                <Center>
+                  <IconClockHour4 size={14} />
+                </Center>
+              }
+            >
+              {dueDateString}
+            </Badge>
+          )}
+          {todoReadOnly.repeatDays && (
+            <Badge
+              color="gray"
+              leftSection={
+                <Center>
+                  <IconRepeat size={14} />
+                </Center>
+              }
+            >
+              {todoReadOnly.repeatDays} days
+            </Badge>
+          )}
+        </>
+      );
+    }, [todoReadOnly.dueDate, todoReadOnly.repeatDays]);
 
     /* The YXmlFragment can be viewed as an array.
   
@@ -314,37 +393,42 @@ const TaskInternal = React.memo(
     );
 
     return (
-      <Flex onClick={onOpenTodo} py={10} px={5} w={"100%"} align={"center"}>
-        {checkbox}
-        {todoReadOnly.focus && (
-          <Tooltip position="bottom" label="In Focus">
-            <IconTargetArrow style={{ marginRight: 10, flexShrink: 0 }} />
+      <Flex direction={"column"} w="100%" py={10} px={5} onClick={onOpenTodo}>
+        <Flex align={"center"}>
+          {checkbox}
+          {todoReadOnly.focus && (
+            <Tooltip position="bottom" label="In Focus">
+              <IconTargetArrow style={{ marginRight: 10, flexShrink: 0 }} />
+            </Tooltip>
+          )}
+          <Tooltip
+            openDelay={500}
+            multiline
+            position={"bottom"}
+            label={
+              <div>
+                <Text>
+                  Modified <TimeAgo live={false} date={todoReadOnly.modified} />{" "}
+                  by{" "}
+                  {todoReadOnly.by && todoReadOnly.by === USER_ID
+                    ? "you"
+                    : byUser && byUser.name}
+                </Text>
+                <Text>
+                  Created <TimeAgo live={false} date={todoReadOnly.created} />
+                </Text>
+                <Text>sortOrder: {todoReadOnly.sortOrder ?? "N/A"}</Text>
+              </div>
+            }
+          >
+            {textContent}
           </Tooltip>
-        )}
-        <Tooltip
-          openDelay={500}
-          multiline
-          position={"bottom"}
-          label={
-            <div>
-              <Text>
-                Modified <TimeAgo live={false} date={todoReadOnly.modified} />{" "}
-                by{" "}
-                {todoReadOnly.by && todoReadOnly.by === USER_ID
-                  ? "you"
-                  : byUser && byUser.name}
-              </Text>
-              <Text>
-                Created <TimeAgo live={false} date={todoReadOnly.created} />
-              </Text>
-              <Text>sortOrder: {todoReadOnly.sortOrder ?? "N/A"}</Text>
-            </div>
-          }
-        >
-          {textContent}
-        </Tooltip>
-        {avatar}
-        {menu}
+          {avatar}
+          {menu}
+        </Flex>
+        <Flex mt={5} sx={{ userSelect: "none" }}>
+          {dueDateRepeat}
+        </Flex>
       </Flex>
     );
   }

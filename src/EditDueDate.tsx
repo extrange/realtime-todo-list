@@ -1,7 +1,7 @@
-import { Group, NumberInput } from "@mantine/core";
+import { Group, Indicator, NumberInput } from "@mantine/core";
 import { DatePickerInput, DateValue } from "@mantine/dates";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
-import { formatISO } from "date-fns";
+import { formatISO, isToday } from "date-fns";
 import { useCallback, useMemo } from "react";
 import { useStore } from "./useStore";
 import { Store, useSyncedStore } from "./useSyncedStore";
@@ -44,15 +44,32 @@ export const EditDueDate = ({ todoId }: InputProps) => {
   );
 
   return (
-    <Group>
+    <Group noWrap>
       <DatePickerInput
+        sx={{ flex: "1 1" }}
+        maw={200}
         label="Due"
+        placeholder="Enter a date"
         clearable
         dropdownType="modal"
         value={currentDate}
         onChange={onDueDateChange}
+        renderDay={(date) => (
+          <Indicator
+            size={6}
+            color="green"
+            offset={-5}
+            disabled={!isToday(date)}
+          >
+            <div>{date.getDate()}</div>
+          </Indicator>
+        )}
       />
       <NumberInput
+        sx={{ flex: "1 1" }}
+        placeholder="None"
+        maw={100}
+        hideControls
         label="Repeat days"
         value={todoReadOnly.repeatDays}
         onChange={onRepeatDaysChange}
