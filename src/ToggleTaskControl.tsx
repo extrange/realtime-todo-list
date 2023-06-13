@@ -1,8 +1,9 @@
 import { RichTextEditor, useRichTextEditorContext } from "@mantine/tiptap";
 import { IconListCheck } from "@tabler/icons-react";
+import React from "react";
 import { useCallback } from "react";
 
-export const ToggleTaskControl = () => {
+export const ToggleTaskControl = React.memo(() => {
   const { editor } = useRichTextEditorContext();
 
   const onClick = useCallback(() => editor.commands.toggleTaskList(), [editor]);
@@ -11,4 +12,4 @@ export const ToggleTaskControl = () => {
       <IconListCheck size="1rem" />
     </RichTextEditor.Control>
   );
-};
+});

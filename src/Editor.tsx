@@ -17,6 +17,7 @@ import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
 import React from "react";
 import { User } from "./App";
+import { ToggleCodeBlockControl } from "./ToggleCodeBlockControl";
 import { ToggleTaskControl } from "./ToggleTaskControl";
 import { USER_ID } from "./constants";
 import { useProvider } from "./useProvider";
@@ -116,6 +117,7 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
           <RichTextEditor.ClearFormatting />
           <RichTextEditor.Highlight />
           <RichTextEditor.Code />
+          <ToggleCodeBlockControl />
         </RichTextEditor.ControlsGroup>
 
         <RichTextEditor.ControlsGroup>
@@ -135,13 +137,6 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
         <RichTextEditor.ControlsGroup>
           <RichTextEditor.Link />
           <RichTextEditor.Unlink />
-        </RichTextEditor.ControlsGroup>
-
-        <RichTextEditor.ControlsGroup>
-          <RichTextEditor.AlignLeft />
-          <RichTextEditor.AlignCenter />
-          <RichTextEditor.AlignJustify />
-          <RichTextEditor.AlignRight />
         </RichTextEditor.ControlsGroup>
       </RichTextEditor.Toolbar>
 

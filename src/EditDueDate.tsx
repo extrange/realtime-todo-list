@@ -44,14 +44,13 @@ export const EditDueDate = ({ todoId }: InputProps) => {
   );
 
   return (
-    <Group noWrap>
+    <Group noWrap mb={"xs"}>
       <DatePickerInput
-        sx={{ flex: "1 1" }}
+        sx={{ flexGrow: 1 }}
         maw={200}
         label="Due"
         placeholder="Enter a date"
         clearable
-        dropdownType="modal"
         value={currentDate}
         onChange={onDueDateChange}
         renderDay={(date) => (
@@ -66,7 +65,7 @@ export const EditDueDate = ({ todoId }: InputProps) => {
         )}
       />
       <NumberInput
-        sx={{ flex: "1 1" }}
+        sx={{ flexGrow: 1 }}
         placeholder="None"
         maw={100}
         hideControls
