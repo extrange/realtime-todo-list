@@ -77,11 +77,13 @@ export const ListItem = ({
   const theme = useMantineTheme();
   const [menuOpened, setMenuOpened] = useState(false);
   const todos = useSyncedStore(selectTodos);
-  /* Show number of un-completed todos for Focus and Uncategorized */
+
   const uncompletedTodos = useMemo(
     () =>
-      todos.filter((t) => !t.completed && (focus ? t.focus : !t.listId)).length,
-    [focus, todos]
+      todos.filter(
+        (t) => !t.completed && (focus ? t.focus : t.listId === listId)
+      ).length,
+    [focus, listId, todos]
   );
 
   const menu = useMemo(
@@ -115,10 +117,11 @@ export const ListItem = ({
           onClick={() => selectList(listId)}
           fw={selected ? 700 : "normal"}
         >
-          {listName ||
-            (focus
-              ? `Focus (${uncompletedTodos})`
-              : `Uncategorized (${uncompletedTodos})`)}
+          {!listName
+            ? `Uncategorized (${uncompletedTodos})`
+            : focus
+            ? `Focus (${uncompletedTodos})`
+            : `${listName} (${uncompletedTodos})`}
         </StyledListContent>
         {menu}
       </StyledFlex>

@@ -166,7 +166,7 @@ export const getTodoTitle = (todo: Todo) => {
   return sanitizeHtml(todo.content.get(0).toString());
 };
 
-/**Check if the Todo has a focus propert and focusSortOrder */
+/**Check if the Todo has a focus property and focusSortOrder */
 export const isFocusTodo = (
   todo: Todo
 ): todo is WithRequired<Todo, "focus" | "focusSortOrder"> =>

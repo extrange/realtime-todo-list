@@ -12,7 +12,6 @@ import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
-import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
 import React from "react";
@@ -23,6 +22,7 @@ import { USER_ID } from "./constants";
 import { useProvider } from "./useProvider";
 import { useStore } from "./useStore";
 import { Store, useSyncedStore } from "./useSyncedStore";
+import { getTodoTitle } from "./util";
 
 type InputProps = {
   editingId: string;
@@ -61,7 +61,6 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
       Underline,
       Link,
       Highlight,
-      TextAlign.configure({ types: ["heading", "paragraph"] }),
       StarterKit.configure({
         history: false,
         document: false,
@@ -86,6 +85,9 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
       }),
     ],
 
+    /* Autofocus only if title is not set */
+    autofocus: !getTodoTitle(todo),
+
     onUpdate: () => {
       if (!edited.current) {
         // This is to disregard the initial onUpdate, which is fired on focus
@@ -101,6 +103,7 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
     onDestroy: () => provider.setAwarenessField("editingId", undefined),
   });
 
+  /* Update user live cursor on changes while editing */
   useEffect(() => {
     // If .focus() is called here it messes up scroll
     editor?.chain().updateUser(user).run();
