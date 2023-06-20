@@ -25,3 +25,6 @@ dist-ssr
 *.sw?
 
 node_modules/
+
+# rollup-plugin-visualizer
+stats.html

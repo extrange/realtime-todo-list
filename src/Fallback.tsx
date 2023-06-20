@@ -8,15 +8,16 @@ import {
   Stack,
 } from "@mantine/core";
 import { IconAlertCircle, IconAlertTriangle } from "@tabler/icons-react";
-import { useState } from "react";
+import { lazy, useState } from "react";
 import { FallbackProps } from "react-error-boundary";
-import { DebugTools } from "./DebugTools";
 
 type InputProps = {
   /**Whether to use DebugTools (will require StoreProvider to supply
    * context higher up in the tree) */
   withDebugTools?: boolean;
 };
+
+const DebugTools = lazy(() => import("./DebugTools"));
 
 const FallbackBase = ({
   error,

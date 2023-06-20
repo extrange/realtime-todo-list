@@ -25,10 +25,8 @@ import {
   IconInfoCircle,
   IconUsers,
 } from "@tabler/icons-react";
-import React, { useEffect, useMemo, useState } from "react";
-import { useErrorBoundary } from "react-error-boundary";
+import React, { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import TimeAgo from "react-timeago";
-import { DebugTools } from "./DebugTools";
 import { ListType } from "./ListContext";
 import {
   COMMIT_HASH,
@@ -49,6 +47,8 @@ type InputProps = {
   asideOpen: boolean;
   setAsideOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
+
+const DebugTools = lazy(() => import("./DebugTools"));
 
 export const AppHeader = ({
   navOpen,
@@ -79,8 +79,6 @@ export const AppHeader = ({
           "Uncategorized",
     [currentList, store, update]
   );
-
-  const { showBoundary } = useErrorBoundary();
 
   useEffect(
     () => void navigator.storage?.estimate().then(setStorageEstimate),
@@ -193,13 +191,9 @@ export const AppHeader = ({
             </Accordion.Control>
             <Accordion.Panel>
               <Stack>
-                <Button
-                  variant="subtle"
-                  onClick={() => showBoundary(new Error("Test Error Message"))}
-                >
-                  Throw error
-                </Button>
-                <DebugTools />
+                <Suspense fallback="Loading...">
+                  <DebugTools />
+                </Suspense>
               </Stack>
             </Accordion.Panel>
           </Accordion.Item>

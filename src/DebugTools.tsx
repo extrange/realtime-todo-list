@@ -6,6 +6,7 @@ import { notifications } from "@mantine/notifications";
 import { Y, getYjsDoc } from "@syncedstore/core";
 import { generateKeyBetween } from "fractional-indexing";
 import { Suspense, lazy, useState } from "react";
+import { useErrorBoundary } from "react-error-boundary";
 import { v4 as uuidv4 } from "uuid";
 import { Doc } from "yjs";
 import { DebugArmedButton } from "./DebugArmedButton";
@@ -30,7 +31,7 @@ const LazyDevTools = lazy(() => import("./DevTools"));
  *
  * Uses StoreProviderContext.
  */
-export const DebugTools = () => {
+export default function DebugTools() {
   const [roomId] = useLocalStorage({ key: CURRENT_ROOM_LOCALSTORAGE_KEY });
   const store = useStore();
   const provider = useProvider();
@@ -38,6 +39,11 @@ export const DebugTools = () => {
   const todos = useSyncedStore(selectTodos);
   const [devToolsEnabled, setDevToolsEnabled] = useState(false);
   const [currentList] = useCurrentList();
+  const { showBoundary } = useErrorBoundary();
+
+  const throwError = () => {
+    showBoundary(Error("Test Error"));
+  };
 
   const clearStoredUsers = () => {
     try {
@@ -223,6 +229,7 @@ export const DebugTools = () => {
   return (
     <>
       {[
+        [throwError, "Throw error"] as const,
         [
           clearStoredUsers,
           "Clear storedUsers (affects all users)",
@@ -280,4 +287,4 @@ export const DebugTools = () => {
       )}
     </>
   );
-};
+}

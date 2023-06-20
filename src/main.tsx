@@ -40,13 +40,13 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
             <StoreProvider>
               <Login>
                 {/* There may be no provider available (e.g. if user has not selected a room) */}
-                <ErrorBoundary FallbackComponent={Fallback}>
-                  <ListProvider>
+                <ListProvider>
+                  <ErrorBoundary FallbackComponent={Fallback}>
                     <UpdateStoredRoomName />
                     <IdleDetect />
                     <App />
-                  </ListProvider>
-                </ErrorBoundary>
+                  </ErrorBoundary>
+                </ListProvider>
               </Login>
             </StoreProvider>
           </RoomProvider>

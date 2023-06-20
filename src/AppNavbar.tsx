@@ -56,7 +56,7 @@ export const AppNavbar = ({ navOpen, closeNav }: InputProps) => {
           <Button
             leftIcon={<IconLogout />}
             onClick={() => setChangeRoom(true)}
-            variant="outline"
+            variant="filled"
             mt={10}
           >
             Change Room

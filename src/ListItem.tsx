@@ -117,10 +117,10 @@ export const ListItem = ({
           onClick={() => selectList(listId)}
           fw={selected ? 700 : "normal"}
         >
-          {!listName
-            ? `Uncategorized (${uncompletedTodos})`
-            : focus
+          {focus
             ? `Focus (${uncompletedTodos})`
+            : !listName
+            ? `Uncategorized (${uncompletedTodos})`
             : `${listName} (${uncompletedTodos})`}
         </StyledListContent>
         {menu}

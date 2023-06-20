@@ -13,7 +13,7 @@ export const colors = [
 /**How long before user is considered idle */
 export const IDLE_TIMEOUT = 60000;
 
-export const RELEASE_DATE = new Date(import.meta.env.VITE_COMMIT_DATE);
+export const RELEASE_DATE = new Date(import.meta.env.VITE_COMMIT_DATE ?? new Date());
 
 export const COMMIT_HASH = import.meta.env.VITE_COMMIT_HASH;
 

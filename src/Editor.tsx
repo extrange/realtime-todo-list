@@ -1,7 +1,6 @@
 import { Document } from "@tiptap/extension-document";
 import { useEditor } from "@tiptap/react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-
 import { RichTextEditor } from "@mantine/tiptap";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import Collaboration from "@tiptap/extension-collaboration";
