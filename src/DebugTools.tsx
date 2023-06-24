@@ -26,10 +26,13 @@ declare global {
 
 const LazyDevTools = lazy(() => import("./DevTools"));
 
-/**Some helpful utilities for debugging syncedStore and Yjs.
+/**
+ * Some helpful utilities for debugging syncedStore and Yjs.
  * Returns a list of buttons.
  *
  * Uses StoreProviderContext.
+ * 
+ * Lazily imported by AppHeader.
  */
 export default function DebugTools() {
   const [roomId] = useLocalStorage({ key: CURRENT_ROOM_LOCALSTORAGE_KEY });

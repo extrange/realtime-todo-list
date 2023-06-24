@@ -11,7 +11,7 @@ export const ToggleCodeBlockControl = React.memo(() => {
   );
   return (
     <RichTextEditor.Control onClick={onClick} title="Code Block">
-      <IconBraces size="1rem" />
+      <IconBraces size="1rem" stroke={1.5} />
     </RichTextEditor.Control>
   );
 });

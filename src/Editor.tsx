@@ -22,6 +22,7 @@ import { useProvider } from "./useProvider";
 import { useStore } from "./useStore";
 import { Store, useSyncedStore } from "./useSyncedStore";
 import { getTodoTitle } from "./util";
+import { ClearFormattingControl } from "./ClearFormattingControl";
 
 type InputProps = {
   editingId: string;
@@ -108,15 +109,15 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
     editor?.chain().updateUser(user).run();
   }, [user, editor]);
 
-  return (
-    <RichTextEditor editor={editor}>
+  const toolbar = useMemo(
+    () => (
       <RichTextEditor.Toolbar sticky stickyOffset={60}>
         <RichTextEditor.ControlsGroup>
           <RichTextEditor.Bold />
           <RichTextEditor.Italic />
           <RichTextEditor.Underline />
           <RichTextEditor.Strikethrough />
-          <RichTextEditor.ClearFormatting />
+          <ClearFormattingControl />
           <RichTextEditor.Highlight />
           <RichTextEditor.Code />
           <ToggleCodeBlockControl />
@@ -141,7 +142,13 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
           <RichTextEditor.Unlink />
         </RichTextEditor.ControlsGroup>
       </RichTextEditor.Toolbar>
+    ),
+    []
+  );
 
+  return (
+    <RichTextEditor editor={editor}>
+      {toolbar}
       <RichTextEditor.Content />
     </RichTextEditor>
   );

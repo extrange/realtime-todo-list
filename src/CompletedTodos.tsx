@@ -1,7 +1,7 @@
 import { Accordion } from "@mantine/core";
-import React, { SetStateAction, useMemo, useState } from "react";
+import React, { SetStateAction, useEffect, useMemo, useState } from "react";
 import { ListType } from "./ListContext";
-import { Task } from "./Task";
+import { TodoItem } from "./TodoItem";
 import { useCurrentList } from "./useCurrentList";
 import { selectTodos, useSyncedStore } from "./useSyncedStore";
 
@@ -37,6 +37,8 @@ export const CompletedTodos = React.memo(({ setEditingId }: InputProps) => {
     [currentList, todos]
   );
 
+  useEffect(() => setOpen(null), [currentList])
+
   const sortedTodos = useMemo(
     () => todosInCurrentList.sort((a, b) => b.modified - a.modified),
     [todosInCurrentList]
@@ -57,7 +59,7 @@ export const CompletedTodos = React.memo(({ setEditingId }: InputProps) => {
           {/* Only render when open, to improve performance */}
           {open &&
             todoIds.map((id) => (
-              <Task
+              <TodoItem
                 completed
                 todoId={id}
                 key={id}

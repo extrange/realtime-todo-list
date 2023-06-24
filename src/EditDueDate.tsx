@@ -51,6 +51,7 @@ export const EditDueDate = ({ todoId }: InputProps) => {
         label="Due"
         placeholder="Enter a date"
         clearable
+        popoverProps={{withinPortal: true}}
         value={currentDate}
         onChange={onDueDateChange}
         renderDay={(date) => (

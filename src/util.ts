@@ -1,4 +1,5 @@
 import { notifications } from "@mantine/notifications";
+import { differenceInCalendarDays } from "date-fns";
 import { generateKeyBetween } from "fractional-indexing";
 import sanitizeHtml from "sanitize-html";
 import { v4 as uuidv4 } from "uuid";
@@ -174,3 +175,24 @@ export const isFocusTodo = (
 
 /**Return T with properties in K marked as required. */
 export type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+
+/**Pretty-format a due date as follows:
+ *
+ * Today
+ * Tomorrow
+ * 3 days ago
+ * In 2 days
+ */
+export const formatDueDate = (date: number, now: number = Date.now()) => {
+  const daysToDue = differenceInCalendarDays(date, now);
+  return (
+    typeof daysToDue === "number" &&
+    (daysToDue === 0
+      ? "Today"
+      : daysToDue === 1
+      ? "Tomorrow"
+      : daysToDue < 1
+      ? `${Math.abs(daysToDue)} day${Math.abs(daysToDue) > 1 ? "s" : ""} ago`
+      : `In ${daysToDue} days`)
+  );
+};

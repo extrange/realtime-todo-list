@@ -25,7 +25,7 @@ import { IconPlus } from "@tabler/icons-react";
 import React, { SetStateAction, useCallback, useMemo, useState } from "react";
 import { DeepReadonly } from "ts-essentials";
 import { CompletedTodos } from "./CompletedTodos";
-import { Task } from "./Task";
+import { TodoItem } from "./TodoItem";
 import { useStore } from "./useStore";
 import { Todo } from "./useSyncedStore";
 import { generateKeyBetweenSafe } from "./util";
@@ -170,11 +170,11 @@ export const TodoViewBase = React.memo(
               strategy={verticalListSortingStrategy}
             >
               {todoIds.map((id) => (
-                <Task todoId={id} key={id} setEditingId={setEditingId} />
+                <TodoItem todoId={id} key={id} setEditingId={setEditingId} />
               ))}
             </SortableContext>
             <DragOverlay>
-              {activeId && <Task dragging todoId={activeId} />}
+              {activeId && <TodoItem dragging todoId={activeId} />}
             </DragOverlay>
           </DndContext>
         ) : (

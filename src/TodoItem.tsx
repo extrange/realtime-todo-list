@@ -44,6 +44,7 @@ import React, {
 } from "react";
 import TimeAgo from "react-timeago";
 import sanitizeHtml from "sanitize-html";
+import { DueDateString } from "./DueDateString";
 import { USER_ID } from "./constants";
 import { useStore } from "./useStore";
 import { Store, selectLists, useSyncedStore } from "./useSyncedStore";
@@ -95,7 +96,7 @@ type DiscriminatedProps =
       setEditingId?: never;
     };
 
-const TaskInternal = React.memo(
+const TodoItemInternal = React.memo(
   ({ todoId, setEditingId, completed }: DiscriminatedProps & CommonProps) => {
     const memoizedSelect = useCallback(
       (s: MappedTypeDescription<Store>) => s.todos.find((t) => t.id === todoId),
@@ -230,18 +231,6 @@ const TaskInternal = React.memo(
             )
           : undefined;
 
-      const dueDateString =
-        typeof daysToDue === "number" &&
-        (daysToDue === 0
-          ? "Today"
-          : daysToDue === 1
-          ? "Tomorrow"
-          : daysToDue < 1
-          ? `${Math.abs(daysToDue)} day${
-              Math.abs(daysToDue) > 1 ? "s" : ""
-            } ago`
-          : `In ${daysToDue} days`);
-
       const color =
         typeof daysToDue === "number"
           ? daysToDue < 1
@@ -262,7 +251,7 @@ const TaskInternal = React.memo(
                 </Center>
               }
             >
-              {dueDateString}
+            <DueDateString dueDate={todoReadOnly.dueDate}/>
             </Badge>
           )}
           {todoReadOnly.repeatDays && (
@@ -282,36 +271,36 @@ const TaskInternal = React.memo(
     }, [todoReadOnly.dueDate, todoReadOnly.repeatDays]);
 
     /* The YXmlFragment can be viewed as an array.
-  
-  The title is the 0th element, and any notes are from index 1 onward.
+    
+    The title is the 0th element, and any notes are from index 1 onward.
 
-  The `toJSON` representation of the YXmlFragment however, could contain
-  XML tags such as <title> even if empty (such as a todo which is created,
-  then subsequently cleared). It is therefore not reliable to check if
-  todoReadOnly.content is empty, when determining if the fragment is empty.
+    The `toJSON` representation of the YXmlFragment however, could contain
+    XML tags such as <title> even if empty (such as a todo which is created,
+    then subsequently cleared). It is therefore not reliable to check if
+    todoReadOnly.content is empty, when determining if the fragment is empty.
 
-  So, to check if it is empty, we check the length of the YXmlFragment.
+    So, to check if it is empty, we check the length of the YXmlFragment.
 
-  To check for the title, we check if there is a first element. The first element will always be the title, even if it is blank.*/
+    To check for the title, we check if there is a first element. The first element will always be the title, even if it is blank.
+    */
     const textContent = useMemo(() => {
       /* todoReadOnly.content needs to be here to force rerenders */
       const title = todoReadOnly.content && getTodoTitle(todo);
-      if (!title)
-        return (
-          <StyledText italic c={"dimmed"}>
-            (empty)
-          </StyledText>
-        );
 
-      /* Take at most the next 3 lines of the todo's notes */
-      const notes = todo.content
-        .slice(1, 3)
-        .map((e) => sanitizeHtml(e.toString()))
-        .join(" ");
+      /* Take at most 300 chars of the todo's notes */
+      const notesArray: string[] = [];
+      todo.content.slice().every((e) => {
+        notesArray.push(sanitizeHtml(e.toString()));
+        return notesArray.join(" ").length < 200;
+      });
+
+      const notes = notesArray.join(" ");
 
       return (
         <StyledText lineClamp={2} c={completed ? "dimmed" : undefined}>
-          {title}
+          <Text italic={!title} c={!title ? "dimmed" : undefined}>
+            {title || "(untitled)"}
+          </Text>
           <Text fz={theme.fontSizes.sm} italic c={"dimmed"}>
             {notes}
           </Text>
@@ -444,43 +433,45 @@ const TaskInternal = React.memo(
  * Heavy memoization helps somewhat, as the contents of the Todo don't rerender
  * (even if the container of the Todo does).
  */
-export const Task = React.memo((props: DiscriminatedProps & CommonProps) => {
-  const { dragging, todoId } = props;
+export const TodoItem = React.memo(
+  (props: DiscriminatedProps & CommonProps) => {
+    const { dragging, todoId } = props;
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: todoId,
-  });
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({
+      id: todoId,
+    });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
 
-    // isDragging: the 'shadow' of the active item (follows overlay)
-    ...(isDragging && { opacity: 0.5, cursor: "grab" }),
+      // isDragging: the 'shadow' of the active item (follows overlay)
+      ...(isDragging && { opacity: 0.5, cursor: "grab" }),
 
-    // dragging: the overlay of the dragged thing
-    ...(dragging && {
-      "--scale": 1.05,
-      backgroundColor: "rgb(44, 46, 51)",
-    }),
-  } as React.CSSProperties;
+      // dragging: the overlay of the dragged thing
+      ...(dragging && {
+        "--scale": 1.05,
+        backgroundColor: "rgb(44, 46, 51)",
+      }),
+    } as React.CSSProperties;
 
-  return (
-    <StyledFlex
-      {...listeners}
-      align={"center"}
-      ref={setNodeRef}
-      {...attributes}
-      style={style}
-    >
-      <TaskInternal {...props} />
-    </StyledFlex>
-  );
-});
+    return (
+      <StyledFlex
+        {...listeners}
+        align={"center"}
+        ref={setNodeRef}
+        {...attributes}
+        style={style}
+      >
+        <TodoItemInternal {...props} />
+      </StyledFlex>
+    );
+  }
+);
