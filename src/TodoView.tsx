@@ -1,5 +1,5 @@
 import { generateKeyBetween } from "fractional-indexing";
-import React, { useCallback, useMemo } from "react";
+import React, { SetStateAction, useCallback, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
 import { ListType } from "./ListContext";
@@ -9,8 +9,12 @@ import { useCurrentList } from "./useCurrentList";
 import { Todo, selectTodos, useSyncedStore } from "./useSyncedStore";
 import { getMaxSortOrder, itemComparator } from "./util";
 
+type InputProps = {
+  setEditingId: React.Dispatch<SetStateAction<string | undefined>>;
+};
+
 /**Shows todos in selected, uncategorized or focus lists */
-export const TodoView = React.memo(() => {
+export const TodoView = React.memo(({ setEditingId }: InputProps) => {
   const [currentList] = useCurrentList();
 
   /* Can't debounce, otherwise the old sort order will flash on dragging end. */
@@ -71,6 +75,7 @@ export const TodoView = React.memo(() => {
 
   return (
     <TodoViewBase
+      setEditingId={setEditingId}
       todos={sortedTodos}
       createTodoFn={createTodo}
       sortKey={isFocusList ? "focusSortOrder" : "sortOrder"}

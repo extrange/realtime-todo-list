@@ -242,13 +242,14 @@ const TaskInternal = React.memo(
             } ago`
           : `In ${daysToDue} days`);
 
-      const color = typeof daysToDue === "number"
-        ? daysToDue < 1
-          ? "red"
-          : daysToDue < 4
-          ? "yellow"
-          : "gray"
-        : undefined;
+      const color =
+        typeof daysToDue === "number"
+          ? daysToDue < 1
+            ? "red"
+            : daysToDue < 4
+            ? "yellow"
+            : "gray"
+          : undefined;
 
       return (
         <>

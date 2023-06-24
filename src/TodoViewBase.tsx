@@ -22,10 +22,9 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { SetStateAction, useCallback, useMemo, useState } from "react";
 import { DeepReadonly } from "ts-essentials";
 import { CompletedTodos } from "./CompletedTodos";
-import { EditTodoWrapper } from "./EditTodoWrapper";
 import { Task } from "./Task";
 import { useStore } from "./useStore";
 import { Todo } from "./useSyncedStore";
@@ -39,22 +38,21 @@ type InputProps = {
 
   /**Function to create a new todo, specific for this view */
   createTodoFn: () => Todo;
+
+  setEditingId: React.Dispatch<SetStateAction<string | undefined>>;
 };
 
-/**Takes a list of filtered, sorted todos and displays them.
- * Handles editor display.
+/**
+ * Takes a list of filtered, sorted todos and displays them.
  */
 export const TodoViewBase = React.memo(
-  ({ todos, sortKey, createTodoFn }: InputProps) => {
+  ({ todos, sortKey, createTodoFn, setEditingId }: InputProps) => {
     const theme = useMantineTheme();
     const store = useStore();
 
     /* The todo currently being dragged, if any */
     const [activeId, setActiveId] = useState<string>();
     const todoIds = useMemo(() => todos.map((t) => t.id), [todos]);
-
-    /* The todo currently being edited */
-    const [editingId, setEditingId] = useState<string>();
 
     /* PointerSensor causes drag-to-refresh on mobile Chrome */
     const sensors = useSensors(
@@ -76,7 +74,7 @@ export const TodoViewBase = React.memo(
       const newTodo = createTodoFn();
       setEditingId(newTodo.id);
       store.todos.unshift(newTodo);
-    }, [createTodoFn, store.todos]);
+    }, [createTodoFn, setEditingId, store.todos]);
 
     const handleDragStart = useCallback(
       (event: DragStartEvent) => setActiveId(event.active.id.toString()),
@@ -132,8 +130,6 @@ export const TodoViewBase = React.memo(
 
     return (
       <>
-        <EditTodoWrapper editingId={editingId} setEditingId={setEditingId} />
-
         {/* This is a hack to make the affix stay within the scrollArea */}
         <div
           style={{
@@ -192,6 +188,7 @@ export const TodoViewBase = React.memo(
             </Text>
           </Center>
         )}
+
         <CompletedTodos setEditingId={setEditingId} />
       </>
     );

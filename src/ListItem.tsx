@@ -76,8 +76,9 @@ export const ListItem = ({
 }: CommonProps & OptionalProps) => {
   const theme = useMantineTheme();
   const [menuOpened, setMenuOpened] = useState(false);
-  const todos = useSyncedStore(selectTodos);
+  const todos = useSyncedStore(selectTodos, 5000);
 
+  /* TODO: Each list item is running this everytime todos change */
   const uncompletedTodos = useMemo(
     () =>
       todos.filter(

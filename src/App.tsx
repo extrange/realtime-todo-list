@@ -5,7 +5,7 @@ import { AppAside } from "./AppAside";
 import { AppFooter } from "./AppFooter";
 import { AppHeader } from "./AppHeader";
 import { AppNavbar } from "./AppNavbar";
-import { TodoView } from "./TodoView";
+import { MainArea } from "./MainArea";
 
 export type User = {
   name?: string;
@@ -63,7 +63,7 @@ export const App = () => {
         h={`calc(${height}px - var(--mantine-footer-height) - var(--mantine-header-height))`}
         offsetScrollbars
       >
-        <TodoView />
+        <MainArea />
       </ScrollArea>
     </AppShell>
   );
