@@ -4,7 +4,9 @@ import { Editor } from "@tiptap/react";
 type InputProps = {
   title: string;
   action: (editor: Editor) => React.MouseEventHandler<HTMLButtonElement>;
-  icon: JSX.Element;
+
+  /**Pass a function to conditionally add styles to the icon */
+  icon: JSX.Element | ((editor: Editor) => JSX.Element);
 
   /**Whether to show the control (default always) */
   show?: (editor: Editor) => boolean;
@@ -17,7 +19,7 @@ export const createControl =
 
     return editor && show(editor) ? (
       <RichTextEditor.Control title={title} onClick={action(editor)}>
-        {icon}
+        {typeof icon === "function" ? icon(editor) : icon}
       </RichTextEditor.Control>
     ) : null;
   };

@@ -29,6 +29,7 @@ import TableHeader from "@tiptap/extension-table-header";
 import Table from "@tiptap/extension-table";
 import { TableControl } from "./controls/TableControl";
 import { IndentControl } from "./controls/IndentControl";
+import { UndoControl } from "./controls/UndoControl";
 
 type InputProps = {
   editingId: string;
@@ -123,6 +124,7 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
     () => (
       <RichTextEditor.Toolbar sticky stickyOffset={60}>
         <RichTextEditor.ControlsGroup>
+          <UndoControl />
           <RichTextEditor.Bold />
           <RichTextEditor.Italic />
           <RichTextEditor.Underline />
@@ -131,6 +133,8 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
           <RichTextEditor.Highlight />
           <RichTextEditor.Code />
           <ToggleCodeBlockControl />
+          <RichTextEditor.Link />
+          <RichTextEditor.Unlink />
         </RichTextEditor.ControlsGroup>
 
         <RichTextEditor.ControlsGroup>
@@ -152,18 +156,13 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
           <TableControl.InsertColumnRight />
           <TableControl.DeleteColumn />
         </RichTextEditor.ControlsGroup>
-
-        <RichTextEditor.ControlsGroup>
-          <RichTextEditor.Link />
-          <RichTextEditor.Unlink />
-        </RichTextEditor.ControlsGroup>
       </RichTextEditor.Toolbar>
     ),
     []
   );
 
   return (
-    <RichTextEditor editor={editor}>
+    <RichTextEditor editor={editor} withTypographyStyles={false}>
       {toolbar}
       <RichTextEditor.Content />
     </RichTextEditor>
