@@ -13,7 +13,12 @@ export const TableControl = {
   /* Table */
   InsertTable: createControl({
     title: "Insert Table",
-    action: (editor) => () => editor.chain().focus().insertTable().run(),
+    action: (editor) => () =>
+      editor
+        .chain()
+        .focus()
+        .insertTable({ rows: 2, cols: 2, withHeaderRow: true })
+        .run(),
     icon: <IconTablePlus stroke={1.5} size="1rem" />,
     show: (editor) => editor.can().chain().focus().insertTable().run(),
   }),

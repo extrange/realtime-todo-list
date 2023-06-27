@@ -140,8 +140,7 @@
   width: 100%;
 }
 
-.ProseMirror td,
-th {
+.ProseMirror :is(td,th) {
   border: 2px solid #ced4da;
   box-sizing: border-box;
   min-width: 1em;
@@ -150,8 +149,11 @@ th {
   vertical-align: top;
 }
 
-.ProseMirror td,
-th > * {
+.ProseMirror td {
+  margin-bottom: 0;
+}
+
+.ProseMirror > * {
   margin-bottom: 0;
 }
 
