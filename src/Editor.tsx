@@ -15,14 +15,20 @@ import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
 import React from "react";
 import { User } from "./App";
-import { ToggleCodeBlockControl } from "./ToggleCodeBlockControl";
-import { ToggleTaskControl } from "./ToggleTaskControl";
+import { ToggleCodeBlockControl } from "./controls/ToggleCodeBlockControl";
+import { ToggleTaskControl } from "./controls/ToggleTaskControl";
 import { USER_ID } from "./constants";
 import { useProvider } from "./useProvider";
 import { useStore } from "./useStore";
 import { Store, useSyncedStore } from "./useSyncedStore";
 import { getTodoTitle } from "./util";
-import { ClearFormattingControl } from "./ClearFormattingControl";
+import { ClearFormattingControl } from "./controls/ClearFormattingControl";
+import TableRow from "@tiptap/extension-table-row";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import Table from "@tiptap/extension-table";
+import { TableControl } from "./controls/TableControl";
+import { IndentControl } from "./controls/IndentControl";
 
 type InputProps = {
   editingId: string;
@@ -60,6 +66,10 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
       TaskList,
       Underline,
       Link,
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableHeader,
+      TableCell,
       Highlight,
       StarterKit.configure({
         history: false,
@@ -124,17 +134,23 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
         </RichTextEditor.ControlsGroup>
 
         <RichTextEditor.ControlsGroup>
-          <RichTextEditor.H1 />
-          <RichTextEditor.H2 />
-          <RichTextEditor.H3 />
-          <RichTextEditor.H4 />
-        </RichTextEditor.ControlsGroup>
-
-        <RichTextEditor.ControlsGroup>
           <RichTextEditor.Blockquote />
           <RichTextEditor.BulletList />
           <RichTextEditor.OrderedList />
           <ToggleTaskControl />
+          <IndentControl.Decrease />
+          <IndentControl.Increase />
+        </RichTextEditor.ControlsGroup>
+
+        <RichTextEditor.ControlsGroup>
+          <TableControl.InsertTable />
+          <TableControl.DeleteTable />
+          <TableControl.InsertRowBefore />
+          <TableControl.InsertRowAfter />
+          <TableControl.DeleteRow />
+          <TableControl.InsertColumnLeft />
+          <TableControl.InsertColumnRight />
+          <TableControl.DeleteColumn />
         </RichTextEditor.ControlsGroup>
 
         <RichTextEditor.ControlsGroup>

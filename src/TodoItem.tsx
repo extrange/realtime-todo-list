@@ -289,7 +289,7 @@ const TodoItemInternal = React.memo(
 
       /* Take at most 300 chars of the todo's notes */
       const notesArray: string[] = [];
-      todo.content.slice().every((e) => {
+      todo.content.slice(1).every((e) => {
         notesArray.push(sanitizeHtml(e.toString()));
         return notesArray.join(" ").length < 200;
       });
