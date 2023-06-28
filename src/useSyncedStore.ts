@@ -1,11 +1,13 @@
 import { getYjsValue, observeDeep } from "@syncedstore/core";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import { debounce } from "lodash";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { DeepReadonly } from "ts-essentials";
+import * as Y from "yjs";
 import { XmlFragment } from "yjs";
 import { User } from "./App";
 import { useStore } from "./useStore";
+import { DEVELOPMENT } from "./constants";
 
 export type Todo = {
   /**The content of the task, used by the TipTap editor. */
@@ -42,7 +44,7 @@ export type Todo = {
 
   /**
    * Due date in ISO8601 (e.g. 2023-06-11). Parse with `Date.parse()`.
-   * 
+   *
    * Note: `Date.parse()` returns a date in **UTC** when giving a date-only
    * string.
    */
@@ -110,11 +112,40 @@ export const useSyncedStore = <T>(
   debounceMs = 300
 ): DeepReadonly<T> => {
   const store = useStore();
-  const [state, setState] = useState(getYjsValue(selector(store))?.toJSON());
+
+  /**Attempt to shallowly copy the selected state.
+   *
+   * Performance notes:
+   * - toJSON(): slowest
+   * - [...store.todos] - shallow copy proxied array - slow
+   * - .slice() - fast
+   * - getYjsValue - fast
+   */
+  const unwrapSelectedState = useCallback(() => {
+    const proxiedSlice = selector(store);
+    const yjsSlice = getYjsValue(proxiedSlice);
+    if (yjsSlice instanceof Y.Array) {
+      return (selector(store) as Array<unknown>).slice();
+    } else if (yjsSlice instanceof Y.Map) {
+      return { ...proxiedSlice };
+    } else return yjsSlice?.toJSON();
+  }, [selector, store]);
+
+  const now = performance.now();
+
+  const [state, setState] = useState(unwrapSelectedState);
+
+  const duration = performance.now() - now;
+  if (DEVELOPMENT && duration >= 10)
+    console.log(`useSyncedStore: ${duration}ms`);
 
   useEffect(() => {
     const onUpdate = () => {
-      setState(getYjsValue(selector(store))?.toJSON());
+      const now = performance.now();
+      setState(unwrapSelectedState());
+      const duration = performance.now() - now;
+      if (DEVELOPMENT && duration >= 10)
+        console.log(`useSyncedStore: ${duration}ms`);
     };
 
     const debouncedUpdate = debounceMs
@@ -122,7 +153,7 @@ export const useSyncedStore = <T>(
       : onUpdate;
 
     return observeDeep(selector ? selector(store) : store, debouncedUpdate);
-  }, [debounceMs, selector, store]);
+  }, [debounceMs, selector, store, unwrapSelectedState]);
 
   return state;
 };

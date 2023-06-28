@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
+export const DEVELOPMENT = import.meta.env.DEV
+
 export const colors = [
   "#958DF1",
   "#F98181",

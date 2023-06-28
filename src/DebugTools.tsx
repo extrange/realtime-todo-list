@@ -4,6 +4,7 @@ import { Button } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { Y, getYjsDoc } from "@syncedstore/core";
+import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import { generateKeyBetween } from "fractional-indexing";
 import { Suspense, lazy, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
@@ -14,13 +15,19 @@ import { CURRENT_ROOM_LOCALSTORAGE_KEY, USER_ID } from "./constants";
 import { useCurrentList } from "./useCurrentList";
 import { useProvider } from "./useProvider";
 import { useStore } from "./useStore";
-import { selectLists, selectTodos, useSyncedStore } from "./useSyncedStore";
+import {
+  Store,
+  selectLists,
+  selectTodos,
+  useSyncedStore,
+} from "./useSyncedStore";
 import { getMaxSortOrder } from "./util";
 
 declare global {
   interface Window {
     YDoc: Doc;
     provider: HocuspocusProvider;
+    store: MappedTypeDescription<Store>;
   }
 }
 
@@ -85,8 +92,9 @@ export default function DebugTools() {
 
   const makeYdocAvailableInWindow = () => {
     window.YDoc = getYjsDoc(store);
+    window.store = store;
     notifications.show({
-      message: "YDoc now available in window",
+      message: "YDoc and store now available in window",
     });
   };
 
@@ -242,7 +250,7 @@ export default function DebugTools() {
         [clearIndexedDb, `Clear IndexedDB for this room`, true] as const,
         [
           makeYdocAvailableInWindow,
-          "Make YDoc available (as window.YDoc)",
+          "Make YDoc and store available in window",
         ] as const,
         [dumpStoredUsers, "Dump storedUsers"] as const,
         [dumpLocalStorage, "Dump localStorage"] as const,

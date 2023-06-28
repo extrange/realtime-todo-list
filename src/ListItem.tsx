@@ -11,7 +11,7 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { IconDotsVertical, IconTargetArrow } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState, useTransition } from "react";
 import { selectTodos, useSyncedStore } from "./useSyncedStore";
 
 type CommonProps = {
@@ -64,71 +64,78 @@ const StyledListContent = createPolymorphicComponent<"div", TextProps>(
   _StyledListContent
 );
 
-export const ListItem = ({
-  listId,
-  listName,
-  selected,
-  deleteList,
-  renameList,
-  selectList,
-  editable,
-  focus,
-}: CommonProps & OptionalProps) => {
-  const theme = useMantineTheme();
-  const [menuOpened, setMenuOpened] = useState(false);
-  const todos = useSyncedStore(selectTodos, 5000);
+export const ListItem = React.memo(
+  ({
+    listId,
+    listName,
+    selected,
+    deleteList,
+    renameList,
+    selectList,
+    editable,
+    focus,
+  }: CommonProps & OptionalProps) => {
+    const [, startTransition] = useTransition();
+    const theme = useMantineTheme();
+    const [menuOpened, setMenuOpened] = useState(false);
 
-  /* TODO: Each list item is running this everytime todos change */
-  const uncompletedTodos = useMemo(
-    () =>
-      todos.filter(
-        (t) => !t.completed && (focus ? t.focus : t.listId === listId)
-      ).length,
-    [focus, listId, todos]
-  );
+    /* TODO This is a band aid. Ideally, we only want to listen to whether:
+    - added/deleted todos
+    - whether completed/focus/listId have changed*/
+    const todos = useSyncedStore(selectTodos, 5000);
 
-  const menu = useMemo(
-    () =>
-      editable ? (
-        <Menu opened={menuOpened} onChange={setMenuOpened} withinPortal>
-          <Portal>{menuOpened && <Overlay opacity={0} />}</Portal>
-          <Menu.Target>
-            <ActionIcon>
-              <IconDotsVertical color={theme.colors.gray[6]} />
-            </ActionIcon>
-          </Menu.Target>
-          <Menu.Dropdown>
-            <Menu.Item onClick={() => listId && deleteList(listId)}>
-              Delete
-            </Menu.Item>
-            <Menu.Item onClick={() => listId && renameList(listId)}>
-              Rename
-            </Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
-      ) : null,
-    [deleteList, editable, listId, menuOpened, renameList, theme.colors.gray]
-  );
+    const uncompletedTodos = useMemo(
+      () =>
+        todos.filter(
+          (t) => !t.completed && (focus ? t.focus : t.listId === listId)
+        ).length,
+      [focus, listId, todos]
+    );
 
-  const render = useMemo(
-    () => (
-      <StyledFlex selected={selected} align={"center"} pl={5}>
-        {focus && <IconTargetArrow style={{ marginRight: 5 }} />}
-        <StyledListContent
-          onClick={() => selectList(listId)}
-          fw={selected ? 700 : "normal"}
-        >
-          {focus
-            ? `Focus (${uncompletedTodos})`
-            : !listName
-            ? `Uncategorized (${uncompletedTodos})`
-            : `${listName} (${uncompletedTodos})`}
-        </StyledListContent>
-        {menu}
-      </StyledFlex>
-    ),
-    [focus, listId, listName, menu, selectList, selected, uncompletedTodos]
-  );
+    const menu = useMemo(
+      () =>
+        editable ? (
+          <Menu opened={menuOpened} onChange={setMenuOpened} withinPortal>
+            <Portal>{menuOpened && <Overlay opacity={0} />}</Portal>
+            <Menu.Target>
+              <ActionIcon>
+                <IconDotsVertical color={theme.colors.gray[6]} />
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item onClick={() => listId && deleteList(listId)}>
+                Delete
+              </Menu.Item>
+              <Menu.Item onClick={() => listId && renameList(listId)}>
+                Rename
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        ) : null,
+      [deleteList, editable, listId, menuOpened, renameList, theme.colors.gray]
+    );
 
-  return render;
-};
+    const render = useMemo(
+      () => (
+        <StyledFlex selected={selected} align={"center"} pl={5}>
+          {focus && <IconTargetArrow style={{ marginRight: 5 }} />}
+          <StyledListContent
+            /*Allow switching slow-rendering lists */
+            onClick={() => startTransition(() => selectList(listId))}
+            fw={selected ? 700 : "normal"}
+          >
+            {focus
+              ? `Focus (${uncompletedTodos})`
+              : !listName
+              ? `Uncategorized (${uncompletedTodos})`
+              : `${listName} (${uncompletedTodos})`}
+          </StyledListContent>
+          {menu}
+        </StyledFlex>
+      ),
+      [focus, listId, listName, menu, selectList, selected, uncompletedTodos]
+    );
+
+    return render;
+  }
+);
