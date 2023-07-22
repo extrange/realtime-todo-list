@@ -4,7 +4,7 @@ import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import { formatISO, isToday } from "date-fns";
 import { useCallback, useMemo } from "react";
 import { useStore } from "./useStore";
-import { Store, useSyncedStore } from "./useSyncedStore";
+import { Store, useSyncedStoreCustomImpl } from "./useSyncedStore";
 
 type InputProps = {
   todoId: string;
@@ -18,7 +18,7 @@ export const EditDueDate = ({ todoId }: InputProps) => {
   );
   const store = useStore();
   const todo = useMemo(() => selectTodo(store), [selectTodo, store]);
-  const todoReadOnly = useSyncedStore(selectTodo);
+  const todoReadOnly = useSyncedStoreCustomImpl(selectTodo);
 
   if (!todo || !todoReadOnly)
     throw Error(`EditDueDate: Could not find todo with id ${todoId}`);

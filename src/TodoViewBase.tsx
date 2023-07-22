@@ -21,18 +21,18 @@ import {
   rem,
   useMantineTheme,
 } from "@mantine/core";
+import { useSyncedStore } from "@syncedstore/react";
 import { IconPlus } from "@tabler/icons-react";
 import React, { SetStateAction, useCallback, useMemo, useState } from "react";
-import { DeepReadonly } from "ts-essentials";
 import { CompletedTodos } from "./CompletedTodos";
-import { TodoItem } from "./TodoItem";
+import { TodoItem } from "./TodoItem/TodoItem";
 import { useStore } from "./useStore";
 import { Todo } from "./useSyncedStore";
 import { generateKeyBetweenSafe } from "./util";
 
 type InputProps = {
   /**List of filtered and sorted todos */
-  todos: DeepReadonly<Todo[]>;
+  todos: Todo[];
   /**The key to sort todos by */
   sortKey: keyof Pick<Todo, "sortOrder" | "focusSortOrder">;
 
@@ -49,10 +49,19 @@ export const TodoViewBase = React.memo(
   ({ todos, sortKey, createTodoFn, setEditingId }: InputProps) => {
     const theme = useMantineTheme();
     const store = useStore();
+    const state = useSyncedStore(store);
+    const todoIds = useMemo(() => state.todos.map((t) => t.id), [state.todos]);
 
     /* The todo currently being dragged, if any */
     const [activeId, setActiveId] = useState<string>();
-    const todoIds = useMemo(() => todos.map((t) => t.id), [todos]);
+
+    const draggedTodo = useMemo(() => {
+      if (activeId) {
+        const todo = todos.find((t) => t.id === activeId);
+        if (!todo) throw Error(`Could not find dragging todo id ${activeId}`);
+        return <TodoItem dragging todo={todo} />;
+      } else return null;
+    }, [activeId, todos]);
 
     /* PointerSensor causes drag-to-refresh on mobile Chrome */
     const sensors = useSensors(
@@ -169,13 +178,15 @@ export const TodoViewBase = React.memo(
               items={todoIds}
               strategy={verticalListSortingStrategy}
             >
-              {todoIds.map((id) => (
-                <TodoItem todoId={id} key={id} setEditingId={setEditingId} />
+              {todos.map((todo) => (
+                <TodoItem
+                  todo={todo}
+                  key={todo.id}
+                  setEditingId={setEditingId}
+                />
               ))}
             </SortableContext>
-            <DragOverlay>
-              {activeId && <TodoItem dragging todoId={activeId} />}
-            </DragOverlay>
+            <DragOverlay>{draggedTodo}</DragOverlay>
           </DndContext>
         ) : (
           <Center h={50}>

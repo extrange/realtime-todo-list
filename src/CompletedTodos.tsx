@@ -1,9 +1,9 @@
 import { Accordion } from "@mantine/core";
 import React, { SetStateAction, useEffect, useMemo, useState } from "react";
 import { ListType } from "./ListContext";
-import { TodoItem } from "./TodoItem";
+import { TodoItem } from "./TodoItem/TodoItem";
 import { useCurrentList } from "./useCurrentList";
-import { selectTodos, useSyncedStore } from "./useSyncedStore";
+import { selectTodos, useSyncedStoreCustomImpl } from "./useSyncedStore";
 
 /* 
 Completed tasks should:
@@ -25,7 +25,7 @@ export const CompletedTodos = React.memo(({ setEditingId }: InputProps) => {
   const [open, setOpen] = useState<string | null>(null);
   const [currentList] = useCurrentList();
 
-  const todos = useSyncedStore(selectTodos);
+  const todos = useSyncedStoreCustomImpl(selectTodos);
 
   const todosInCurrentList = useMemo(
     () =>
@@ -60,7 +60,6 @@ export const CompletedTodos = React.memo(({ setEditingId }: InputProps) => {
           {open &&
             todoIds.map((id) => (
               <TodoItem
-                completed
                 todoId={id}
                 key={id}
                 setEditingId={setEditingId}

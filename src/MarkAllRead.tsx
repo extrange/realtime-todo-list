@@ -1,7 +1,7 @@
 import { Button } from "@mantine/core";
 import React, { useCallback, useMemo, useState } from "react";
 import { USER_ID } from "./constants";
-import { selectTodos, useSyncedStore } from "./useSyncedStore";
+import { selectTodos, useSyncedStoreCustomImpl } from "./useSyncedStore";
 
 type MarkAllRead = "markAllRead";
 
@@ -20,7 +20,7 @@ declare global {
 
 export const MarkAllRead = React.memo(
   ({ closeNav }: { closeNav: () => void }) => {
-    const todosReadonly = useSyncedStore(selectTodos, 1000);
+    const todosReadonly = useSyncedStoreCustomImpl(selectTodos, 1000);
 
     /* Necessary because only localStorage is updated and there is no way to listen to localStorage. */
     const [render, forceRender] = useState({});

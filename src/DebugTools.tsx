@@ -19,7 +19,7 @@ import {
   Store,
   selectLists,
   selectTodos,
-  useSyncedStore,
+  useSyncedStoreCustomImpl,
 } from "./useSyncedStore";
 import { getMaxSortOrder } from "./util";
 
@@ -45,8 +45,8 @@ export default function DebugTools() {
   const [roomId] = useLocalStorage({ key: CURRENT_ROOM_LOCALSTORAGE_KEY });
   const store = useStore();
   const provider = useProvider();
-  const lists = useSyncedStore(selectLists);
-  const todos = useSyncedStore(selectTodos);
+  const lists = useSyncedStoreCustomImpl(selectLists);
+  const todos = useSyncedStoreCustomImpl(selectTodos);
   const [devToolsEnabled, setDevToolsEnabled] = useState(false);
   const [currentList] = useCurrentList();
   const { showBoundary } = useErrorBoundary();

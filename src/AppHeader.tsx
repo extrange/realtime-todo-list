@@ -38,7 +38,7 @@ import { getUserStatus } from "./getUserStatus";
 import { useAwareness } from "./useAwareness";
 import { useCurrentList } from "./useCurrentList";
 import { useStore } from "./useStore";
-import { selectStoredUsers, useSyncedStore } from "./useSyncedStore";
+import { selectStoredUsers, useSyncedStoreCustomImpl } from "./useSyncedStore";
 import { formatBytes } from "./util";
 
 type InputProps = {
@@ -65,7 +65,7 @@ export const AppHeader = ({
   const [update, forceUpdate] = useState({});
 
   const awareness = useAwareness();
-  const storedUsers = useSyncedStore(selectStoredUsers);
+  const storedUsers = useSyncedStoreCustomImpl(selectStoredUsers);
   const { onlineUsers } = getUserStatus(awareness, storedUsers);
   const numberOnline = useMemo(() => [...onlineUsers].length, [onlineUsers]);
 

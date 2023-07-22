@@ -62,8 +62,6 @@ export const generateKeyBetweenSafe = <T extends keyof Sortable>(
   b: Sortable | undefined,
   sortKey: T
 ) => {
-  console.log("a", a?.[sortKey]);
-  console.log("b", b?.[sortKey]);
   try {
     return generateKeyBetween(a?.[sortKey], b?.[sortKey]);
   } catch (e) {
@@ -159,6 +157,19 @@ export const validateUuid = (uuid: string) =>
 
 /**Get the title of the todo, or undefined if none */
 export const getTodoTitle = (todo: Todo) => {
+  /*The XmlFragment can be viewed as an array.
+    
+    The title is the 0th element, and any notes are from index 1 onward.
+
+    The `toJSON` representation of the XmlFragment however, could contain
+    XML tags such as <title> even if empty (such as a todo which is created,
+    then subsequently cleared). It is therefore not reliable to check if
+    todo.content is empty, when determining if the fragment is empty.
+
+    So, to check if it is empty, we check the length of the XmlFragment.
+
+    To check for the title, we check if there is a first element. The first element will always be the title, even if it is blank.*/
+
   /* Empty todo. todoReadOnly.content could be non-empty, even
   if the Todo is really empty.*/
   if (!todo.content || !todo.content.length) return undefined;

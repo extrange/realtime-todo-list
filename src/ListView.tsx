@@ -7,7 +7,7 @@ import { ListType } from "./ListContext";
 import { ListItem } from "./ListItem";
 import { useCurrentList } from "./useCurrentList";
 import { useStore } from "./useStore";
-import { selectLists, selectTodos, useSyncedStore } from "./useSyncedStore";
+import { selectLists, selectTodos, useSyncedStoreCustomImpl } from "./useSyncedStore";
 import { getMaxSortOrder } from "./util";
 
 type CurrentListNameChange = "currentListNameChange";
@@ -31,7 +31,7 @@ type InputProps = {
 
 export const ListView = ({ closeNav }: InputProps) => {
   const store = useStore();
-  const lists = useSyncedStore(selectLists);
+  const lists = useSyncedStoreCustomImpl(selectLists);
   const [currentList, setCurrentList] = useCurrentList();
 
   const createList = useCallback(() => {

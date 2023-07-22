@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { UserStatus } from "./UserStatus";
 import { getUserStatus } from "./getUserStatus";
 import { useAwareness } from "./useAwareness";
-import { UserData, selectStoredUsers, useSyncedStore } from "./useSyncedStore";
+import { UserData, selectStoredUsers, useSyncedStoreCustomImpl } from "./useSyncedStore";
 
 const sortUsers = <T extends UserData>(users: Map<string, T>) =>
   [...users].sort(
@@ -12,7 +12,7 @@ const sortUsers = <T extends UserData>(users: Map<string, T>) =>
 
 export const OnlineUsers = () => {
   const awareness = useAwareness();
-  const storedUsers = useSyncedStore(selectStoredUsers);
+  const storedUsers = useSyncedStoreCustomImpl(selectStoredUsers);
 
   const { onlineUsers, offlineUsers } = getUserStatus(awareness, storedUsers);
 

@@ -2,10 +2,10 @@ import { Button, Modal, TextInput } from "@mantine/core";
 import { IconPencil } from "@tabler/icons-react";
 import React, { useCallback, useState } from "react";
 import { useStore } from "./useStore";
-import { selectMeta, useSyncedStore } from "./useSyncedStore";
+import { selectMeta, useSyncedStoreCustomImpl } from "./useSyncedStore";
 
 export const EditRoom = () => {
-  const meta = useSyncedStore(selectMeta);
+  const meta = useSyncedStoreCustomImpl(selectMeta);
   const store = useStore();
   const [open, setOpen] = useState(false);
 

@@ -20,7 +20,7 @@ import { ToggleTaskControl } from "./controls/ToggleTaskControl";
 import { USER_ID } from "./constants";
 import { useProvider } from "./useProvider";
 import { useStore } from "./useStore";
-import { Store, useSyncedStore } from "./useSyncedStore";
+import { Store, useSyncedStoreCustomImpl } from "./useSyncedStore";
 import { getTodoTitle } from "./util";
 import { ClearFormattingControl } from "./controls/ClearFormattingControl";
 import TableRow from "@tiptap/extension-table-row";
@@ -57,7 +57,7 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
     (s: MappedTypeDescription<Store>) => s.storedUsers[USER_ID]?.user,
     []
   );
-  const user = useSyncedStore(selectOwnUser) as User;
+  const user = useSyncedStoreCustomImpl(selectOwnUser) as User;
   const provider = useProvider();
   const edited = useRef(false);
 

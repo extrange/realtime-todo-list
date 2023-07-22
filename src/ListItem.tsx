@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { IconDotsVertical, IconTargetArrow } from "@tabler/icons-react";
 import React, { useMemo, useState, useTransition } from "react";
-import { selectTodos, useSyncedStore } from "./useSyncedStore";
+import { selectTodos, useSyncedStoreCustomImpl } from "./useSyncedStore";
 
 type CommonProps = {
   selected?: boolean;
@@ -82,7 +82,7 @@ export const ListItem = React.memo(
     /* TODO This is a band aid. Ideally, we only want to listen to whether:
     - added/deleted todos
     - whether completed/focus/listId have changed*/
-    const todos = useSyncedStore(selectTodos, 5000);
+    const todos = useSyncedStoreCustomImpl(selectTodos, 5000);
 
     const uncompletedTodos = useMemo(
       () =>

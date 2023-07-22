@@ -107,7 +107,7 @@ export type Store = {
  *
  * @returns `toJSON` representation of the observed Yjs type
  */
-export const useSyncedStore = <T>(
+export const useSyncedStoreCustomImpl = <T>(
   selector: (s: MappedTypeDescription<Store>) => T,
   debounceMs = 300
 ): DeepReadonly<T> => {

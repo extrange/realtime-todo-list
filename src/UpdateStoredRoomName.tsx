@@ -7,7 +7,7 @@ import {
 } from "./constants";
 import { useIsConnected } from "./useIsConnected";
 import { useStore } from "./useStore";
-import { selectMeta, useSyncedStore } from "./useSyncedStore";
+import { selectMeta, useSyncedStoreCustomImpl } from "./useSyncedStore";
 import { useUserData } from "./useUserData";
 
 /**Updates the stored roomName in localStorage whenever meta.roomName is
@@ -17,7 +17,7 @@ export const UpdateStoredRoomName = () => {
   const [currentRoomId] = useLocalStorage({
     key: CURRENT_ROOM_LOCALSTORAGE_KEY,
   });
-  const meta = useSyncedStore(selectMeta);
+  const meta = useSyncedStoreCustomImpl(selectMeta);
   const [, setSavedRooms] = useLocalStorage<SavedRooms>({
     key: SAVED_ROOMS_LOCALSTORAGE_KEY,
     defaultValue: {},

@@ -3,10 +3,10 @@ import { differenceInCalendarDays } from "date-fns";
 import { useMemo } from "react";
 import { NetworkOverlay } from "./NetworkOverlay";
 import { useRerenderDaily } from "./useRerenderDaily";
-import { selectTodos, useSyncedStore } from "./useSyncedStore";
+import { selectTodos, useSyncedStoreCustomImpl } from "./useSyncedStore";
 
 export const AppFooter = () => {
-  const todos = useSyncedStore(selectTodos, 5000);
+  const todos = useSyncedStoreCustomImpl(selectTodos, 5000);
 
   const time = useRerenderDaily();
 
