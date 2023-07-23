@@ -47,7 +47,9 @@ export const ListView = ({ closeNav }: InputProps) => {
     .slice()
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  // Triggered when todos change, ignoring text change events
+  /* Triggered when todos change, ignoring text change events
+  This loops through all todos and generates the uncompletedCount.
+  This is much more performant than filtering todos in each ListItem.*/
   const updateUncompletedCount = useCallback(
     (e?: Array<YMapEvent<Todo>>) => {
       if (e) {

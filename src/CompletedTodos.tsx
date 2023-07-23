@@ -1,50 +1,37 @@
 import { Accordion } from "@mantine/core";
-import React, { SetStateAction, useEffect, useMemo, useState } from "react";
+import { useSyncedStore } from "@syncedstore/react";
+import React, { SetStateAction, useEffect, useState } from "react";
 import { ListType } from "./ListContext";
 import { TodoItem } from "./TodoItem/TodoItem";
 import { useCurrentList } from "./useCurrentList";
-import { selectTodos, useSyncedStoreCustomImpl } from "./useSyncedStore";
-
-/* 
-Completed tasks should:
-
-be sorted by last modified date
-
-not be sortable
-
-be dimmed
-
-accordion at bottom of task list
- */
+import { useStore } from "./useStore";
 
 type InputProps = {
   setEditingId: React.Dispatch<SetStateAction<string | undefined>>;
 };
 
+/**
+ *
+ * Completed tasks are:
+ *
+ * - sorted by last modified date, not user sortable
+ * - dimmed
+ * - shown as an accordion at bottom of task list
+ * - not rendered unless opened explicitly
+ */
 export const CompletedTodos = React.memo(({ setEditingId }: InputProps) => {
+  const store = useStore();
+  const todos = useSyncedStore(store.todos);
   const [open, setOpen] = useState<string | null>(null);
   const [currentList] = useCurrentList();
 
-  const todos = useSyncedStoreCustomImpl(selectTodos);
-
-  const todosInCurrentList = useMemo(
-    () =>
-      todos.filter(
-        (t) =>
-          t.completed &&
-          (currentList === ListType.Focus ? t.focus : t.listId === currentList)
-      ),
-    [currentList, todos]
+  const todosInCurrentList = todos.filter(
+    (t) =>
+      t.completed &&
+      (currentList === ListType.Focus ? t.focus : t.listId === currentList)
   );
 
-  useEffect(() => setOpen(null), [currentList])
-
-  const sortedTodos = useMemo(
-    () => todosInCurrentList.sort((a, b) => b.modified - a.modified),
-    [todosInCurrentList]
-  );
-
-  const todoIds = useMemo(() => sortedTodos.map((t) => t.id), [sortedTodos]);
+  useEffect(() => setOpen(null), [currentList]);
 
   return (
     <Accordion
@@ -54,16 +41,14 @@ export const CompletedTodos = React.memo(({ setEditingId }: InputProps) => {
       chevronPosition="left"
     >
       <Accordion.Item value="completed">
-        <Accordion.Control>Completed ({todoIds.length})</Accordion.Control>
+        <Accordion.Control>
+          Completed ({todosInCurrentList.length})
+        </Accordion.Control>
         <Accordion.Panel>
           {/* Only render when open, to improve performance */}
           {open &&
-            todoIds.map((id) => (
-              <TodoItem
-                todoId={id}
-                key={id}
-                setEditingId={setEditingId}
-              />
+            todosInCurrentList.map((t) => (
+              <TodoItem todo={t} key={t.id} setEditingId={setEditingId} />
             ))}
         </Accordion.Panel>
       </Accordion.Item>

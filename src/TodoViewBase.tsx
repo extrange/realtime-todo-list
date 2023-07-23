@@ -21,7 +21,6 @@ import {
   rem,
   useMantineTheme,
 } from "@mantine/core";
-import { useSyncedStore } from "@syncedstore/react";
 import { IconPlus } from "@tabler/icons-react";
 import React, { SetStateAction, useCallback, useMemo, useState } from "react";
 import { CompletedTodos } from "./CompletedTodos";
@@ -49,8 +48,7 @@ export const TodoViewBase = React.memo(
   ({ todos, sortKey, createTodoFn, setEditingId }: InputProps) => {
     const theme = useMantineTheme();
     const store = useStore();
-    const state = useSyncedStore(store);
-    const todoIds = useMemo(() => state.todos.map((t) => t.id), [state.todos]);
+    const todoIds = useMemo(() => todos.map((t) => t.id), [todos]);
 
     /* The todo currently being dragged, if any */
     const [activeId, setActiveId] = useState<string>();
