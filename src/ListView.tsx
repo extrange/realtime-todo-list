@@ -9,6 +9,7 @@ import { YMapEvent } from "yjs/dist/src/internals";
 import { ListType } from "./ListContext";
 import { ListItem } from "./ListItem";
 import { useCurrentList } from "./useCurrentList";
+import { useProviderEvent } from "./useProviderEvent";
 import { useStore } from "./useStore";
 import { Todo, selectLists, selectTodos } from "./useSyncedStore";
 import { getMaxSortOrder } from "./util";
@@ -34,13 +35,13 @@ type InputProps = {
 
 export const ListView = ({ closeNav }: InputProps) => {
   const store = useStore();
-  const state = useSyncedStore(store);
-  const lists = state.lists;
-  const todos = state.todos;
+  const lists = useSyncedStore(store.lists);
+  const todos = useSyncedStore(store.todos);
   const [uncompletedTodosCount, setUncompletedTodosCount] = useState<
     Map<string, number>
   >(new Map());
   const [currentList, setCurrentList] = useCurrentList();
+  const synced = useProviderEvent("synced");
 
   /* Sort lists alphabetically */
   const sortedLists = lists
@@ -89,6 +90,12 @@ export const ListView = ({ closeNav }: InputProps) => {
       setUncompletedTodosCount(temp);
     },
     [lists, todos]
+  );
+
+  // Necessary for initial render on mobile
+  useEffect(
+    () => void (synced && updateUncompletedCount()),
+    [synced, updateUncompletedCount]
   );
 
   useEffect(
