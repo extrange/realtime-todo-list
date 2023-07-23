@@ -6,6 +6,7 @@ import { useProviderEvent } from "./useProviderEvent";
  * Notes:
  * - It appears (at least from UpdateStoredRoomName) safe to assume that
  * the store has been fully synced if this returns true.
+ * - Causes re-renders (especially when `unsyncedChanges` crosses a tolerance)
  *
  * @param tolerance how many unsynced changes before considering as unsynced
  * @returns whether the client is truly connected to the server

@@ -161,7 +161,7 @@ export const TodoItemInternal = React.memo(
 
     return (
       <Profiler
-        id={todo.id}
+        id={`Todo ${todo.id}`}
         onRender={(id, phase, duration) =>
           duration > 5 && console.info(id, phase, duration)
         }

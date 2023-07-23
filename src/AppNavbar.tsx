@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { useLocalStorage, useMediaQuery } from "@mantine/hooks";
 import { IconLogout } from "@tabler/icons-react";
-import { CSSProperties, useCallback, useState } from "react";
+import { CSSProperties, Profiler, useCallback, useState } from "react";
 import { EditRoom } from "./EditRoom";
 import { EditUser } from "./EditUser";
 import { ListView } from "./ListView";
@@ -49,7 +49,14 @@ export const AppNavbar = ({ navOpen, closeNav }: InputProps) => {
         <EditRoom />
         <EditUser />
         <ScrollArea pt={5} offsetScrollbars>
-          <ListView closeNav={closeNav} />
+          <Profiler
+            id={"ListView"}
+            onRender={(id, phase, duration) =>
+              duration > 5 && console.info(id, phase, duration)
+            }
+          >
+            <ListView closeNav={closeNav} />
+          </Profiler>
         </ScrollArea>
         <Flex direction={"column"} justify={"flex-end"} mt={10}>
           <MarkAllRead closeNav={closeNav} />

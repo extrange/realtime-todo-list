@@ -22,12 +22,7 @@ export const TodoView = React.memo(({ setEditingId }: InputProps) => {
   const store = useStore();
   const state = useSyncedStore(store);
 
-  /* Can't debounce, otherwise the old sort order will flash on dragging end. */
-
-  const isFocusList = useMemo(
-    () => currentList === ListType.Focus,
-    [currentList]
-  );
+  const isFocusList = currentList === ListType.Focus;
 
   /* Determine Todos to show based on current list */
   const todosInCurrentList = state.todos.filter(

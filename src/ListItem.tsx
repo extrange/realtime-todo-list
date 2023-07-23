@@ -11,29 +11,29 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { IconDotsVertical, IconTargetArrow } from "@tabler/icons-react";
-import React, { useMemo, useState, useTransition } from "react";
-import { selectTodos, useSyncedStoreCustomImpl } from "./useSyncedStore";
+import React, { useCallback, useMemo, useState, useTransition } from "react";
+import { List } from "./useSyncedStore";
 
 type CommonProps = {
   selected?: boolean;
   selectList: (id?: string) => void;
+  uncompletedTodosCount: number;
 };
 
 type OptionalProps =
   | {
+      /** Editable lists*/
       editable: true;
       focus?: never;
-      listId: string;
-      listName?: string;
+      list: List;
       deleteList: (id: string) => void;
       renameList: (id: string) => void;
     }
   | {
-      /**Uncategorized */
+      /**Uncategorized and Focus*/
       editable?: false;
       focus?: boolean;
-      listId?: never;
-      listName?: never;
+      list?: never;
       deleteList?: never;
       renameList?: never;
     };
@@ -66,8 +66,8 @@ const StyledListContent = createPolymorphicComponent<"div", TextProps>(
 
 export const ListItem = React.memo(
   ({
-    listId,
-    listName,
+    list,
+    uncompletedTodosCount,
     selected,
     deleteList,
     renameList,
@@ -78,19 +78,6 @@ export const ListItem = React.memo(
     const [, startTransition] = useTransition();
     const theme = useMantineTheme();
     const [menuOpened, setMenuOpened] = useState(false);
-
-    /* TODO This is a band aid. Ideally, we only want to listen to whether:
-    - added/deleted todos
-    - whether completed/focus/listId have changed*/
-    const todos = useSyncedStoreCustomImpl(selectTodos, 5000);
-
-    const uncompletedTodos = useMemo(
-      () =>
-        todos.filter(
-          (t) => !t.completed && (focus ? t.focus : t.listId === listId)
-        ).length,
-      [focus, listId, todos]
-    );
 
     const menu = useMemo(
       () =>
@@ -103,39 +90,42 @@ export const ListItem = React.memo(
               </ActionIcon>
             </Menu.Target>
             <Menu.Dropdown>
-              <Menu.Item onClick={() => listId && deleteList(listId)}>
-                Delete
-              </Menu.Item>
-              <Menu.Item onClick={() => listId && renameList(listId)}>
-                Rename
-              </Menu.Item>
+              <Menu.Item onClick={() => deleteList(list.id)}>Delete</Menu.Item>
+              <Menu.Item onClick={() => renameList(list.id)}>Rename</Menu.Item>
             </Menu.Dropdown>
           </Menu>
         ) : null,
-      [deleteList, editable, listId, menuOpened, renameList, theme.colors.gray]
+      [
+        deleteList,
+        editable,
+        list?.id,
+        menuOpened,
+        renameList,
+        theme.colors.gray,
+      ]
     );
 
-    const render = useMemo(
-      () => (
-        <StyledFlex selected={selected} align={"center"} pl={5}>
-          {focus && <IconTargetArrow style={{ marginRight: 5 }} />}
-          <StyledListContent
-            /*Allow switching slow-rendering lists */
-            onClick={() => startTransition(() => selectList(listId))}
-            fw={selected ? 700 : "normal"}
-          >
-            {focus
-              ? `Focus (${uncompletedTodos})`
-              : !listName
-              ? `Uncategorized (${uncompletedTodos})`
-              : `${listName} (${uncompletedTodos})`}
-          </StyledListContent>
-          {menu}
-        </StyledFlex>
-      ),
-      [focus, listId, listName, menu, selectList, selected, uncompletedTodos]
+    const onClick = useCallback(
+      () => startTransition(() => selectList(list?.id)),
+      [list?.id, selectList]
     );
 
-    return render;
+    return (
+      <StyledFlex selected={selected} align={"center"} pl={5}>
+        {focus && <IconTargetArrow style={{ marginRight: 5 }} />}
+        <StyledListContent
+          /*Allow switching slow-rendering lists */
+          onClick={onClick}
+          fw={selected ? 700 : "normal"}
+        >
+          {focus
+            ? `Focus (${uncompletedTodosCount})`
+            : !list?.name
+            ? `Uncategorized (${uncompletedTodosCount})`
+            : `${list.name} (${uncompletedTodosCount})`}
+        </StyledListContent>
+        {menu}
+      </StyledFlex>
+    );
   }
 );

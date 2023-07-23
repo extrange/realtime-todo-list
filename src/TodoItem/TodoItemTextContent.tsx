@@ -61,7 +61,7 @@ export const TodoItemTextContent = React.memo(({ todo }: InputProps) => {
   useLayoutEffect(() => {
     onChange(); //Initial render
     return observeDeep(todo.content, () => startTransition(onChange));
-  }, [todo.content, onChange]);
+  }, [todo.content,  onChange]);
 
   return (
     <StyledText lineClamp={2} c={todo.completed ? "dimmed" : undefined}>

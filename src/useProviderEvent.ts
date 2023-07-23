@@ -55,6 +55,7 @@ type Options = {
  * true. However, `unsyncedChanges` continues to increase.
  * - After reconnecting, Firefox sometimes only receives changes, and doesn't
  * send changes.
+ * - Causes a re-render on events
  * */
 export const useProviderEvent = <T extends keyof SupportedProviderEvent>(
   event: T,

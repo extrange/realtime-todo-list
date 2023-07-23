@@ -18,7 +18,7 @@ Notes:
 - Properties with frequent updates - use `useDeferredValue`/`useTransition` (but only if values are memoizable - see below)
 - Simple properties e.g. `boolean`, `number` can be used as memoization dependencies.
   - [ ] Can they be deferred?
-- If you pass a proxied value to a child, `useSyncedStore` is necessary to set the event listener on the child. For example, the following will not update to changes in `todo.focus`:
+- If you pass a proxied value to a child, `useSyncedStore` is necessary to [set the event listener on the child][use-reactive]. For example, the following will not update to changes in `todo.focus`:
 
   ```ts
   const MyComponent = ({ todo }: { todo: Todo }) => {

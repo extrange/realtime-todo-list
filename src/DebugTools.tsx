@@ -5,6 +5,7 @@ import { useLocalStorage } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { Y, getYjsDoc } from "@syncedstore/core";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
+import { formatISO } from "date-fns";
 import { generateKeyBetween } from "fractional-indexing";
 import { Suspense, lazy, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
@@ -38,7 +39,7 @@ const LazyDevTools = lazy(() => import("./DevTools"));
  * Returns a list of buttons.
  *
  * Uses StoreProviderContext.
- * 
+ *
  * Lazily imported by AppHeader.
  */
 export default function DebugTools() {
@@ -207,6 +208,12 @@ export default function DebugTools() {
           );
         }
 
+        const repeatDays = Math.random() > 0.5 ? undefined : 5;
+        const dueDate =
+          Math.random() > 0.5
+            ? undefined
+            : formatISO(new Date(), { representation: "date" });
+
         store.todos.push({
           id,
           sortOrder,
@@ -216,6 +223,8 @@ export default function DebugTools() {
           created: now,
           modified: now,
           listId: l,
+          dueDate,
+          repeatDays,
         });
       });
     });
