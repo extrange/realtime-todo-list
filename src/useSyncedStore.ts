@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { DeepReadonly } from "ts-essentials";
 import * as Y from "yjs";
 import { XmlFragment } from "yjs";
-import { User } from "./App";
+import { User } from "./AppShell";
 import { useStore } from "./useStore";
 import { DEVELOPMENT } from "./constants";
 

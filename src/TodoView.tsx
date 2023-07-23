@@ -21,6 +21,7 @@ export const TodoView = React.memo(({ setEditingId }: InputProps) => {
 
   const store = useStore();
   const todos = useSyncedStore(store.todos);
+  // const [sortedTodos, setSortedTodos] = useState<Array<Todo>>([])
 
   const isFocusList = currentList === ListType.Focus;
 
@@ -28,6 +29,7 @@ export const TodoView = React.memo(({ setEditingId }: InputProps) => {
   const todosInCurrentList = todos.filter(
     (t) => (isFocusList ? t.focus : t.listId === currentList) && !t.completed
   );
+
 
   const sortedTodos = useMemo(
     () =>

@@ -14,7 +14,7 @@ import TaskList from "@tiptap/extension-task-list";
 import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
 import React from "react";
-import { User } from "./App";
+import { User } from "./AppShell";
 import { ToggleCodeBlockControl } from "./controls/ToggleCodeBlockControl";
 import { ToggleTaskControl } from "./controls/ToggleTaskControl";
 import { USER_ID } from "./constants";
