@@ -20,12 +20,12 @@ export const TodoView = React.memo(({ setEditingId }: InputProps) => {
   const [currentList] = useCurrentList();
 
   const store = useStore();
-  const state = useSyncedStore(store);
+  const todos = useSyncedStore(store.todos);
 
   const isFocusList = currentList === ListType.Focus;
 
   /* Determine Todos to show based on current list */
-  const todosInCurrentList = state.todos.filter(
+  const todosInCurrentList = todos.filter(
     (t) => (isFocusList ? t.focus : t.listId === currentList) && !t.completed
   );
 

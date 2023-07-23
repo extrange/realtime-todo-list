@@ -1,11 +1,12 @@
 import { AppShell, ScrollArea, useMantineTheme } from "@mantine/core";
 import { useViewportSize } from "@mantine/hooks";
-import { SetStateAction, useCallback, useState } from "react";
+import { Profiler, SetStateAction, useCallback, useState } from "react";
 import { AppAside } from "./AppAside";
 import { AppFooter } from "./AppFooter";
 import { AppHeader } from "./AppHeader";
 import { AppNavbar } from "./AppNavbar";
-import { MainArea } from "./MainArea";
+import { EditTodoWrapper } from "./EditTodoWrapper";
+import { TodoView } from "./TodoView";
 
 export type User = {
   name?: string;
@@ -15,6 +16,7 @@ export type User = {
 export const App = () => {
   const [navOpen, setNavOpen] = useState(false);
   const [asideOpen, setAsideOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string>();
   const { height } = useViewportSize();
 
   /* For AppHeader: Don't allow both the NavBar and Aside to be open */
@@ -63,7 +65,15 @@ export const App = () => {
         h={`calc(${height}px - var(--mantine-footer-height) - var(--mantine-header-height))`}
         offsetScrollbars
       >
-        <MainArea />
+        <EditTodoWrapper editingId={editingId} setEditingId={setEditingId} />
+        <Profiler
+          id={"TodoView"}
+          onRender={(id, phase, duration) =>
+            duration > 5 && console.info(id, phase, duration)
+          }
+        >
+          <TodoView setEditingId={setEditingId} />
+        </Profiler>
       </ScrollArea>
     </AppShell>
   );
