@@ -30,7 +30,6 @@ export const TodoView = React.memo(({ setEditingId }: InputProps) => {
     (t) => (isFocusList ? t.focus : t.listId === currentList) && !t.completed
   );
 
-
   const sortedTodos = useMemo(
     () =>
       todosInCurrentList

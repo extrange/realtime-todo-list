@@ -67,7 +67,7 @@ export const AppShell = () => {
         h={`calc(${height}px - var(--mantine-footer-height) - var(--mantine-header-height))`}
         offsetScrollbars
       >
-        <App/>
+        <App />
       </ScrollArea>
     </AppShellMantine>
   );

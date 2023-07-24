@@ -5,7 +5,7 @@ import { useSyncedStore } from "@syncedstore/react";
 import { generateKeyBetween } from "fractional-indexing";
 import { useCallback, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { YMapEvent } from "yjs/dist/src/internals";
+import { YMapEvent, YXmlEvent } from "yjs/dist/src/internals";
 import { ListType } from "./ListContext";
 import { ListItem } from "./ListItem";
 import { useCurrentList } from "./useCurrentList";
@@ -52,7 +52,7 @@ export const ListView = ({ closeNav }: InputProps) => {
   This loops through all todos and generates the uncompletedCount.
   This is much more performant than filtering todos in each ListItem.*/
   const updateUncompletedCount = useCallback(
-    (e?: Array<YMapEvent<Todo>>) => {
+    (e?: Array<YMapEvent<Todo> | YXmlEvent>) => {
       if (e) {
         /* We only care when focus, completed and listId change*/
         const todoItemKeysToCheck: Array<keyof Todo> = [
@@ -62,13 +62,17 @@ export const ListView = ({ closeNav }: InputProps) => {
         ];
         const shouldContinue =
           e.some((ev) =>
-            todoItemKeysToCheck.some((k) => ev.keysChanged?.has(k))
+            todoItemKeysToCheck.some((k) =>
+              (ev as YMapEvent<Todo>).keysChanged?.has(k)
+            )
           ) ||
           /* Array add/remove */
           e.some(
             (ev) =>
               // TODO find a better way to type this
-              (ev._changes as Record<string, Array<unknown>>)?.delta?.length
+              (ev._changes as Record<string, Array<unknown>>)?.delta?.length &&
+              // Ignore todo.content newline additions
+              !(ev as unknown as Record<string, boolean>).childListChanged
           );
         if (!shouldContinue) return;
       }
