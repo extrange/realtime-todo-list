@@ -2,7 +2,7 @@ import { Accordion } from "@mantine/core";
 import { useSyncedStore } from "@syncedstore/react";
 import React, { SetStateAction, useEffect, useState } from "react";
 import { ListType } from "./ListContext";
-import { TodoItem } from "./TodoItem/TodoItem";
+import { TodoItemWrapper } from "./TodoItem/TodoItemWrapper";
 import { useCurrentList } from "./useCurrentList";
 import { useStore } from "./useStore";
 
@@ -48,7 +48,7 @@ export const CompletedTodos = React.memo(({ setEditingId }: InputProps) => {
           {/* Only render when open, to improve performance */}
           {open &&
             todosInCurrentList.map((t) => (
-              <TodoItem todo={t} key={t.id} setEditingId={setEditingId} />
+              <TodoItemWrapper todo={t} key={t.id} setEditingId={setEditingId} />
             ))}
         </Accordion.Panel>
       </Accordion.Item>

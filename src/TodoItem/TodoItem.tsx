@@ -1,94 +1,174 @@
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import styled from "@emotion/styled";
-import { Flex } from "@mantine/core";
-import React from "react";
-import { Todo } from "../useSyncedStore";
-import { TodoItemInternal } from "./TodoItemInternal";
+import {
+  ActionIcon,
+  Badge,
+  Center,
+  Flex,
+  Menu,
+  Overlay,
+  Portal,
+  useMantineTheme,
+} from "@mantine/core";
+import { useSyncedStore } from "@syncedstore/react";
+import {
+  IconCheckbox,
+  IconClockHour4,
+  IconDotsVertical,
+  IconRepeat,
+  IconSquare,
+  IconTargetArrow,
+} from "@tabler/icons-react";
+import {
+  addDays,
+  differenceInCalendarDays,
+  formatISO,
+  isValid,
+} from "date-fns";
+import React, { SyntheticEvent, useCallback, useMemo, useState } from "react";
+import { DueDateString } from "../DueDateString";
+import { USER_ID } from "../constants";
+import { TodoItemAvatar } from "./TodoItemAvatar";
+import { TodoItemMenuDropdown } from "./TodoItemMenuDropdown";
+import { TodoItemTextContent } from "./TodoItemTextContent";
+import {
+  TodoItemAdditionalProps,
+  TodoItemCommonProps,
+} from "./TodoItemWrapper";
 
-const StyledFlex = styled(Flex)`
-  @keyframes pop {
-    0% {
-      transform: scale(1);
-      box-shadow: var(--box-shadow);
-    }
-    100% {
-      transform: scale(var(--scale));
-      box-shadow: var(--box-shadow-picked-up);
-    }
-  }
-  animation: pop 200ms cubic-bezier(0.18, 0.67, 0.6, 1.22);
-  transform: scale(var(--scale));
-  border-bottom: 0.0625rem solid rgb(55, 58, 64);
-
-  :hover {
-    background-color: rgb(44, 46, 51);
-  }
-`;
-
-export type TodoItemCommonProps = {
-  todo: Todo;
-};
-
-export type TodoItemAdditionalProps =
-  | {
-      /** Whether the Todo is being dragged */
-      dragging?: false;
-      setEditingId: React.Dispatch<React.SetStateAction<string | undefined>>;
-    }
-  | {
-      dragging: true;
-      setEditingId?: never;
-    };
-
-/**
- * This component is separated into 2 because of this issue.
- * https://github.com/clauderic/dnd-kit/issues/389#issuecomment-1013324147
- *
- * Essentially, when dragging, all the Sortables re-render unnecessarily.
- *
- * Heavy memoization helps somewhat, as the contents of the Todo don't rerender
- * (even if the container of the Todo does).
- */
 export const TodoItem = React.memo(
-  (props: TodoItemAdditionalProps & TodoItemCommonProps) => {
-    const { dragging, todo } = props;
+  ({
+    todo: _todo,
+    setEditingId,
+  }: TodoItemAdditionalProps & TodoItemCommonProps) => {
+    const theme = useMantineTheme();
 
-    const {
-      attributes,
-      listeners,
-      setNodeRef,
-      transform,
-      transition,
-      isDragging,
-    } = useSortable({
-      id: todo.id,
-    });
+    const todo = useSyncedStore(_todo);
 
-    const style = {
-      transform: CSS.Transform.toString(transform),
-      transition,
+    const [menuOpened, setMenuOpened] = useState(false);
 
-      // isDragging: the 'shadow' of the active item (follows overlay)
-      ...(isDragging && { opacity: 0.5, cursor: "grab" }),
+    const openMenu = useCallback((e: SyntheticEvent) => {
+      e.stopPropagation();
+      setMenuOpened(true);
+    }, []);
 
-      // dragging: the overlay of the dragged thing
-      ...(dragging && {
-        "--scale": 1.05,
-        backgroundColor: "rgb(44, 46, 51)",
-      }),
-    } as React.CSSProperties;
+    const completeTodo = useCallback(
+      (e: SyntheticEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        todo.modified = Date.now();
+        todo.by = USER_ID;
+
+        if (todo.repeatDays && !todo.completed) {
+          /* If this is a repeating task that was completed,
+          do not mark as completed, update due date */
+          todo.dueDate = formatISO(addDays(new Date(), todo.repeatDays), {
+            representation: "date",
+          });
+        } else {
+          todo.completed = !todo.completed;
+        }
+      },
+      [todo]
+    );
+
+    /* Mark todo as read on open */
+    const onOpenTodo = useCallback(() => {
+      localStorage.setItem(todo.id, Date.now().toString());
+      setEditingId?.(todo.id);
+    }, [setEditingId, todo.id]);
+
+    const checkbox = useMemo(
+      () => (
+        <ActionIcon onClick={completeTodo} mr={10}>
+          {todo.completed ? (
+            <IconCheckbox color={theme.colors.gray[6]} />
+          ) : (
+            <IconSquare color={theme.colors.gray[6]} />
+          )}
+        </ActionIcon>
+      ),
+      [completeTodo, theme.colors.gray, todo.completed]
+    );
+
+    const dueDateRepeat = useMemo(() => {
+      const daysToDue =
+        todo.dueDate && isValid(Date.parse(todo.dueDate))
+          ? differenceInCalendarDays(Date.parse(todo.dueDate), new Date())
+          : undefined;
+
+      const color =
+        typeof daysToDue === "number"
+          ? daysToDue < 1
+            ? "red"
+            : daysToDue < 4
+            ? "yellow"
+            : "gray"
+          : undefined;
+
+      return (
+        <Flex mt={5} sx={{ userSelect: "none" }}>
+          {todo.dueDate && (
+            <Badge
+              color={color}
+              leftSection={
+                <Center>
+                  <IconClockHour4 size={14} />
+                </Center>
+              }
+            >
+              <DueDateString dueDate={todo.dueDate} />
+            </Badge>
+          )}
+          {todo.repeatDays && (
+            <Badge
+              color="gray"
+              leftSection={
+                <Center>
+                  <IconRepeat size={14} />
+                </Center>
+              }
+            >
+              {todo.repeatDays} days
+            </Badge>
+          )}
+        </Flex>
+      );
+    }, [todo.dueDate, todo.repeatDays]);
+
+    const todoFocus = useMemo(
+      () =>
+        todo.focus && (
+          <IconTargetArrow style={{ marginRight: 10, flexShrink: 0 }} />
+        ),
+      [todo.focus]
+    );
+
+    const menu = useMemo(
+      () => (
+        <Menu opened={menuOpened} onChange={setMenuOpened} withinPortal>
+          <Portal>{menuOpened && <Overlay opacity={0} />}</Portal>
+          <Menu.Target>
+            <ActionIcon onClick={openMenu}>
+              <IconDotsVertical color={theme.colors.gray[6]} />
+            </ActionIcon>
+          </Menu.Target>
+          {menuOpened && <TodoItemMenuDropdown todo={todo} />}
+        </Menu>
+      ),
+      [menuOpened, openMenu, theme.colors.gray, todo]
+    );
 
     return (
-      <StyledFlex
-        {...listeners}
-        align={"center"}
-        ref={setNodeRef}
-        {...attributes}
-        style={style}
-      >
-        <TodoItemInternal {...props} />
-      </StyledFlex>
+      <Flex direction={"column"} w="100%" py={10} px={5} onClick={onOpenTodo}>
+        <Flex align={"center"}>
+          {checkbox}
+          {todoFocus}
+          <TodoItemTextContent todo={todo} />
+          <TodoItemAvatar todo={todo} />
+          {menu}
+        </Flex>
+        {dueDateRepeat}
+      </Flex>
     );
   }
 );
+
+TodoItem.displayName = "TodoItem";

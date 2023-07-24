@@ -76,3 +76,5 @@ export const TodoView = React.memo(({ setEditingId }: InputProps) => {
     />
   );
 });
+
+TodoView.displayName = "TodoView";

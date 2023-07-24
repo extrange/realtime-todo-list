@@ -24,7 +24,7 @@ import {
 import { IconPlus } from "@tabler/icons-react";
 import React, { SetStateAction, useCallback, useMemo, useState } from "react";
 import { CompletedTodos } from "./CompletedTodos";
-import { TodoItem } from "./TodoItem/TodoItem";
+import { TodoItemWrapper } from "./TodoItem/TodoItemWrapper";
 import { useStore } from "./useStore";
 import { Todo } from "./useSyncedStore";
 import { generateKeyBetweenSafe } from "./util";
@@ -57,7 +57,7 @@ export const TodoViewBase = React.memo(
       if (activeId) {
         const todo = todos.find((t) => t.id === activeId);
         if (!todo) throw Error(`Could not find dragging todo id ${activeId}`);
-        return <TodoItem dragging todo={todo} />;
+        return <TodoItemWrapper dragging todo={todo} />;
       } else return null;
     }, [activeId, todos]);
 
@@ -177,7 +177,7 @@ export const TodoViewBase = React.memo(
               strategy={verticalListSortingStrategy}
             >
               {todos.map((todo) => (
-                <TodoItem
+                <TodoItemWrapper
                   todo={todo}
                   key={todo.id}
                   setEditingId={setEditingId}
@@ -203,3 +203,5 @@ export const TodoViewBase = React.memo(
     );
   }
 );
+
+TodoViewBase.displayName = "TodoViewBase";
