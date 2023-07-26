@@ -2,7 +2,7 @@ import React, { Profiler, useState } from "react";
 import { EditTodoWrapper } from "./EditTodoWrapper";
 import { TodoView } from "./TodoView";
 
-export const App = React.memo(() => {
+export const AppBody = React.memo(() => {
   const [editingId, setEditingId] = useState<string>();
 
   return (
@@ -11,7 +11,7 @@ export const App = React.memo(() => {
       <Profiler
         id={"TodoView"}
         onRender={(id, phase, duration) =>
-          duration > 5 && console.info(id, phase, duration)
+          duration > 15 && console.info(id, phase, duration)
         }
       >
         <TodoView setEditingId={setEditingId} />
@@ -20,4 +20,4 @@ export const App = React.memo(() => {
   );
 });
 
-App.displayName = 'App'
+AppBody.displayName = 'AppBody'

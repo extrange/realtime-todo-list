@@ -52,7 +52,7 @@ export const AppNavbar = ({ navOpen, closeNav }: InputProps) => {
           <Profiler
             id={"ListView"}
             onRender={(id, phase, duration) =>
-              duration > 5 && console.info(id, phase, duration)
+              duration > 30 && console.info(id, phase, duration)
             }
           >
             <ListView closeNav={closeNav} />

@@ -7,7 +7,9 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 ### `useSyncedStore`
 
 - If a value is conditionally accessed, and during a render it is not accessed, it stops being updated for future renders.
-- [ ] If you do `state.todos.map(...)`, is this a shallow or deep listener?
+- Accessing an array (e.g. `state.todos`) can result in either a shallow or deep listener depending on what properties were accessed
+  - In `state.todos.length`, it is a shallow listener
+  - In `state.todos.map(t => t.focus)`, it is a deep listener, but only on the `todo.focus` property
 
 Notes:
 
@@ -41,9 +43,24 @@ Notes:
 
 Tooltip causes `React.memo` to fail presumably because it uses `React.cloneElement`l [on its children][tooltip-clone-element].
 
-### Slow functions to avoid
+### Performance
+
+Benchmark (for 10,000 objects)
+
+- `Array.forEach` (syncedStore proxy) - 100ms
+- `getYjsValue().toArray().forEach` (raw Yjs) - 50ms
+- `Object.entries(YMap).forEach` - 200ms
+- `[...getYjsValue(YMap).entries()].forEach` - 50ms
+
+Others:
 
 - `Array.find` (within SyncedStore proxied objects) - around 20ms for 1000 objects
+
+
+### React Profiler
+
+- When using `<Profiler>` in a mapped array, you must also give it a `key` otherwise children will re-render whenever their parent does.
+- The Profiler does not include time spent in callbacks (e.g. in ListView)
 
 [use-reactive]: https://github.com/YousefED/reactive/blob/main/packages/reactive-react/src/useReactive.ts
 [tooltip-clone-element]: https://github.com/mantinedev/mantine/blob/cf0f85faec56615ea5fbd7813e83bac60dbaefb7/src/mantine-core/src/Tooltip/Tooltip.tsx#L193

@@ -1,17 +1,15 @@
 import { Button, Flex } from "@mantine/core";
 
-import { observeDeep } from "@syncedstore/core";
 import { useSyncedStore } from "@syncedstore/react";
 import { generateKeyBetween } from "fractional-indexing";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { YMapEvent, YXmlEvent } from "yjs/dist/src/internals";
 import { ListType } from "./ListContext";
 import { ListItem } from "./ListItem";
+import { useAppStore } from "./appStore";
 import { useCurrentList } from "./useCurrentList";
-import { useProviderEvent } from "./useProviderEvent";
 import { useStore } from "./useStore";
-import { Todo, selectLists, selectTodos } from "./useSyncedStore";
+import { selectLists, selectTodos } from "./useSyncedStore";
 import { getMaxSortOrder } from "./util";
 
 type CurrentListNameChange = "currentListNameChange";
@@ -36,76 +34,16 @@ type InputProps = {
 export const ListView = ({ closeNav }: InputProps) => {
   const store = useStore();
   const lists = useSyncedStore(store.lists);
-  const todos = useSyncedStore(store.todos);
-  const [uncompletedTodosCount, setUncompletedTodosCount] = useState<
-    Map<string, number>
-  >(new Map());
   const [currentList, setCurrentList] = useCurrentList();
-  const synced = useProviderEvent("synced");
+
+  const uncompletedTodosCount = useAppStore(
+    (state) => state.uncompletedTodosCount
+  );
 
   /* Sort lists alphabetically */
   const sortedLists = lists
     .slice()
     .sort((a, b) => a.name.localeCompare(b.name));
-
-  /* Triggered when todos change, ignoring text change events
-  This loops through all todos and generates the uncompletedCount.
-  This is much more performant than filtering todos in each ListItem.*/
-  const updateUncompletedCount = useCallback(
-    (e?: Array<YMapEvent<Todo> | YXmlEvent>) => {
-      if (e) {
-        /* We only care when focus, completed and listId change*/
-        const todoItemKeysToCheck: Array<keyof Todo> = [
-          "focus",
-          "completed",
-          "listId",
-        ];
-        const shouldContinue =
-          e.some((ev) =>
-            todoItemKeysToCheck.some((k) =>
-              (ev as YMapEvent<Todo>).keysChanged?.has(k)
-            )
-          ) ||
-          /* Array add/remove */
-          e.some(
-            (ev) =>
-              // TODO find a better way to type this
-              (ev._changes as Record<string, Array<unknown>>)?.delta?.length &&
-              // Ignore todo.content newline additions
-              !(ev as unknown as Record<string, boolean>).childListChanged
-          );
-        if (!shouldContinue) return;
-      }
-
-      const temp = new Map([
-        ["focus", 0],
-        ["uncategorized", 0],
-        ...lists.map((l) => [l.id, 0] as [string, number]),
-      ]);
-
-      todos.forEach((t) => {
-        if (t.completed) return;
-        if (t.focus) temp.set("focus", (temp.get("focus") as number) + 1);
-        if (!t.listId)
-          temp.set("uncategorized", (temp.get("uncategorized") as number) + 1);
-        else temp.set(t.listId, (temp.get(t.listId) as number) + 1);
-      });
-
-      setUncompletedTodosCount(temp);
-    },
-    [lists, todos]
-  );
-
-  // Necessary for initial render on mobile
-  useEffect(
-    () => void (synced && updateUncompletedCount()),
-    [synced, updateUncompletedCount]
-  );
-
-  useEffect(
-    () => observeDeep(todos, updateUncompletedCount),
-    [updateUncompletedCount, todos]
-  );
 
   const createList = useCallback(() => {
     const name = prompt("Enter list name:");

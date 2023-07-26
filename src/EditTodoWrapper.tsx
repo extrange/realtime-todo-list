@@ -32,3 +32,5 @@ export const EditTodoWrapper = React.memo(
     );
   }
 );
+
+EditTodoWrapper.displayName = "EditTodoWrapper";

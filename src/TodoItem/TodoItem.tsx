@@ -1,3 +1,4 @@
+import styled from "@emotion/styled";
 import {
   ActionIcon,
   Badge,
@@ -34,11 +35,20 @@ import {
   TodoItemCommonProps,
 } from "./TodoItemWrapper";
 
+const StyledFlex = styled(Flex)`
+  border-bottom: 0.0625rem solid rgb(55, 58, 64);
+
+  :hover {
+    background-color: rgb(44, 46, 51);
+  }
+`;
+
 export const TodoItem = React.memo(
   ({
     todo: _todo,
     setEditingId,
   }: TodoItemAdditionalProps & TodoItemCommonProps) => {
+    if (!_todo) throw Error(`Todo passed was ${typeof _todo}!`);
     const theme = useMantineTheme();
 
     const todo = useSyncedStore(_todo);
@@ -157,7 +167,13 @@ export const TodoItem = React.memo(
     );
 
     return (
-      <Flex direction={"column"} w="100%" py={10} px={5} onClick={onOpenTodo}>
+      <StyledFlex
+        direction={"column"}
+        w="100%"
+        py={10}
+        px={5}
+        onClick={onOpenTodo}
+      >
         <Flex align={"center"}>
           {checkbox}
           {todoFocus}
@@ -166,7 +182,7 @@ export const TodoItem = React.memo(
           {menu}
         </Flex>
         {dueDateRepeat}
-      </Flex>
+      </StyledFlex>
     );
   }
 );

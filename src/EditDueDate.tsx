@@ -1,10 +1,9 @@
 import { Group, Indicator, NumberInput } from "@mantine/core";
 import { DatePickerInput, DateValue } from "@mantine/dates";
-import { MappedTypeDescription } from "@syncedstore/core/types/doc";
+import { useSyncedStore } from "@syncedstore/react";
 import { formatISO, isToday } from "date-fns";
 import { useCallback, useMemo } from "react";
 import { useStore } from "./useStore";
-import { Store, useSyncedStoreCustomImpl } from "./useSyncedStore";
 
 type InputProps = {
   todoId: string;
@@ -12,21 +11,18 @@ type InputProps = {
 
 /**Flexbox containing inputs for editing the due date and p */
 export const EditDueDate = ({ todoId }: InputProps) => {
-  const selectTodo = useCallback(
-    (s: MappedTypeDescription<Store>) => s.todos.find((t) => t.id === todoId),
-    [todoId]
-  );
   const store = useStore();
-  const todo = useMemo(() => selectTodo(store), [selectTodo, store]);
-  const todoReadOnly = useSyncedStoreCustomImpl(selectTodo);
+  const state = useSyncedStore(store);
+  const todo = useMemo(
+    () => state.todos.find((t) => t.id === todoId),
+    [state.todos, todoId]
+  );
 
-  if (!todo || !todoReadOnly)
-    throw Error(`EditDueDate: Could not find todo with id ${todoId}`);
+  if (!todo) throw Error(`EditDueDate: Could not find todo with id ${todoId}`);
 
   const currentDate = useMemo(
-    () =>
-      todoReadOnly.dueDate ? new Date(Date.parse(todoReadOnly.dueDate)) : null,
-    [todoReadOnly.dueDate]
+    () => (todo.dueDate ? new Date(Date.parse(todo.dueDate)) : null),
+    [todo.dueDate]
   );
 
   const onDueDateChange = useCallback(
@@ -51,7 +47,7 @@ export const EditDueDate = ({ todoId }: InputProps) => {
         label="Due"
         placeholder="Enter a date"
         clearable
-        popoverProps={{withinPortal: true}}
+        popoverProps={{ withinPortal: true }}
         value={currentDate}
         onChange={onDueDateChange}
         renderDay={(date) => (
@@ -71,7 +67,7 @@ export const EditDueDate = ({ todoId }: InputProps) => {
         maw={100}
         hideControls
         label="Repeat days"
-        value={todoReadOnly.repeatDays}
+        value={todo.repeatDays}
         onChange={onRepeatDaysChange}
       />
     </Group>

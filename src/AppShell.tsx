@@ -5,7 +5,7 @@ import {
 } from "@mantine/core";
 import { useViewportSize } from "@mantine/hooks";
 import { SetStateAction, useCallback, useState } from "react";
-import { App } from "./App";
+import { AppBody } from "./AppBody";
 import { AppAside } from "./AppAside";
 import { AppFooter } from "./AppFooter";
 import { AppHeader } from "./AppHeader";
@@ -67,7 +67,7 @@ export const AppShell = () => {
         h={`calc(${height}px - var(--mantine-footer-height) - var(--mantine-header-height))`}
         offsetScrollbars
       >
-        <App />
+        <AppBody />
       </ScrollArea>
     </AppShellMantine>
   );

@@ -1,35 +1,34 @@
-import { Document } from "@tiptap/extension-document";
-import { useEditor } from "@tiptap/react";
-import { useCallback, useEffect, useMemo, useRef } from "react";
 import { RichTextEditor } from "@mantine/tiptap";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
+import { Document } from "@tiptap/extension-document";
 import { Heading } from "@tiptap/extension-heading";
 import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
+import Table from "@tiptap/extension-table";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Underline from "@tiptap/extension-underline";
+import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import React from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { User } from "./AppShell";
+import { USER_ID } from "./constants";
+import { ClearFormattingControl } from "./controls/ClearFormattingControl";
+import { IndentControl } from "./controls/IndentControl";
+import { TableControl } from "./controls/TableControl";
 import { ToggleCodeBlockControl } from "./controls/ToggleCodeBlockControl";
 import { ToggleTaskControl } from "./controls/ToggleTaskControl";
-import { USER_ID } from "./constants";
+import { UndoControl } from "./controls/UndoControl";
 import { useProvider } from "./useProvider";
 import { useStore } from "./useStore";
 import { Store, useSyncedStoreCustomImpl } from "./useSyncedStore";
 import { getTodoTitle } from "./util";
-import { ClearFormattingControl } from "./controls/ClearFormattingControl";
-import TableRow from "@tiptap/extension-table-row";
-import TableCell from "@tiptap/extension-table-cell";
-import TableHeader from "@tiptap/extension-table-header";
-import Table from "@tiptap/extension-table";
-import { TableControl } from "./controls/TableControl";
-import { IndentControl } from "./controls/IndentControl";
-import { UndoControl } from "./controls/UndoControl";
 
 type InputProps = {
   editingId: string;
@@ -168,3 +167,5 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
     </RichTextEditor>
   );
 });
+
+Editor.displayName = "Editor";

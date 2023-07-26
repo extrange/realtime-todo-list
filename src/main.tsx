@@ -2,7 +2,7 @@ import "@fontsource/inter";
 import "@fontsource/jetbrains-mono";
 import { MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
-import React from "react";
+import React, { Profiler } from "react";
 import ReactDOM from "react-dom/client";
 import { AppShell } from "./AppShell.tsx";
 
@@ -14,6 +14,7 @@ import { Login } from "./Login.tsx";
 import { ReloadPrompt } from "./ReloadPrompt.tsx";
 import { RoomProvider } from "./RoomProvider.tsx";
 import { StoreProvider } from "./StoreProvider.tsx";
+import { TodoListUpdater } from "./TodoListUpdater.tsx";
 import { UpdateStoredRoomName } from "./UpdateStoredRoomName.tsx";
 import "./app.css";
 
@@ -44,6 +45,14 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                   <ErrorBoundary FallbackComponent={Fallback}>
                     <UpdateStoredRoomName />
                     <IdleDetect />
+                    <Profiler
+                      id={"TodoListUpdated"}
+                      onRender={(id, phase, duration) =>
+                        duration > 15 && console.info(id, phase, duration)
+                      }
+                    >
+                      <TodoListUpdater />
+                    </Profiler>
                     <AppShell />
                   </ErrorBoundary>
                 </ListProvider>

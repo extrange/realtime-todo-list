@@ -2,7 +2,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import styled from "@emotion/styled";
 import { Flex } from "@mantine/core";
-import React, { Profiler, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Todo } from "../useSyncedStore";
 import { TodoItem } from "./TodoItem";
 
@@ -19,11 +19,6 @@ const StyledFlex = styled(Flex)`
   }
   animation: pop 200ms cubic-bezier(0.18, 0.67, 0.6, 1.22);
   transform: scale(var(--scale));
-  border-bottom: 0.0625rem solid rgb(55, 58, 64);
-
-  :hover {
-    background-color: rgb(44, 46, 51);
-  }
 `;
 
 export type TodoItemCommonProps = {
@@ -84,22 +79,14 @@ export const TodoItemWrapper = React.memo(
     );
 
     return (
-      <Profiler
-        id={`TodoItemWrapper ${todo.id}`}
-        onRender={(id, phase, duration) =>
-          duration > 5 && console.info(id, phase, duration)
-        }
+      <StyledFlex
+        {...listeners}
+        ref={setNodeRef}
+        {...attributes}
+        style={style}
       >
-        <StyledFlex
-          {...listeners}
-          align={"center"}
-          ref={setNodeRef}
-          {...attributes}
-          style={style}
-        >
-          <TodoItem {...props} />
-        </StyledFlex>
-      </Profiler>
+        <TodoItem {...props} />
+      </StyledFlex>
     );
   }
 );
