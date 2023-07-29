@@ -3,6 +3,7 @@
  * over the todos array twice (once in ListView and again in TodoView)
  */
 import { create } from "zustand";
+import { devtools } from "zustand/middleware";
 import { Todo } from "./useSyncedStore";
 
 type AppStore = {
@@ -23,17 +24,19 @@ type AppStore = {
   setCompletedTodos: (todos: Todo[]) => void;
 };
 
-export const useAppStore = create<AppStore>()((set) => ({
-  uncompletedTodosCount: new Map(),
-  setUncompletedTodosCount: (counts) =>
-    set(() => ({ uncompletedTodosCount: counts })),
+export const useAppStore = create<AppStore>()(
+  devtools((set) => ({
+    uncompletedTodosCount: new Map(),
+    setUncompletedTodosCount: (counts) =>
+      set(() => ({ uncompletedTodosCount: counts })),
 
-  completedTodos: [],
-  setCompletedTodos: (todos) => set(() => ({ completedTodos: todos })),
+    completedTodos: [],
+    setCompletedTodos: (todos) => set(() => ({ completedTodos: todos })),
 
-  uncompletedTodos: [],
-  setUncompletedTodos: (todos) => set(() => ({ uncompletedTodos: todos })),
+    uncompletedTodos: [],
+    setUncompletedTodos: (todos) => set(() => ({ uncompletedTodos: todos })),
 
-  uncompletedTodoIds: [],
-  setUncompletedTodoIds: (ids) => set(() => ({ uncompletedTodoIds: ids })),
-}));
+    uncompletedTodoIds: [],
+    setUncompletedTodoIds: (ids) => set(() => ({ uncompletedTodoIds: ids })),
+  }))
+);

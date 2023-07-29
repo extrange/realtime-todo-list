@@ -115,19 +115,21 @@ export const TodoView = React.memo(({ setEditingId }: InputProps) => {
   }, [draggedTodoId, uncompletedTodos]);
 
   /* PointerSensor causes drag-to-refresh on mobile Chrome */
-  const sensors = useSensors(
-    useSensor(TouchSensor, {
+  const sensorOptions = useMemo(
+    /*  Memoization is necessary to prevent the DndContext from
+    passing down new onMouseOver callbacks etc in lower contexts, which
+    causes rerenders*/
+    () => ({
       activationConstraint: {
         delay: 250,
         tolerance: 5,
       },
     }),
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        delay: 250,
-        tolerance: 5,
-      },
-    })
+    []
+  );
+  const sensors = useSensors(
+    useSensor(TouchSensor, sensorOptions),
+    useSensor(MouseSensor, sensorOptions)
   );
 
   const onClickCreateTodo = useCallback(() => {
@@ -147,8 +149,10 @@ export const TodoView = React.memo(({ setEditingId }: InputProps) => {
     setDraggedTodoId(undefined);
 
     if (over && active.id !== over.id) {
-      const activeTodo = store.todos.find((t) => t.id === active.id) as Todo;
-      const overTodo = store.todos.find((t) => t.id === over.id) as Todo;
+      const activeTodo = uncompletedTodos.find(
+        (t) => t.id === active.id
+      ) as Todo;
+      const overTodo = uncompletedTodos.find((t) => t.id === over.id) as Todo;
 
       /* If over's sortOrder > active's, user is moving the Todo to 
           somewhere above it's original positition. In this case, we want to

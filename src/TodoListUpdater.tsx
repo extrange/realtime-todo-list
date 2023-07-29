@@ -45,9 +45,9 @@ export const TodoListUpdater = () => {
 
   const isFocusList = currentList === ListType.Focus;
 
-  /* We only care when focus, completed and listId change*/
+  /* We only care when focus, completed, listId  and sortOrder change*/
   const todoItemKeysToCheck: Array<keyof Todo> = useMemo(
-    () => ["focus", "completed", "listId"],
+    () => ["focus", "completed", "listId", "sortOrder", "focusSortOrder"],
     []
   );
 
@@ -104,9 +104,14 @@ export const TodoListUpdater = () => {
             }
           }
 
-          // Todos
+          // Todos in Uncategorized and lists
           if ((t.get("listId") as Todo["listId"]) === currentList) {
-            if (isFocusList && (!t.get("focus") as Todo["focus"])) return;
+            if (t.get("completed") as Todo["completed"])
+              /* Push the syncedStore instance */
+              completedTodos.push(todos[idx]);
+            else uncompletedTodos.push(todos[idx]);
+            // Focus list
+          } else if (isFocusList && (t.get("focus") as Todo["focus"])) {
             if (t.get("completed") as Todo["completed"])
               /* Push the syncedStore instance */
               completedTodos.push(todos[idx]);
@@ -124,7 +129,7 @@ export const TodoListUpdater = () => {
       setCompletedTodos(completedTodos);
       setUncompletedTodoIds(uncompletedTodos.map((t) => t.id));
       setUncompletedTodosCount(uncompletedTodosCount);
-      console.log(`TodoListUpdater time taken: ${performance.now() - start}ms`);
+      console.log("TodoListUpdater", performance.now() - start);
     },
     [
       currentList,

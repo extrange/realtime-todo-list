@@ -36,8 +36,8 @@ Notes:
     return todo.focus ? "focus" : "not focus";
   };
   ```
-
-  - Strangely, `todo.content` works on children.
+  - For complex properties e.g. `todo.content`, merely accessing the value will not trigger a re-render - it needs to be manually subscribed to with `observeDeep`.
+  - In `<StrictMode>`, this will cause a double-render (once on the component mount, again within `useSyncedStore` as it calls `forceUpdate` internally when attaching the observer). It will not affect production.
 
 ### Tooltip
 
@@ -55,7 +55,6 @@ Benchmark (for 10,000 objects)
 Others:
 
 - `Array.find` (within SyncedStore proxied objects) - around 20ms for 1000 objects
-
 
 ### React Profiler
 

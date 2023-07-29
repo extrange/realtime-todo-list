@@ -24,7 +24,12 @@ import {
   formatISO,
   isValid,
 } from "date-fns";
-import React, { SyntheticEvent, useCallback, useMemo, useState } from "react";
+import React, {
+  SyntheticEvent,
+  useCallback,
+  useMemo,
+  useState
+} from "react";
 import { DueDateString } from "../DueDateString";
 import { USER_ID } from "../constants";
 import { TodoItemAvatar } from "./TodoItemAvatar";
@@ -48,9 +53,10 @@ export const TodoItem = React.memo(
     todo: _todo,
     setEditingId,
   }: TodoItemAdditionalProps & TodoItemCommonProps) => {
-    if (!_todo) throw Error(`Todo passed was ${typeof _todo}!`);
     const theme = useMantineTheme();
 
+    // Necessary to make this reactive
+    // Causes extra rerender only in strict mode (hook 1 changed)
     const todo = useSyncedStore(_todo);
 
     const [menuOpened, setMenuOpened] = useState(false);
@@ -151,21 +157,6 @@ export const TodoItem = React.memo(
       [todo.focus]
     );
 
-    const menu = useMemo(
-      () => (
-        <Menu opened={menuOpened} onChange={setMenuOpened} withinPortal>
-          <Portal>{menuOpened && <Overlay opacity={0} />}</Portal>
-          <Menu.Target>
-            <ActionIcon onClick={openMenu}>
-              <IconDotsVertical color={theme.colors.gray[6]} />
-            </ActionIcon>
-          </Menu.Target>
-          {menuOpened && <TodoItemMenuDropdown todo={todo} />}
-        </Menu>
-      ),
-      [menuOpened, openMenu, theme.colors.gray, todo]
-    );
-
     return (
       <StyledFlex
         direction={"column"}
@@ -179,7 +170,15 @@ export const TodoItem = React.memo(
           {todoFocus}
           <TodoItemTextContent todo={todo} />
           <TodoItemAvatar todo={todo} />
-          {menu}
+          <Menu opened={menuOpened} onChange={setMenuOpened} withinPortal>
+            <Portal>{menuOpened && <Overlay opacity={0} />}</Portal>
+            <Menu.Target>
+              <ActionIcon onClick={openMenu}>
+                <IconDotsVertical color={theme.colors.gray[6]} />
+              </ActionIcon>
+            </Menu.Target>
+            {menuOpened && <TodoItemMenuDropdown todo={todo} />}
+          </Menu>
         </Flex>
         {dueDateRepeat}
       </StyledFlex>

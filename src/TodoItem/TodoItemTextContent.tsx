@@ -6,15 +6,9 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { observeDeep } from "@syncedstore/core";
-import React, {
-  useCallback,
-  useLayoutEffect,
-  useState,
-  useTransition,
-} from "react";
-import sanitizeHtml from "sanitize-html";
+import React, { useCallback, useEffect, useState } from "react";
 import { Todo } from "../useSyncedStore";
-import { getTodoTitle } from "../util";
+import { getNotes, getTodoTitle } from "../util";
 
 const _StyledText = styled(Text)`
   flex-grow: 1;
@@ -34,34 +28,21 @@ type InputProps = {
 export const TodoItemTextContent = React.memo(({ todo }: InputProps) => {
   const theme = useMantineTheme();
 
-  const [title, setTitle] = useState<string>();
-  const [notes, setNotes] = useState<string>();
-  const [, startTransition] = useTransition();
+  // Initial render
+  const [title, setTitle] = useState<string>(() => getTodoTitle(todo));
+  const [notes, setNotes] = useState<string>(() => getNotes(todo));
 
   const onChange = useCallback(() => {
-    /* Set the title */
     setTitle(getTodoTitle(todo));
-
-    /* Set the notes */
-
-    /* Take at most 300 chars of the todo's notes */
-    const notesArray: string[] = [];
-
-    // FIXME For very long strings, they are truncated prematurely before 200 chars
-    todo.content.slice(1).every((e) => {
-      notesArray.push(sanitizeHtml(e.toString()));
-      return notesArray.join(" ").length < 200;
-    });
-
-    setNotes(notesArray.join(" "));
+    setNotes(getNotes(todo));
   }, [todo]);
 
-  /* useLayoutEffect instead of useEffect to avoid a flash of 'untitled'
-  Only affects initial render */
-  useLayoutEffect(() => {
-    onChange(); //Initial render
-    return observeDeep(todo.content, () => startTransition(onChange));
-  }, [todo.content,  onChange]);
+  // Attach observers manually, since we are not using useSyncedStore here
+  // (simply accessing todo.content will not trigger rerenders on change)
+  useEffect(
+    () => observeDeep(todo.content, onChange),
+    [todo.content, onChange]
+  );
 
   return (
     <StyledText lineClamp={2} c={todo.completed ? "dimmed" : undefined}>

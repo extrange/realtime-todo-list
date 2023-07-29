@@ -79,12 +79,7 @@ export const TodoItemWrapper = React.memo(
     );
 
     return (
-      <StyledFlex
-        {...listeners}
-        ref={setNodeRef}
-        {...attributes}
-        style={style}
-      >
+      <StyledFlex {...listeners} ref={setNodeRef} {...attributes} style={style}>
         <TodoItem {...props} />
       </StyledFlex>
     );

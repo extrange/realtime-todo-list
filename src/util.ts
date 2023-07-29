@@ -74,7 +74,11 @@ export const generateKeyBetweenSafe = <T extends keyof Sortable>(
     }
 
     // Otherwise, throw
-    throw new Error(`Error while generating sort keys: ${JSON.stringify(e)}`);
+    throw new Error(
+      `Error while generating sort keys for ${JSON.stringify(
+        a
+      )} and ${JSON.stringify(b)} : ${JSON.stringify(e)}`
+    );
   }
 };
 
@@ -155,7 +159,7 @@ export const validateUuid = (uuid: string) =>
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
   );
 
-/**Get the title of the todo, or undefined if none */
+/**Get the title of the todo*/
 export const getTodoTitle = (todo: Todo) => {
   /*The XmlFragment can be viewed as an array.
     
@@ -172,10 +176,22 @@ export const getTodoTitle = (todo: Todo) => {
 
   /* Empty todo. todoReadOnly.content could be non-empty, even
   if the Todo is really empty.*/
-  if (!todo.content || !todo.content.length) return undefined;
+  if (!todo.content || !todo.content.length) return "";
 
   /* Note: both title and notes will count spaces as non-empty */
   return sanitizeHtml(todo.content.get(0).toString());
+};
+
+export const getNotes = (todo: Todo) => {
+  /* Take at most 300 chars of the todo's notes */
+  const notesArray: string[] = [];
+
+  // FIXME For very long strings, they are truncated prematurely before 200 chars
+  todo.content.slice(1).every((e) => {
+    notesArray.push(sanitizeHtml(e.toString()));
+    return notesArray.join(" ").length < 200;
+  });
+  return notesArray.join(" ");
 };
 
 /**Check if the Todo has a focus property and focusSortOrder */
