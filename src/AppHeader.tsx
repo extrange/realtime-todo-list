@@ -50,214 +50,211 @@ type InputProps = {
 
 const DebugTools = lazy(() => import("./DebugTools"));
 
-export const AppHeader = ({
-  navOpen,
-  setNavOpen,
-  asideOpen,
-  setAsideOpen,
-}: InputProps) => {
-  const [showInfo, setShowInfo] = useState<boolean>(false);
-  const [storageEstimate, setStorageEstimate] = useState<
-    StorageEstimate | undefined
-  >();
-  const theme = useMantineTheme();
-  const [roomId] = useLocalStorage({ key: CURRENT_ROOM_LOCALSTORAGE_KEY });
-  const [update, forceUpdate] = useState({});
+export const AppHeader = React.memo(
+  ({ navOpen, setNavOpen, asideOpen, setAsideOpen }: InputProps) => {
+    const [showInfo, setShowInfo] = useState<boolean>(false);
+    const [storageEstimate, setStorageEstimate] = useState<
+      StorageEstimate | undefined
+    >();
+    const theme = useMantineTheme();
+    const [roomId] = useLocalStorage({ key: CURRENT_ROOM_LOCALSTORAGE_KEY });
+    const [update, forceUpdate] = useState({});
 
-  const awareness = useAwareness();
-  const storedUsers = useSyncedStoreCustomImpl(selectStoredUsers);
-  const { onlineUsers } = getUserStatus(awareness, storedUsers);
-  const numberOnline = useMemo(() => [...onlineUsers].length, [onlineUsers]);
+    const awareness = useAwareness();
+    const storedUsers = useSyncedStoreCustomImpl(selectStoredUsers);
+    const { onlineUsers } = getUserStatus(awareness, storedUsers);
+    const numberOnline = useMemo(() => [...onlineUsers].length, [onlineUsers]);
 
-  const store = useStore();
-  const [currentList] = useCurrentList();
-  const currentListName = useMemo(
-    () =>
-      currentList === ListType.Focus
-        ? "Focus"
-        : (update && store.lists.find((l) => l.id === currentList)?.name) ??
-          "Uncategorized",
-    [currentList, store, update]
-  );
+    const store = useStore();
+    const [currentList] = useCurrentList();
+    const currentListName = useMemo(
+      () =>
+        currentList === ListType.Focus
+          ? "Focus"
+          : (update && store.lists.find((l) => l.id === currentList)?.name) ??
+            "Uncategorized",
+      [currentList, store, update]
+    );
 
-  useEffect(
-    () => void navigator.storage?.estimate().then(setStorageEstimate),
-    []
-  );
+    useEffect(
+      () => void navigator.storage?.estimate().then(setStorageEstimate),
+      []
+    );
 
-  /* Listen to changes in the current list name */
-  useEffect(() => {
-    const handleListNameChange = () => forceUpdate({});
-    document.addEventListener("currentListNameChange", handleListNameChange);
-    return () =>
-      document.removeEventListener(
-        "currentListNameChange",
-        handleListNameChange
-      );
-  }, []);
+    /* Listen to changes in the current list name */
+    useEffect(() => {
+      const handleListNameChange = () => forceUpdate({});
+      document.addEventListener("currentListNameChange", handleListNameChange);
+      return () =>
+        document.removeEventListener(
+          "currentListNameChange",
+          handleListNameChange
+        );
+    }, []);
 
-  return (
-    <>
-      <Modal
-        opened={showInfo}
-        onClose={() => setShowInfo(false)}
-        withCloseButton={false}
-        styles={{ overlay: { backdropFilter: "blur(2px)" } }}
-      >
-        <Table>
-          <tbody>
-            <tr>
-              <td>Room ID:</td>
-              <td>
-                <Flex align={"center"}>
+    return (
+      <>
+        <Modal
+          opened={showInfo}
+          onClose={() => setShowInfo(false)}
+          withCloseButton={false}
+          styles={{ overlay: { backdropFilter: "blur(2px)" } }}
+        >
+          <Table>
+            <tbody>
+              <tr>
+                <td>Room ID:</td>
+                <td>
+                  <Flex align={"center"}>
+                    <Code
+                      block
+                      sx={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
+                    >
+                      {roomId}
+                    </Code>
+                    <CopyButton value={roomId}>
+                      {({ copied, copy }) => (
+                        <ActionIcon onClick={copy} mx={10}>
+                          {copied ? <IconCheck /> : <IconCopy />}
+                        </ActionIcon>
+                      )}
+                    </CopyButton>
+                  </Flex>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <Text>Commit hash:</Text>
+                </td>
+                <td>
                   <Code
                     block
                     sx={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
                   >
-                    {roomId}
+                    {COMMIT_HASH}
                   </Code>
-                  <CopyButton value={roomId}>
-                    {({ copied, copy }) => (
-                      <ActionIcon onClick={copy} mx={10}>
-                        {copied ? <IconCheck /> : <IconCopy />}
-                      </ActionIcon>
-                    )}
-                  </CopyButton>
-                </Flex>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <Text>Commit hash:</Text>
-              </td>
-              <td>
-                <Code
-                  block
-                  sx={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
-                >
-                  {COMMIT_HASH}
-                </Code>
-              </td>
-            </tr>
-            <tr>
-              <td>Released:</td>
-              <td>
-                {new Intl.DateTimeFormat("en-SG", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                  timeZone: "Asia/Singapore",
-                }).format(RELEASE_DATE)}{" "}
-                (
-                <TimeAgo live={false} date={RELEASE_DATE} />)
-              </td>
-            </tr>
-            <tr>
-              <td>Changes:</td>
-              <td>
-                <Code
-                  block
-                  sx={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
-                >
-                  {COMMIT_MSG}
-                </Code>
-              </td>
-            </tr>
-            <tr>
-              <td>Storage used:</td>
-              <td>
-                {storageEstimate?.quota && storageEstimate.usage
-                  ? `${formatBytes(storageEstimate.usage)} of ${formatBytes(
-                      storageEstimate.quota
-                    )}`
-                  : "Calculating..."}
-              </td>
-            </tr>
-          </tbody>
-        </Table>
-        <Button
-          leftIcon={<IconBrandGithub />}
-          component="a"
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://github.com/extrange/realtime-todo-list"
-          variant={"subtle"}
-        >
-          View on Github
-        </Button>
-        <Accordion>
-          <Accordion.Item value="debugging">
-            <Accordion.Control icon={<IconAlertTriangle />}>
-              Debugging (dangerous!)
-            </Accordion.Control>
-            <Accordion.Panel>
-              <Stack>
-                <Suspense fallback="Loading...">
-                  <DebugTools />
-                </Suspense>
-              </Stack>
-            </Accordion.Panel>
-          </Accordion.Item>
-        </Accordion>
-      </Modal>
-
-      {/* Main content */}
-      <Header
-        height={48}
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-        px={theme.spacing.xs}
-      >
-        <MediaQuery largerThan="sm" styles={{ visibility: "hidden" }}>
-          <Burger
-            opened={navOpen}
-            onClick={() => setNavOpen((o) => !o)}
-            size="sm"
-            color={theme.colors.gray[6]}
-          />
-        </MediaQuery>
-        <Flex
-          justify={"center"}
-          align={"center"}
-          sx={{ flex: "1 1" }}
-          /* https://stackoverflow.com/questions/43934648/how-to-make-flexbox-items-shrink-correctly-when-in-a-nested-container */
-          miw={0}
-          px={"xs"}
-        >
-          <Text
-            fz={"xl"}
-            ta={"center"}
-            sx={{
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-            }}
+                </td>
+              </tr>
+              <tr>
+                <td>Released:</td>
+                <td>
+                  {new Intl.DateTimeFormat("en-SG", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                    timeZone: "Asia/Singapore",
+                  }).format(RELEASE_DATE)}{" "}
+                  (
+                  <TimeAgo live={false} date={RELEASE_DATE} />)
+                </td>
+              </tr>
+              <tr>
+                <td>Changes:</td>
+                <td>
+                  <Code
+                    block
+                    sx={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
+                  >
+                    {COMMIT_MSG}
+                  </Code>
+                </td>
+              </tr>
+              <tr>
+                <td>Storage used:</td>
+                <td>
+                  {storageEstimate?.quota && storageEstimate.usage
+                    ? `${formatBytes(storageEstimate.usage)} of ${formatBytes(
+                        storageEstimate.quota
+                      )}`
+                    : "Calculating..."}
+                </td>
+              </tr>
+            </tbody>
+          </Table>
+          <Button
+            leftIcon={<IconBrandGithub />}
+            component="a"
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://github.com/extrange/realtime-todo-list"
+            variant={"subtle"}
           >
-            {currentListName}
-          </Text>
-          <ActionIcon mx={5} onClick={() => setShowInfo(true)}>
-            <IconInfoCircle color={"grey"} />
-          </ActionIcon>
-        </Flex>
-        <MediaQuery largerThan="sm" styles={{ visibility: "hidden" }}>
-          {asideOpen ? (
-            <CloseButton
-              variant="subtle"
-              c={theme.colors.gray[6]}
-              onClick={() => setAsideOpen(false)}
-              size="md"
+            View on Github
+          </Button>
+          <Accordion>
+            <Accordion.Item value="debugging">
+              <Accordion.Control icon={<IconAlertTriangle />}>
+                Debugging (dangerous!)
+              </Accordion.Control>
+              <Accordion.Panel>
+                <Stack>
+                  <Suspense fallback="Loading...">
+                    <DebugTools />
+                  </Suspense>
+                </Stack>
+              </Accordion.Panel>
+            </Accordion.Item>
+          </Accordion>
+        </Modal>
+
+        {/* Main content */}
+        <Header
+          height={48}
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+          px={theme.spacing.xs}
+        >
+          <MediaQuery largerThan="sm" styles={{ visibility: "hidden" }}>
+            <Burger
+              opened={navOpen}
+              onClick={() => setNavOpen((o) => !o)}
+              size="sm"
+              color={theme.colors.gray[6]}
             />
-          ) : (
-            <ActionIcon onClick={() => setAsideOpen((o) => !o)}>
-              <Indicator disabled={!numberOnline} inline label={numberOnline}>
-                <IconUsers color={theme.colors.gray[6]} />
-              </Indicator>
+          </MediaQuery>
+          <Flex
+            justify={"center"}
+            align={"center"}
+            sx={{ flex: "1 1" }}
+            /* https://stackoverflow.com/questions/43934648/how-to-make-flexbox-items-shrink-correctly-when-in-a-nested-container */
+            miw={0}
+            px={"xs"}
+          >
+            <Text
+              fz={"xl"}
+              ta={"center"}
+              sx={{
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {currentListName}
+            </Text>
+            <ActionIcon mx={5} onClick={() => setShowInfo(true)}>
+              <IconInfoCircle color={"grey"} />
             </ActionIcon>
-          )}
-        </MediaQuery>
-      </Header>
-    </>
-  );
-};
+          </Flex>
+          <MediaQuery largerThan="sm" styles={{ visibility: "hidden" }}>
+            {asideOpen ? (
+              <CloseButton
+                variant="subtle"
+                c={theme.colors.gray[6]}
+                onClick={() => setAsideOpen(false)}
+                size="md"
+              />
+            ) : (
+              <ActionIcon onClick={() => setAsideOpen((o) => !o)}>
+                <Indicator disabled={!numberOnline} inline label={numberOnline}>
+                  <IconUsers color={theme.colors.gray[6]} />
+                </Indicator>
+              </ActionIcon>
+            )}
+          </MediaQuery>
+        </Header>
+      </>
+    );
+  }
+);

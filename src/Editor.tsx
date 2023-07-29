@@ -1,5 +1,5 @@
 import { RichTextEditor } from "@mantine/tiptap";
-import { MappedTypeDescription } from "@syncedstore/core/types/doc";
+import { useSyncedStore } from "@syncedstore/react";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import { Document } from "@tiptap/extension-document";
@@ -16,8 +16,8 @@ import TaskList from "@tiptap/extension-task-list";
 import Underline from "@tiptap/extension-underline";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import { User } from "./AppShell";
+import React, { useEffect, useMemo, useRef } from "react";
+import { useAppStore } from "./appStore";
 import { USER_ID } from "./constants";
 import { ClearFormattingControl } from "./controls/ClearFormattingControl";
 import { IndentControl } from "./controls/IndentControl";
@@ -27,36 +27,23 @@ import { ToggleTaskControl } from "./controls/ToggleTaskControl";
 import { UndoControl } from "./controls/UndoControl";
 import { useProvider } from "./useProvider";
 import { useStore } from "./useStore";
-import { Store, useSyncedStoreCustomImpl } from "./useSyncedStore";
 import { getTodoTitle } from "./util";
-
-type InputProps = {
-  editingId: string;
-};
 
 const Title = Heading.configure({ levels: [2] });
 Title.name = "title";
 
 /**Tiptap Editor with collaborative features */
-export const Editor = React.memo(({ editingId }: InputProps) => {
+export const Editor = React.memo(() => {
   const store = useStore();
-
-  /* Need the SyncedStore instance here, as editor modifies content */
-  const todo = useMemo(
-    () => store.todos.find((t) => t.id === editingId),
-    [editingId, store.todos]
-  );
-
-  if (!todo) {
-    throw new Error(`EditTodo: Could not find todo with ID ${editingId}`);
-  }
+  const todo = useAppStore((state) => state.editingTodo);
 
   /* To update lastModified */
-  const selectOwnUser = useCallback(
-    (s: MappedTypeDescription<Store>) => s.storedUsers[USER_ID]?.user,
-    []
-  );
-  const user = useSyncedStoreCustomImpl(selectOwnUser) as User;
+  const user = useSyncedStore(store.storedUsers[USER_ID]?.user);
+
+  if (!todo || !user) {
+    throw new Error(`EditTodo: todo or user is undefined!`);
+  }
+
   const provider = useProvider();
   const edited = useRef(false);
 
@@ -108,6 +95,7 @@ export const Editor = React.memo(({ editingId }: InputProps) => {
       todo.by = USER_ID;
     },
     onCreate: () => {
+      /* To announce to other users the todo this user is editing */
       provider.setAwarenessField("editingId", todo.id);
     },
     onDestroy: () => provider.setAwarenessField("editingId", undefined),

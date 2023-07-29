@@ -22,6 +22,9 @@ type AppStore = {
   /**Completed todos in current list */
   completedTodos: Todo[];
   setCompletedTodos: (todos: Todo[]) => void;
+
+  editingTodo?: Todo;
+  setEditingTodo: (todo?: Todo) => void;
 };
 
 export const useAppStore = create<AppStore>()(
@@ -38,5 +41,8 @@ export const useAppStore = create<AppStore>()(
 
     uncompletedTodoIds: [],
     setUncompletedTodoIds: (ids) => set(() => ({ uncompletedTodoIds: ids })),
+
+    editingTodo: undefined,
+    setEditingTodo: (todo) => set(() => ({ editingTodo: todo })),
   }))
 );

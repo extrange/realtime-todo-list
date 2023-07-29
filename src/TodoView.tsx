@@ -26,16 +26,13 @@ import { IconPlus } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
 import React, {
   Profiler,
-  SetStateAction,
   useCallback,
   useEffect,
   useMemo,
   useState,
 } from "react";
-import { useEvent } from "react-use-event-hook";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
-import { shallow } from "zustand/shallow";
 import { ListType } from "./ListContext";
 import { TodoItem } from "./TodoItem/TodoItem";
 import { TodoItemWrapper } from "./TodoItem/TodoItemWrapper";
@@ -46,30 +43,22 @@ import { useStore } from "./useStore";
 import { Todo } from "./useSyncedStore";
 import { generateKeyBetweenSafe, getMaxSortOrder } from "./util";
 
-type InputProps = {
-  setEditingId: React.Dispatch<SetStateAction<string | undefined>>;
-};
-
 /**
  * Shows todos in selected, uncategorized, focus or completed lists.
  */
-export const TodoView = React.memo(({ setEditingId }: InputProps) => {
+export const TodoView = React.memo(() => {
   const theme = useMantineTheme();
 
   const store = useStore();
   const [currentList] = useCurrentList();
+  const setEditingId = useAppStore((state) => state.setEditingTodo);
 
   const [draggedTodoId, setDraggedTodoId] = useState<string>();
   const [open, setOpen] = useState<string | null>(null);
 
-  const [completedTodos, uncompletedTodos, todoIds] = useAppStore(
-    (state) => [
-      state.completedTodos,
-      state.uncompletedTodos,
-      state.uncompletedTodoIds,
-    ],
-    shallow
-  );
+  const completedTodos = useAppStore((state) => state.completedTodos);
+  const uncompletedTodos = useAppStore((state) => state.uncompletedTodos);
+  const todoIds = useAppStore((state) => state.uncompletedTodoIds);
 
   const isFocusList = currentList === ListType.Focus;
 
@@ -134,8 +123,8 @@ export const TodoView = React.memo(({ setEditingId }: InputProps) => {
 
   const onClickCreateTodo = useCallback(() => {
     const newTodo = createTodo();
-    setEditingId(newTodo.id);
     store.todos.unshift(newTodo);
+    setEditingId(store.todos.find((t) => t.id === newTodo.id));
   }, [createTodo, setEditingId, store.todos]);
 
   const handleDragStart = useCallback(
@@ -143,54 +132,57 @@ export const TodoView = React.memo(({ setEditingId }: InputProps) => {
     []
   );
 
-  const handleDragEnd = useEvent((event: DragEndEvent) => {
-    const { active, over } = event;
-    const sortKey: keyof Todo = isFocusList ? "focusSortOrder" : "sortOrder";
-    setDraggedTodoId(undefined);
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      const sortKey: keyof Todo = isFocusList ? "focusSortOrder" : "sortOrder";
+      setDraggedTodoId(undefined);
 
-    if (over && active.id !== over.id) {
-      const activeTodo = uncompletedTodos.find(
-        (t) => t.id === active.id
-      ) as Todo;
-      const overTodo = uncompletedTodos.find((t) => t.id === over.id) as Todo;
+      if (over && active.id !== over.id) {
+        const activeTodo = uncompletedTodos.find(
+          (t) => t.id === active.id
+        ) as Todo;
+        const overTodo = uncompletedTodos.find((t) => t.id === over.id) as Todo;
 
-      /* If over's sortOrder > active's, user is moving the Todo to 
+        /* If over's sortOrder > active's, user is moving the Todo to 
           somewhere above it's original positition. In this case, we want to
           move the active Todo above the over Todo, and vice versa.
           
           Note: if either of the todos don't have a sort order, we still try
           to sort anyway...*/
-      const overTodoSortOrder = overTodo[sortKey];
-      const activeTodoSortOrder = activeTodo[sortKey];
-      if (
-        overTodoSortOrder &&
-        activeTodoSortOrder &&
-        overTodoSortOrder > activeTodoSortOrder
-      ) {
-        // Find the todo above the over todo, in the sorted array
-        const aboveTodo =
-          uncompletedTodos[
-            uncompletedTodos.findIndex((t) => t.id === overTodo.id) - 1
-          ];
-        activeTodo[sortKey] = generateKeyBetweenSafe(
-          overTodo,
-          aboveTodo,
-          sortKey
-        );
-      } else {
-        // Find the todo below the over todo, in the sorted array
-        const belowTodo =
-          uncompletedTodos[
-            uncompletedTodos.findIndex((t) => t.id === overTodo.id) + 1
-          ];
-        activeTodo[sortKey] = generateKeyBetweenSafe(
-          belowTodo,
-          overTodo,
-          sortKey
-        );
+        const overTodoSortOrder = overTodo[sortKey];
+        const activeTodoSortOrder = activeTodo[sortKey];
+        if (
+          overTodoSortOrder &&
+          activeTodoSortOrder &&
+          overTodoSortOrder > activeTodoSortOrder
+        ) {
+          // Find the todo above the over todo, in the sorted array
+          const aboveTodo =
+            uncompletedTodos[
+              uncompletedTodos.findIndex((t) => t.id === overTodo.id) - 1
+            ];
+          activeTodo[sortKey] = generateKeyBetweenSafe(
+            overTodo,
+            aboveTodo,
+            sortKey
+          );
+        } else {
+          // Find the todo below the over todo, in the sorted array
+          const belowTodo =
+            uncompletedTodos[
+              uncompletedTodos.findIndex((t) => t.id === overTodo.id) + 1
+            ];
+          activeTodo[sortKey] = generateKeyBetweenSafe(
+            belowTodo,
+            overTodo,
+            sortKey
+          );
+        }
       }
-    }
-  });
+    },
+    [isFocusList, uncompletedTodos]
+  );
 
   return (
     <>
@@ -241,11 +233,7 @@ export const TodoView = React.memo(({ setEditingId }: InputProps) => {
                   duration > 15 && console.info(id, phase, duration)
                 }
               >
-                <TodoItemWrapper
-                  todo={todo}
-                  key={todo.id}
-                  setEditingId={setEditingId}
-                />
+                <TodoItemWrapper todo={todo} key={todo.id} />
               </Profiler>
             ))}
           </SortableContext>
@@ -282,9 +270,7 @@ export const TodoView = React.memo(({ setEditingId }: InputProps) => {
             </Accordion.Control>
             <Accordion.Panel>
               {open &&
-                completedTodos.map((t) => (
-                  <TodoItem todo={t} key={t.id} setEditingId={setEditingId} />
-                ))}
+                completedTodos.map((t) => <TodoItem todo={t} key={t.id} />)}
             </Accordion.Panel>
           </Accordion.Item>
         </Accordion>

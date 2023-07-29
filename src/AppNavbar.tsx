@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { useLocalStorage, useMediaQuery } from "@mantine/hooks";
 import { IconLogout } from "@tabler/icons-react";
-import { CSSProperties, Profiler, useCallback, useState } from "react";
+import React, { CSSProperties, Profiler, useCallback, useState } from "react";
 import { EditRoom } from "./EditRoom";
 import { EditUser } from "./EditUser";
 import { ListView } from "./ListView";
@@ -23,7 +23,7 @@ type InputProps = {
   closeNav: () => void;
 };
 
-export const AppNavbar = ({ navOpen, closeNav }: InputProps) => {
+export const AppNavbar = React.memo(({ navOpen, closeNav }: InputProps) => {
   const theme = useMantineTheme();
   const isDesktop = useMediaQuery(`(min-width: ${theme.breakpoints.sm})`);
 
@@ -81,4 +81,4 @@ export const AppNavbar = ({ navOpen, closeNav }: InputProps) => {
       {render}
     </Transition>
   );
-};
+});

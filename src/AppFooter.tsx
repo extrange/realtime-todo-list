@@ -1,11 +1,11 @@
 import { Center, Footer, Text } from "@mantine/core";
 import { differenceInCalendarDays } from "date-fns";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { NetworkOverlay } from "./NetworkOverlay";
 import { useRerenderDaily } from "./useRerenderDaily";
 import { selectTodos, useSyncedStoreCustomImpl } from "./useSyncedStore";
 
-export const AppFooter = () => {
+export const AppFooter = React.memo(() => {
   const todos = useSyncedStoreCustomImpl(selectTodos, 5000);
 
   const time = useRerenderDaily();
@@ -61,4 +61,4 @@ export const AppFooter = () => {
       <NetworkOverlay />
     </Footer>
   );
-};
+});

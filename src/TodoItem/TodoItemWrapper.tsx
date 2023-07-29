@@ -21,20 +21,12 @@ const StyledFlex = styled(Flex)`
   transform: scale(var(--scale));
 `;
 
-export type TodoItemCommonProps = {
+export type TodoItemProps = {
   todo: Todo;
-};
 
-export type TodoItemAdditionalProps =
-  | {
-      /** Whether the Todo is being dragged */
-      dragging?: false;
-      setEditingId: React.Dispatch<React.SetStateAction<string | undefined>>;
-    }
-  | {
-      dragging: true;
-      setEditingId?: never;
-    };
+  /** Whether the Todo is being dragged */
+  dragging?: boolean;
+};
 
 /**
  * This component is separated into 2 because of this issue.
@@ -45,45 +37,43 @@ export type TodoItemAdditionalProps =
  * Heavy memoization helps somewhat, as the contents of the Todo don't rerender
  * (even if the container of the Todo does).
  */
-export const TodoItemWrapper = React.memo(
-  (props: TodoItemAdditionalProps & TodoItemCommonProps) => {
-    const { dragging, todo } = props;
+export const TodoItemWrapper = React.memo((props: TodoItemProps) => {
+  const { dragging, todo } = props;
 
-    const {
-      attributes,
-      listeners,
-      setNodeRef,
-      transform,
-      transition,
-      isDragging,
-    } = useSortable({
-      id: todo.id,
-    });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: todo.id,
+  });
 
-    const style = useMemo(
-      () =>
-        ({
-          transform: CSS.Transform.toString(transform),
-          transition,
+  const style = useMemo(
+    () =>
+      ({
+        transform: CSS.Transform.toString(transform),
+        transition,
 
-          // isDragging: the 'shadow' of the active item (follows overlay)
-          ...(isDragging && { opacity: 0.5, cursor: "grab" }),
+        // isDragging: the 'shadow' of the active item (follows overlay)
+        ...(isDragging && { opacity: 0.5, cursor: "grab" }),
 
-          // dragging: the overlay of the dragged thing
-          ...(dragging && {
-            "--scale": 1.05,
-            backgroundColor: "rgb(44, 46, 51)",
-          }),
-        } as React.CSSProperties),
-      [dragging, isDragging, transform, transition]
-    );
+        // dragging: the overlay of the dragged thing
+        ...(dragging && {
+          "--scale": 1.05,
+          backgroundColor: "rgb(44, 46, 51)",
+        }),
+      } as React.CSSProperties),
+    [dragging, isDragging, transform, transition]
+  );
 
-    return (
-      <StyledFlex {...listeners} ref={setNodeRef} {...attributes} style={style}>
-        <TodoItem {...props} />
-      </StyledFlex>
-    );
-  }
-);
+  return (
+    <StyledFlex {...listeners} ref={setNodeRef} {...attributes} style={style}>
+      <TodoItem {...props} />
+    </StyledFlex>
+  );
+});
 
 TodoItemWrapper.displayName = "TodoItemWrapper";

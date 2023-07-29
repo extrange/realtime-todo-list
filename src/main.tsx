@@ -4,7 +4,7 @@ import { MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import React, { Profiler } from "react";
 import ReactDOM from "react-dom/client";
-import { AppShell } from "./AppShell.tsx";
+import { App } from "./App.tsx";
 
 import { ErrorBoundary } from "react-error-boundary";
 import { Fallback, FallbackWithoutDebugTools } from "./Fallback.tsx";
@@ -53,7 +53,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                     >
                       <TodoListUpdater />
                     </Profiler>
-                    <AppShell />
+                    <App />
                   </ErrorBoundary>
                 </ListProvider>
               </Login>
