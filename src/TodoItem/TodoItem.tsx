@@ -24,12 +24,7 @@ import {
   formatISO,
   isValid,
 } from "date-fns";
-import React, {
-  SyntheticEvent,
-  useCallback,
-  useMemo,
-  useState
-} from "react";
+import React, { SyntheticEvent, useCallback, useMemo, useState } from "react";
 import { DueDateString } from "../DueDateString";
 import { USER_ID } from "../constants";
 import { TodoItemAvatar } from "./TodoItemAvatar";
