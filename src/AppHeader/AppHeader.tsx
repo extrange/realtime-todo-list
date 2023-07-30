@@ -8,7 +8,6 @@ import {
   CopyButton,
   Flex,
   Header,
-  Indicator,
   MediaQuery,
   Modal,
   Stack,
@@ -23,23 +22,20 @@ import {
   IconCheck,
   IconCopy,
   IconInfoCircle,
-  IconUsers,
 } from "@tabler/icons-react";
 import React, { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import TimeAgo from "react-timeago";
-import { ListType } from "./ListContext";
+import { ListType } from "../ListContext";
 import {
   COMMIT_HASH,
   COMMIT_MSG,
   CURRENT_ROOM_LOCALSTORAGE_KEY,
   RELEASE_DATE,
-} from "./constants";
-import { getUserStatus } from "./getUserStatus";
-import { useAwareness } from "./useAwareness";
-import { useCurrentList } from "./useCurrentList";
-import { useStore } from "./useStore";
-import { selectStoredUsers, useSyncedStoreCustomImpl } from "./useSyncedStore";
-import { formatBytes } from "./util";
+} from "../constants";
+import { useCurrentList } from "../useCurrentList";
+import { useStore } from "../useStore";
+import { formatBytes } from "../util";
+import { AppHeaderNumUsersOnline } from "./AppHeaderNumUsersOnline";
 
 type InputProps = {
   navOpen: boolean;
@@ -48,7 +44,7 @@ type InputProps = {
   setAsideOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const DebugTools = lazy(() => import("./DebugTools"));
+const DebugTools = lazy(() => import("../DebugTools"));
 
 export const AppHeader = React.memo(
   ({ navOpen, setNavOpen, asideOpen, setAsideOpen }: InputProps) => {
@@ -59,11 +55,6 @@ export const AppHeader = React.memo(
     const theme = useMantineTheme();
     const [roomId] = useLocalStorage({ key: CURRENT_ROOM_LOCALSTORAGE_KEY });
     const [update, forceUpdate] = useState({});
-
-    const awareness = useAwareness();
-    const storedUsers = useSyncedStoreCustomImpl(selectStoredUsers);
-    const { onlineUsers } = getUserStatus(awareness, storedUsers);
-    const numberOnline = useMemo(() => [...onlineUsers].length, [onlineUsers]);
 
     const store = useStore();
     const [currentList] = useCurrentList();
@@ -246,11 +237,7 @@ export const AppHeader = React.memo(
                 size="md"
               />
             ) : (
-              <ActionIcon onClick={() => setAsideOpen((o) => !o)}>
-                <Indicator disabled={!numberOnline} inline label={numberOnline}>
-                  <IconUsers color={theme.colors.gray[6]} />
-                </Indicator>
-              </ActionIcon>
+              <AppHeaderNumUsersOnline setAsideOpen={setAsideOpen} />
             )}
           </MediaQuery>
         </Header>
@@ -258,3 +245,5 @@ export const AppHeader = React.memo(
     );
   }
 );
+
+AppHeader.displayName = "AppHeader";

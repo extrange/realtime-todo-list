@@ -3,8 +3,8 @@
  * over the todos array twice (once in ListView and again in TodoView)
  */
 import { create } from "zustand";
-import { devtools } from "zustand/middleware";
 import { Todo } from "./useSyncedStore";
+import { WithRequired } from "./util";
 
 type AppStore = {
   /**Map of <listId, uncompletedTodosCount> */
@@ -25,24 +25,29 @@ type AppStore = {
 
   editingTodo?: Todo;
   setEditingTodo: (todo?: Todo) => void;
+
+  /**Due and overdue todos */
+  dueTodos: WithRequired<Todo, "dueDate">[];
+  setDueTodos: (todos: WithRequired<Todo, "dueDate">[]) => void;
 };
 
-export const useAppStore = create<AppStore>()(
-  devtools((set) => ({
-    uncompletedTodosCount: new Map(),
-    setUncompletedTodosCount: (counts) =>
-      set(() => ({ uncompletedTodosCount: counts })),
+export const useAppStore = create<AppStore>()((set) => ({
+  uncompletedTodosCount: new Map(),
+  setUncompletedTodosCount: (uncompletedTodosCount) =>
+    set({ uncompletedTodosCount }),
 
-    completedTodos: [],
-    setCompletedTodos: (todos) => set(() => ({ completedTodos: todos })),
+  completedTodos: [],
+  setCompletedTodos: (completedTodos) => set({ completedTodos }),
 
-    uncompletedTodos: [],
-    setUncompletedTodos: (todos) => set(() => ({ uncompletedTodos: todos })),
+  uncompletedTodos: [],
+  setUncompletedTodos: (uncompletedTodos) => set({ uncompletedTodos }),
 
-    uncompletedTodoIds: [],
-    setUncompletedTodoIds: (ids) => set(() => ({ uncompletedTodoIds: ids })),
+  uncompletedTodoIds: [],
+  setUncompletedTodoIds: (uncompletedTodoIds) => set({ uncompletedTodoIds }),
 
-    editingTodo: undefined,
-    setEditingTodo: (todo) => set(() => ({ editingTodo: todo })),
-  }))
-);
+  editingTodo: undefined,
+  setEditingTodo: (editingTodo) => set({ editingTodo }),
+
+  dueTodos: [],
+  setDueTodos: (dueTodos) => set({ dueTodos }),
+}));

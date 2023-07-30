@@ -1,4 +1,5 @@
 import { getYjsValue, observeDeep } from "@syncedstore/core";
+import { differenceInCalendarDays } from "date-fns";
 import { useCallback, useEffect, useMemo } from "react";
 import { YMapEvent, YXmlEvent } from "yjs";
 import { YArray, YMap } from "yjs/dist/src/internals";
@@ -9,7 +10,7 @@ import { useCurrentList } from "./useCurrentList";
 import { useProviderEvent } from "./useProviderEvent";
 import { useStore } from "./useStore";
 import { Todo } from "./useSyncedStore";
-import { itemComparator } from "./util";
+import { WithRequired, itemComparator } from "./util";
 
 /**
  * Triggered when todos, list or currentList changes, ignoring text
@@ -33,12 +34,14 @@ export const TodoListUpdater = () => {
     setCompletedTodos,
     setUncompletedTodoIds,
     setUncompletedTodosCount,
+    setDueTodos,
   ] = useAppStore(
     (state) => [
       state.setUncompletedTodos,
       state.setCompletedTodos,
       state.setUncompletedTodoIds,
       state.setUncompletedTodosCount,
+      state.setDueTodos,
     ],
     shallow
   );
@@ -47,11 +50,19 @@ export const TodoListUpdater = () => {
 
   /* We only care when focus, completed, listId  and sortOrder change*/
   const todoItemKeysToCheck: Array<keyof Todo> = useMemo(
-    () => ["focus", "completed", "listId", "sortOrder", "focusSortOrder"],
+    () => [
+      "focus",
+      "completed",
+      "listId",
+      "sortOrder",
+      "focusSortOrder",
+      "dueDate",
+    ],
     []
   );
 
-  /*Will not appear in Profiler.*/
+  /* Place todos into categories.
+  Will not appear in Profiler.*/
   const handleTodosUpdate = useCallback(
     (e?: Array<YMapEvent<Todo> | YXmlEvent>) => {
       const start = performance.now();
@@ -81,12 +92,15 @@ export const TodoListUpdater = () => {
 
       const uncompletedTodos: Todo[] = [];
       const completedTodos: Todo[] = [];
+      const dueTodos: WithRequired<Todo, "dueDate">[] = [];
 
-      (getYjsValue(todos) as YArray<YMap<Todo[keyof Todo]>>)
-        .toArray()
-        .forEach((t, idx) => {
-          // Lists
+      (getYjsValue(todos) as YArray<YMap<Todo[keyof Todo]>>).forEach(
+        (t, idx) => {
+          // Uncompleted todos
           if (!t.get("completed") as Todo["completed"]) {
+            // Lists - uncompletedTodosCount
+
+            // For Focus list
             if (t.get("focus") as Todo["focus"]) {
               const currentCount = uncompletedTodosCount.get("focus") || 0;
               uncompletedTodosCount.set("focus", currentCount + 1);
@@ -94,6 +108,7 @@ export const TodoListUpdater = () => {
 
             const listId = t.get("listId") as Todo["listId"];
 
+            // For non-Focus lists and Uncategorized
             if (!listId) {
               const currentCount =
                 uncompletedTodosCount.get("uncategorized") || 0;
@@ -101,6 +116,18 @@ export const TodoListUpdater = () => {
             } else {
               const currentCount = uncompletedTodosCount.get(listId) || 0;
               uncompletedTodosCount.set(listId, currentCount + 1);
+            }
+
+            // Due/overdue todos
+            const dueDate = t.get("dueDate") as Todo["dueDate"];
+
+            if (
+              dueDate &&
+              differenceInCalendarDays(new Date(), Date.parse(dueDate)) >= 0
+            ) {
+              // We push todos[idx] (the proxied object) instead of t (the yjs value), so we can listen to it later in components with useSyncedStore
+              const todo = todos[idx] as WithRequired<Todo, "dueDate">;
+              dueTodos.push(todo);
             }
           }
 
@@ -117,18 +144,19 @@ export const TodoListUpdater = () => {
               completedTodos.push(todos[idx]);
             else uncompletedTodos.push(todos[idx]);
           }
-        });
+        }
+      );
 
       // For 100 todos, sorting takes 1-2ms
       completedTodos.sort((a, b) => b.modified - a.modified);
       uncompletedTodos.sort(
         itemComparator(isFocusList ? "focusSortOrder" : "sortOrder")
       );
-
       setUncompletedTodos(uncompletedTodos);
       setCompletedTodos(completedTodos);
       setUncompletedTodoIds(uncompletedTodos.map((t) => t.id));
       setUncompletedTodosCount(uncompletedTodosCount);
+      setDueTodos(dueTodos);
       console.log("TodoListUpdater", performance.now() - start);
     },
     [
@@ -136,6 +164,7 @@ export const TodoListUpdater = () => {
       isFocusList,
       lists,
       setCompletedTodos,
+      setDueTodos,
       setUncompletedTodoIds,
       setUncompletedTodos,
       setUncompletedTodosCount,

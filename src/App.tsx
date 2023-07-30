@@ -16,7 +16,7 @@ import {
 } from "react";
 import { AppAside } from "./AppAside";
 import { AppFooter } from "./AppFooter";
-import { AppHeader } from "./AppHeader";
+import { AppHeader } from "./AppHeader/AppHeader";
 import { AppNavbar } from "./AppNavbar";
 import { EditTodoWrapper } from "./EditTodoWrapper";
 import { TodoView } from "./TodoView";
@@ -66,7 +66,19 @@ export const App = () => {
     [closeNav, navOpen]
   );
 
-  const footer = useMemo(() => <AppFooter />, []);
+  const footer = useMemo(
+    () => (
+      <Profiler
+        id={"AppFooter"}
+        onRender={(id, phase, duration) =>
+          duration > 10 && console.info(id, phase, duration)
+        }
+      >
+        <AppFooter />
+      </Profiler>
+    ),
+    []
+  );
 
   const aside = useMemo(() => <AppAside asideOpen={asideOpen} />, [asideOpen]);
 

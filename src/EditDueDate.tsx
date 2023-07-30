@@ -1,12 +1,16 @@
-import { Group, Indicator, NumberInput } from "@mantine/core";
+import { CSSObject, Group, Indicator, NumberInput } from "@mantine/core";
 import { DatePickerInput, DateValue } from "@mantine/dates";
+import { useSyncedStore } from "@syncedstore/react";
 import { formatISO, isToday } from "date-fns";
 import React, { useCallback, useMemo } from "react";
 import { useAppStore } from "./appStore";
 
 /**Flexbox containing inputs for editing the due date and p */
 export const EditDueDate = React.memo(() => {
-  const editingTodo = useAppStore((state) => state.editingTodo);
+  const _editingTodo = useAppStore((state) => state.editingTodo);
+
+  // This reference does not change
+  const editingTodo = useSyncedStore(_editingTodo);
 
   if (!editingTodo) throw Error(`EditDueDate: No editingTodo!`);
 
@@ -32,30 +36,34 @@ export const EditDueDate = React.memo(() => {
     [editingTodo]
   );
 
+  const inputStyles = useMemo((): CSSObject => ({ flexGrow: 1 }), []);
+
+  const popoverProps = useMemo(() => ({ withinPortal: true }), []);
+
+  const renderDay = useCallback(
+    (date: Date) => (
+      <Indicator size={6} color="green" offset={-5} disabled={!isToday(date)}>
+        <div>{date.getDate()}</div>
+      </Indicator>
+    ),
+    []
+  );
+
   return (
     <Group noWrap mb={"xs"}>
       <DatePickerInput
-        sx={{ flexGrow: 1 }}
+        sx={inputStyles}
         maw={200}
         label="Due"
         placeholder="Enter a date"
         clearable
-        popoverProps={{ withinPortal: true }}
+        popoverProps={popoverProps}
         value={currentDate}
         onChange={onDueDateChange}
-        renderDay={(date) => (
-          <Indicator
-            size={6}
-            color="green"
-            offset={-5}
-            disabled={!isToday(date)}
-          >
-            <div>{date.getDate()}</div>
-          </Indicator>
-        )}
+        renderDay={renderDay}
       />
       <NumberInput
-        sx={{ flexGrow: 1 }}
+        sx={inputStyles}
         placeholder="None"
         maw={100}
         hideControls

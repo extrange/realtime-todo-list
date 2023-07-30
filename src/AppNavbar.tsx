@@ -82,3 +82,5 @@ export const AppNavbar = React.memo(({ navOpen, closeNav }: InputProps) => {
     </Transition>
   );
 });
+
+AppNavbar.displayName = "AppNavbar";

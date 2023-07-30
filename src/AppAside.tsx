@@ -1,6 +1,6 @@
 import { Aside, ScrollArea, Transition, useMantineTheme } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import { CSSProperties } from "react";
+import React, { CSSProperties, useCallback } from "react";
 import { OnlineUsers } from "./OnlineUsers";
 
 type InputProps = {
@@ -10,23 +10,28 @@ type InputProps = {
 /**
  * Shows user online/active status, and recently viewed todos.
  */
-export const AppAside = ({ asideOpen }: InputProps) => {
+export const AppAside = React.memo(({ asideOpen }: InputProps) => {
   const theme = useMantineTheme();
   const isDesktop = useMediaQuery(`(min-width: ${theme.breakpoints.sm})`);
 
-  const jsx = (styles?: CSSProperties) => (
-    <Aside style={styles} p="none" width={{ sm: 200, lg: 300 }}>
-      <ScrollArea>
-        <OnlineUsers />
-      </ScrollArea>
-    </Aside>
+  const getContent = useCallback(
+    (styles?: CSSProperties) => (
+      <Aside style={styles} p="none" width={{ sm: 200, lg: 300 }}>
+        <ScrollArea>
+          <OnlineUsers />
+        </ScrollArea>
+      </Aside>
+    ),
+    []
   );
 
   return isDesktop ? (
-    jsx()
+    getContent()
   ) : (
     <Transition mounted={isDesktop || !!asideOpen} transition="slide-left">
-      {jsx}
+      {getContent}
     </Transition>
   );
-};
+});
+
+AppAside.displayName = "AppAside";

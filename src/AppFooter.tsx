@@ -2,34 +2,29 @@ import { Center, Footer, Text } from "@mantine/core";
 import { differenceInCalendarDays } from "date-fns";
 import React, { useMemo } from "react";
 import { NetworkOverlay } from "./NetworkOverlay";
+import { useAppStore } from "./appStore";
 import { useRerenderDaily } from "./useRerenderDaily";
-import { selectTodos, useSyncedStoreCustomImpl } from "./useSyncedStore";
 
 export const AppFooter = React.memo(() => {
-  const todos = useSyncedStoreCustomImpl(selectTodos, 5000);
+  // will shallow compare improve rendering time?
+  const dueTodos = useAppStore((state) => state.dueTodos);
 
   const time = useRerenderDaily();
 
   const todosDueToday = useMemo(
     () =>
-      todos.filter(
-        (t) =>
-          !t.completed &&
-          t.dueDate &&
-          differenceInCalendarDays(time, Date.parse(t.dueDate)) === 0
+      dueTodos.filter(
+        (t) => differenceInCalendarDays(time, Date.parse(t.dueDate)) === 0
       ).length,
-    [time, todos]
+    [dueTodos, time]
   );
 
   const todosOverdue = useMemo(
     () =>
-      todos.filter(
-        (t) =>
-          !t.completed &&
-          t.dueDate &&
-          differenceInCalendarDays(time, Date.parse(t.dueDate)) > 0
+      dueTodos.filter(
+        (t) => differenceInCalendarDays(time, Date.parse(t.dueDate)) > 0
       ).length,
-    [time, todos]
+    [dueTodos, time]
   );
 
   const dueString = useMemo(() => {
@@ -62,3 +57,5 @@ export const AppFooter = React.memo(() => {
     </Footer>
   );
 });
+
+AppFooter.displayName = "AppFooter";
