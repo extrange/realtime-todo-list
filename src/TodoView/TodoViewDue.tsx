@@ -1,4 +1,5 @@
 import { Accordion } from "@mantine/core";
+import { compareAsc } from "date-fns";
 import React, { useMemo, useState } from "react";
 import { TodoItem } from "../TodoItem/TodoItem";
 import { useAppStore } from "../appStore";
@@ -16,7 +17,7 @@ export const TodoViewDue = React.memo(() => {
 
   // Don't show due todos which are already in focus
   const filteredDueTodos = useMemo(
-    () => dueTodos.filter((t) => !focusTodoIdsSet.has(t.id)),
+    () => dueTodos.filter((t) => !focusTodoIdsSet.has(t.id)).sort((a, b) => compareAsc(Date.parse(a.dueDate), Date.parse(b.dueDate))),
     [dueTodos, focusTodoIdsSet]
   );
 
