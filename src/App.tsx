@@ -19,7 +19,7 @@ import { AppFooter } from "./AppFooter";
 import { AppHeader } from "./AppHeader/AppHeader";
 import { AppNavbar } from "./AppNavbar";
 import { EditTodoWrapper } from "./EditTodoWrapper";
-import { TodoView } from "./TodoView";
+import { TodoView } from "./TodoView/TodoView";
 
 export type User = {
   name?: string;

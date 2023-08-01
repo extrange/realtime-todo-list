@@ -61,7 +61,7 @@ export const AppHeader = React.memo(
     const currentListName = useMemo(
       () =>
         currentList === ListType.Focus
-          ? "Focus"
+          ? "Focus/Due"
           : (update && store.lists.find((l) => l.id === currentList)?.name) ??
             "Uncategorized",
       [currentList, store, update]

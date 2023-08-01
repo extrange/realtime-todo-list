@@ -14,7 +14,6 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import {
-  Accordion,
   ActionIcon,
   Affix,
   Center,
@@ -24,24 +23,20 @@ import {
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
-import React, {
-  Profiler,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { Profiler, useCallback, useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
-import { ListType } from "./ListContext";
-import { TodoItem } from "./TodoItem/TodoItem";
-import { TodoItemWrapper } from "./TodoItem/TodoItemWrapper";
-import { useAppStore } from "./appStore";
-import { USER_ID } from "./constants";
-import { useCurrentList } from "./useCurrentList";
-import { useStore } from "./useStore";
-import { Todo } from "./useSyncedStore";
-import { generateKeyBetweenSafe, getMaxSortOrder } from "./util";
+import { ListType } from "../ListContext";
+import { TodoItem } from "../TodoItem/TodoItem";
+import { TodoItemWrapper } from "../TodoItem/TodoItemWrapper";
+import { useAppStore } from "../appStore";
+import { USER_ID } from "../constants";
+import { useCurrentList } from "../useCurrentList";
+import { useStore } from "../useStore";
+import { Todo } from "../useSyncedStore";
+import { generateKeyBetweenSafe, getMaxSortOrder } from "../util";
+import { TodoViewCompleted } from "./TodoViewCompleted";
+import { TodoViewDue } from "./TodoViewDue";
 
 /**
  * Shows todos in selected, uncategorized, focus or completed lists.
@@ -54,16 +49,11 @@ export const TodoView = React.memo(() => {
   const setEditingId = useAppStore((state) => state.setEditingTodo);
 
   const [draggedTodoId, setDraggedTodoId] = useState<string>();
-  const [open, setOpen] = useState<string | null>(null);
 
-  const completedTodos = useAppStore((state) => state.completedTodos);
   const uncompletedTodos = useAppStore((state) => state.uncompletedTodos);
   const todoIds = useAppStore((state) => state.uncompletedTodoIds);
 
   const isFocusList = currentList === ListType.Focus;
-
-  // Close when changing lists
-  useEffect(() => setOpen(null), [currentList]);
 
   const createTodo = useCallback((): Todo => {
     const now = Date.now();
@@ -251,30 +241,29 @@ export const TodoView = React.memo(() => {
         </Center>
       )}
 
-      <Profiler
-        id={"CompletedTodos"}
-        onRender={(id, phase, duration) =>
-          duration > 5 && console.info(id, phase, duration)
-        }
-      >
-        {/* Accordion is cheap (~3ms) */}
-        <Accordion
-          value={open}
-          onChange={setOpen}
-          styles={{ content: { padding: 0 } }}
-          chevronPosition="left"
+      {/* Show due todos only in Focus */}
+      {currentList === "focus" && (
+        <Profiler
+          id={"DueTodos"}
+          onRender={(id, phase, duration) =>
+            duration > 5 && console.info(id, phase, duration)
+          }
         >
-          <Accordion.Item value="completed">
-            <Accordion.Control>
-              Completed ({completedTodos.length})
-            </Accordion.Control>
-            <Accordion.Panel>
-              {open &&
-                completedTodos.map((t) => <TodoItem todo={t} key={t.id} />)}
-            </Accordion.Panel>
-          </Accordion.Item>
-        </Accordion>
-      </Profiler>
+          <TodoViewDue />
+        </Profiler>
+      )}
+
+      {/* Don't show completed todos in Focus */}
+      {currentList !== "focus" && (
+        <Profiler
+          id={"CompletedTodos"}
+          onRender={(id, phase, duration) =>
+            duration > 5 && console.info(id, phase, duration)
+          }
+        >
+          <TodoViewCompleted />
+        </Profiler>
+      )}
     </>
   );
 });

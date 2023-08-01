@@ -119,7 +119,7 @@ export const ListItem = React.memo(
           fw={selected ? 700 : "normal"}
         >
           {focus
-            ? `Focus (${uncompletedTodosCount})`
+            ? `Focus/Due (${uncompletedTodosCount})`
             : !list?.name
             ? `Uncategorized (${uncompletedTodosCount})`
             : `${list.name} (${uncompletedTodosCount})`}

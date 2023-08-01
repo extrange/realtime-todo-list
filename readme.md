@@ -2,6 +2,12 @@
 
 An app to manage tasks within multiple lists, with realtime + offline synchronization, and collaborative editing.
 
+## Target Performance Metrics
+
+- TodoView total render time: < 500ms
+- Editor total render time: < 500ms
+- Room switch time: < 500ms
+
 ## Known Issues
 
 ### `useSyncedStore`
