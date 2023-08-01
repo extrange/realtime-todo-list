@@ -128,6 +128,13 @@ export const TodoListUpdater = () => {
               // We push todos[idx] (the proxied object) instead of t (the yjs value), so we can listen to it later in components with useSyncedStore
               const todo = todos[idx] as WithRequired<Todo, "dueDate">;
               dueTodos.push(todo);
+
+              /* Add due todos to the Focus/Due count
+              If it was already a focus task, it would have been counted above */
+              if (!t.get("focus") as Todo["focus"]) {
+                const currentCount = uncompletedTodosCount.get("focus") || 0;
+                uncompletedTodosCount.set("focus", currentCount + 1);
+              }
             }
           }
 
