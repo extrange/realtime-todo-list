@@ -108,6 +108,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
       notifications.show({
         id: todo.id,
         autoClose: 3000,
+        withCloseButton: false,
         ...(todo.completed && { icon: <IconCheck size={"1.1rem"} /> }),
         message: (
           <Flex sx={{ justifyContent: "space-between" }} align={"center"}>
@@ -129,6 +130,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
                   id: todo.id,
                   message: "Action undone",
                   autoClose: 1000,
+                  withCloseButton: false,
                 });
               }}
             >
