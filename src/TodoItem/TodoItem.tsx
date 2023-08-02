@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   ActionIcon,
+  Anchor,
   Badge,
   Center,
   Flex,
@@ -9,8 +10,10 @@ import {
   Portal,
   useMantineTheme,
 } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { useSyncedStore } from "@syncedstore/react";
 import {
+  IconCheck,
   IconCheckbox,
   IconClockHour4,
   IconDotsVertical,
@@ -28,6 +31,7 @@ import React, { SyntheticEvent, useCallback, useMemo, useState } from "react";
 import { DueDateString } from "../DueDateString";
 import { useAppStore } from "../appStore";
 import { USER_ID } from "../constants";
+import { getTodoTitle } from "../util";
 import { TodoItemAvatar } from "./TodoItemAvatar";
 import { TodoItemMenuDropdown } from "./TodoItemMenuDropdown";
 import { TodoItemTextContent } from "./TodoItemTextContent";
@@ -56,21 +60,83 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
     setMenuOpened(true);
   }, []);
 
+  /**Note: this can be clicked on either a completed or uncompleted todo */
   const completeTodo = useCallback(
     (e: SyntheticEvent<HTMLButtonElement>) => {
       e.stopPropagation();
+      const originalCompleted = todo.completed;
+      const originalModified = todo.modified;
+      const originalBy = todo.by;
+
       todo.modified = Date.now();
       todo.by = USER_ID;
 
-      if (todo.repeatDays && !todo.completed) {
-        /* If this is a repeating task that was completed,
-          do not mark as completed, update due date */
-        todo.dueDate = formatISO(addDays(new Date(), todo.repeatDays), {
-          representation: "date",
-        });
+      const undoActions = [
+        () => {
+          todo.modified = originalModified;
+          todo.by = originalBy;
+        },
+      ];
+
+      if (todo.completed) {
+        // Uncompleting a todo
+        undoActions.push(() => (todo.completed = true));
+        todo.completed = false;
       } else {
-        todo.completed = !todo.completed;
+        // Completing a todo
+        if (todo.repeatDays && !todo.completed) {
+          /* Repeating todo:
+        - do not mark as completed, just update due date */
+          const originalDueDate = todo.dueDate;
+          todo.dueDate = formatISO(addDays(new Date(), todo.repeatDays), {
+            representation: "date",
+          });
+
+          // To undo, we reset the due date
+          undoActions.push(() => (todo.dueDate = originalDueDate));
+        } else {
+          // Non-repeating todo
+          todo.completed = true;
+
+          undoActions.push(() => (todo.completed = false));
+        }
       }
+
+      // Fixes notifications not appearing when manually completing then uncompleting a todo
+      notifications.hide(todo.id);
+
+      notifications.show({
+        id: todo.id,
+        autoClose: 3000,
+        ...(todo.completed && { icon: <IconCheck size={"1.1rem"} /> }),
+        message: (
+          <Flex sx={{ justifyContent: "space-between" }} align={"center"}>
+            <div
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {!originalCompleted
+                ? getTodoTitle(todo)
+                : "Marked as uncompleted"}
+            </div>
+            <Anchor
+              onClick={() => {
+                undoActions.forEach((f) => f());
+                notifications.update({
+                  id: todo.id,
+                  message: "Action undone",
+                  autoClose: 1000,
+                });
+              }}
+            >
+              Undo
+            </Anchor>
+          </Flex>
+        ),
+      });
     },
     [todo]
   );
