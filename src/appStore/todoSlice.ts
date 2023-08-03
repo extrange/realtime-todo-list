@@ -1,12 +1,12 @@
+import { StateCreator } from "zustand";
+import { Todo } from "../useSyncedStore";
+import { WithRequired } from "../util";
+
 /**
  * This is done for performance optimization, to avoid iterating
  * over the todos array twice (once in ListView and again in TodoView)
  */
-import { create } from "zustand";
-import { Todo } from "./useSyncedStore";
-import { WithRequired } from "./util";
-
-type AppStore = {
+export type TodoSlice = {
   /**Map of <listId, uncompletedTodosCount> */
   uncompletedTodosCount: Map<string, number>;
   setUncompletedTodosCount: (counts: Map<string, number>) => void;
@@ -31,7 +31,7 @@ type AppStore = {
   setDueTodos: (todos: WithRequired<Todo, "dueDate">[]) => void;
 };
 
-export const useAppStore = create<AppStore>()((set) => ({
+export const createTodoSlice: StateCreator<TodoSlice> = (set) => ({
   uncompletedTodosCount: new Map(),
   setUncompletedTodosCount: (uncompletedTodosCount) =>
     set({ uncompletedTodosCount }),
@@ -50,4 +50,4 @@ export const useAppStore = create<AppStore>()((set) => ({
 
   dueTodos: [],
   setDueTodos: (dueTodos) => set({ dueTodos }),
-}));
+});

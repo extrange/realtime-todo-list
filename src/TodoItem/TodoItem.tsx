@@ -29,7 +29,7 @@ import {
 } from "date-fns";
 import React, { SyntheticEvent, useCallback, useMemo, useState } from "react";
 import { DueDateString } from "../DueDateString";
-import { useAppStore } from "../appStore";
+import { useAppStore } from "../appStore/appStore";
 import { USER_ID } from "../constants";
 import { getTodoTitle } from "../util";
 import { TodoItemAvatar } from "./TodoItemAvatar";

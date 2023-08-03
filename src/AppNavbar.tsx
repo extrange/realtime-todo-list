@@ -1,9 +1,11 @@
 import {
+  ActionIcon,
   Button,
   Flex,
   Modal,
   Navbar,
   ScrollArea,
+  Tooltip,
   Transition,
   useMantineTheme,
 } from "@mantine/core";
@@ -15,6 +17,7 @@ import { EditUser } from "./EditUser";
 import { ListView } from "./ListView";
 import { MarkAllRead } from "./MarkAllRead";
 import { SavedRoomsView } from "./SavedRoomsView";
+import { Settings } from "./Settings/Settings";
 import { CURRENT_ROOM_LOCALSTORAGE_KEY } from "./constants";
 import "./editor.css";
 
@@ -48,7 +51,7 @@ export const AppNavbar = React.memo(({ navOpen, closeNav }: InputProps) => {
         </Modal>
         <EditRoom />
         <EditUser />
-        <ScrollArea pt={5} offsetScrollbars>
+        <ScrollArea pt={5}>
           <Profiler
             id={"ListView"}
             onRender={(id, phase, duration) =>
@@ -58,26 +61,33 @@ export const AppNavbar = React.memo(({ navOpen, closeNav }: InputProps) => {
             <ListView closeNav={closeNav} />
           </Profiler>
         </ScrollArea>
-        <Flex direction={"column"} justify={"flex-end"} mt={10}>
+        <Flex align="center" justify={"space-between"} mt={10}>
+          <Tooltip label="Change room" color="gray">
+            <ActionIcon
+              variant="light"
+              color="primary"
+              onClick={() => setChangeRoom(true)}
+              mr={10}
+              size="lg"
+            >
+              <IconLogout />
+            </ActionIcon>
+          </Tooltip>
           <MarkAllRead closeNav={closeNav} />
-          <Button
-            leftIcon={<IconLogout />}
-            onClick={() => setChangeRoom(true)}
-            variant="filled"
-            mt={10}
-          >
-            Change Room
-          </Button>
+          <Settings closeNav={closeNav} />
         </Flex>
       </Navbar>
     ),
     [changeRoom, closeNav, setCurrentRoomId]
   );
 
-  return isDesktop ? (
-    render()
-  ) : (
-    <Transition mounted={isDesktop || !!navOpen} transition="slide-right">
+  return (
+    <Transition
+      mounted={isDesktop || !!navOpen}
+      transition="slide-right"
+      // So that Settings can still persist when NavBar is closed
+      keepMounted
+    >
       {render}
     </Transition>
   );

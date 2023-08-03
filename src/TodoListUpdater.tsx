@@ -1,11 +1,12 @@
 import { getYjsValue, observeDeep } from "@syncedstore/core";
-import { differenceInCalendarDays } from "date-fns";
+import { differenceInCalendarDays, startOfToday } from "date-fns";
 import { useCallback, useEffect, useMemo } from "react";
 import { YMapEvent, YXmlEvent } from "yjs";
 import { YArray, YMap } from "yjs/dist/src/internals";
 import { shallow } from "zustand/shallow";
 import { ListType } from "./ListContext";
-import { useAppStore } from "./appStore";
+import { useAppStore } from "./appStore/appStore";
+import { useSettingsStore } from "./appStore/settingsStore";
 import { useCurrentList } from "./useCurrentList";
 import { useProviderEvent } from "./useProviderEvent";
 import { useStore } from "./useStore";
@@ -45,6 +46,9 @@ export const TodoListUpdater = () => {
     ],
     shallow
   );
+
+  // Read settings
+  const hideDueTodos = useSettingsStore((state) => state.hideDueTodos);
 
   const isFocusList = currentList === ListType.Focus;
 
@@ -98,6 +102,17 @@ export const TodoListUpdater = () => {
         (t, idx) => {
           // Uncompleted todos
           if (!t.get("completed") as Todo["completed"]) {
+            // If hideDueTodos, completely exclude this group of todos from further processing
+            if (hideDueTodos) {
+              const dueDate = t.get("dueDate") as Todo["dueDate"];
+              if (
+                dueDate &&
+                differenceInCalendarDays(Date.parse(dueDate), startOfToday()) >
+                  0
+              )
+                return;
+            }
+
             // Lists - uncompletedTodosCount
 
             // For Focus list
@@ -168,6 +183,7 @@ export const TodoListUpdater = () => {
     },
     [
       currentList,
+      hideDueTodos,
       isFocusList,
       lists,
       setCompletedTodos,

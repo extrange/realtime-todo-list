@@ -5,7 +5,7 @@ import { useMediaQuery } from "@mantine/hooks";
 import React from "react";
 import { EditDueDate } from "./EditDueDate";
 import { Editor } from "./Editor";
-import { useAppStore } from "./appStore";
+import { useAppStore } from "./appStore/appStore";
 
 export const EditTodoWrapper = React.memo(() => {
   const theme = useMantineTheme();

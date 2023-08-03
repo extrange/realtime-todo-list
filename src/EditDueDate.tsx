@@ -3,7 +3,7 @@ import { DatePickerInput, DateValue } from "@mantine/dates";
 import { useSyncedStore } from "@syncedstore/react";
 import { formatISO, isToday } from "date-fns";
 import React, { useCallback, useMemo } from "react";
-import { useAppStore } from "./appStore";
+import { useAppStore } from "./appStore/appStore";
 
 /**Flexbox containing inputs for editing the due date and p */
 export const EditDueDate = React.memo(() => {

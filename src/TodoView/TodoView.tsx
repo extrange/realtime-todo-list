@@ -29,7 +29,7 @@ import { XmlFragment } from "yjs";
 import { ListType } from "../ListContext";
 import { TodoItem } from "../TodoItem/TodoItem";
 import { TodoItemWrapper } from "../TodoItem/TodoItemWrapper";
-import { useAppStore } from "../appStore";
+import { useAppStore } from "../appStore/appStore";
 import { USER_ID } from "../constants";
 import { useCurrentList } from "../useCurrentList";
 import { useStore } from "../useStore";

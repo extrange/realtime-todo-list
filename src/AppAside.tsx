@@ -25,10 +25,12 @@ export const AppAside = React.memo(({ asideOpen }: InputProps) => {
     []
   );
 
-  return isDesktop ? (
-    getContent()
-  ) : (
-    <Transition mounted={isDesktop || !!asideOpen} transition="slide-left">
+  return (
+    <Transition
+      keepMounted
+      mounted={isDesktop || !!asideOpen}
+      transition="slide-left"
+    >
       {getContent}
     </Transition>
   );

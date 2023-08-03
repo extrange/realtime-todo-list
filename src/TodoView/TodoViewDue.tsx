@@ -2,7 +2,7 @@ import { Accordion } from "@mantine/core";
 import { compareAsc } from "date-fns";
 import React, { useMemo, useState } from "react";
 import { TodoItem } from "../TodoItem/TodoItem";
-import { useAppStore } from "../appStore";
+import { useAppStore } from "../appStore/appStore";
 
 /**Due and overdue todos, unsortable. */
 export const TodoViewDue = React.memo(() => {

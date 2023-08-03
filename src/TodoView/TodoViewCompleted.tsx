@@ -1,7 +1,7 @@
 import { Accordion } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { TodoItem } from "../TodoItem/TodoItem";
-import { useAppStore } from "../appStore";
+import { useAppStore } from "../appStore/appStore";
 import { useCurrentList } from "../useCurrentList";
 
 /**Accordion of completed todos, unsortable */

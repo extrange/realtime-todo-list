@@ -6,7 +6,7 @@ import { useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { ListType } from "./ListContext";
 import { ListItem } from "./ListItem";
-import { useAppStore } from "./appStore";
+import { useAppStore } from "./appStore/appStore";
 import { useCurrentList } from "./useCurrentList";
 import { useStore } from "./useStore";
 import { selectLists, selectTodos } from "./useSyncedStore";

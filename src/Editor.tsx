@@ -17,7 +17,7 @@ import Underline from "@tiptap/extension-underline";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import React, { useEffect, useMemo, useRef } from "react";
-import { useAppStore } from "./appStore";
+import { useAppStore } from "./appStore/appStore";
 import { USER_ID } from "./constants";
 import { ClearFormattingControl } from "./controls/ClearFormattingControl";
 import { IndentControl } from "./controls/IndentControl";

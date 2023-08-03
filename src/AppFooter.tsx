@@ -1,7 +1,7 @@
 import { Center, Footer, Text } from "@mantine/core";
 import React from "react";
 import { NetworkOverlay } from "./NetworkOverlay";
-import { useAppStore } from "./appStore";
+import { useAppStore } from "./appStore/appStore";
 import { useRerenderDaily } from "./useRerenderDaily";
 import { Todo } from "./useSyncedStore";
 
