@@ -1,5 +1,5 @@
 import { getYjsValue, observeDeep } from "@syncedstore/core";
-import { differenceInCalendarDays, startOfToday } from "date-fns";
+import { differenceInCalendarDays } from "date-fns";
 import { useCallback, useEffect, useMemo } from "react";
 import { YMapEvent, YXmlEvent } from "yjs";
 import { YArray, YMap } from "yjs/dist/src/internals";
@@ -107,8 +107,7 @@ export const TodoListUpdater = () => {
               const dueDate = t.get("dueDate") as Todo["dueDate"];
               if (
                 dueDate &&
-                differenceInCalendarDays(Date.parse(dueDate), startOfToday()) >
-                  0
+                differenceInCalendarDays(Date.parse(dueDate), new Date()) > 0
               )
                 return;
             }
