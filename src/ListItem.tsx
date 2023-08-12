@@ -106,6 +106,7 @@ export const ListItem = React.memo(
     );
 
     const onClick = useCallback(
+      /*Allow switching slow-rendering lists */
       () => startTransition(() => selectList(list?.id)),
       [list?.id, selectList]
     );
@@ -113,11 +114,7 @@ export const ListItem = React.memo(
     return (
       <StyledFlex selected={selected} align={"center"} pl={5}>
         {focus && <IconTargetArrow style={{ marginRight: 5 }} />}
-        <StyledListContent
-          /*Allow switching slow-rendering lists */
-          onClick={onClick}
-          fw={selected ? 700 : "normal"}
-        >
+        <StyledListContent onClick={onClick} fw={selected ? 700 : "normal"}>
           {focus
             ? `Focus/Due (${uncompletedTodosCount})`
             : !list?.name

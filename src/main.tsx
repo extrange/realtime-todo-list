@@ -14,7 +14,7 @@ import { Login } from "./Login.tsx";
 import { ReloadPrompt } from "./ReloadPrompt.tsx";
 import { RoomProvider } from "./RoomProvider.tsx";
 import { StoreProvider } from "./StoreProvider.tsx";
-import { TodoListUpdater } from "./TodoListUpdater.tsx";
+import { TodoListUpdater } from "./TodoListUpdater/TodoListUpdater.tsx";
 import { UpdateStoredRoomName } from "./UpdateStoredRoomName.tsx";
 import "./app.css";
 

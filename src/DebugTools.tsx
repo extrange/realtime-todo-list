@@ -5,6 +5,7 @@ import { useLocalStorage } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { Y, getYjsDoc } from "@syncedstore/core";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
+import { useSyncedStore } from "@syncedstore/react";
 import { formatISO } from "date-fns";
 import { generateKeyBetween } from "fractional-indexing";
 import { Suspense, lazy, useState } from "react";
@@ -16,12 +17,7 @@ import { CURRENT_ROOM_LOCALSTORAGE_KEY, USER_ID } from "./constants";
 import { useCurrentList } from "./useCurrentList";
 import { useProvider } from "./useProvider";
 import { useStore } from "./useStore";
-import {
-  Store,
-  selectLists,
-  selectTodos,
-  useSyncedStoreCustomImpl,
-} from "./useSyncedStore";
+import { Store } from "./useSyncedStore";
 import { getMaxSortOrder } from "./util";
 
 declare global {
@@ -46,8 +42,9 @@ export default function DebugTools() {
   const [roomId] = useLocalStorage({ key: CURRENT_ROOM_LOCALSTORAGE_KEY });
   const store = useStore();
   const provider = useProvider();
-  const lists = useSyncedStoreCustomImpl(selectLists);
-  const todos = useSyncedStoreCustomImpl(selectTodos);
+  const lists = store.lists;
+  const todos = store.todos;
+  const syncedStoreTodos = useSyncedStore(todos);
   const [devToolsEnabled, setDevToolsEnabled] = useState(false);
   const [currentList] = useCurrentList();
   const { showBoundary } = useErrorBoundary();
@@ -246,6 +243,13 @@ export default function DebugTools() {
         "1px solid #" + (~~(Math.random() * (1 << 24))).toString(16);
     });
 
+  const benchmarkForEach = () => {
+    const start = performance.now();
+    syncedStoreTodos.filter((t) => t.id === "");
+    const end = performance.now();
+    console.log(`Took ${end - start}ms`);
+  };
+
   return (
     <>
       {[
@@ -289,6 +293,10 @@ export default function DebugTools() {
         ] as const,
         [debugLayout, "Debug layout"] as const,
         [markAllCompleted, "Complete all todos in current list", true] as const,
+        [
+          benchmarkForEach,
+          "Benchmark forEach (yjs) with element access",
+        ] as const,
       ].map(([handler, title, requireArm = false]) =>
         requireArm ? (
           <DebugArmedButton key={title} variant="filled" onClick={handler}>

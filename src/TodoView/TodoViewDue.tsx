@@ -12,12 +12,22 @@ export const TodoViewDue = React.memo(() => {
 
   /* Since TodoViewDue only displays when 'Focus' is selected,
   this will be the current focus list. */
-  const focusTodoIds = useAppStore((state) => state.uncompletedTodoIds);
-  const focusTodoIdsSet = useMemo(() => new Set(focusTodoIds), [focusTodoIds]);
+  const focusTodos = useAppStore((state) => state.focusTodos);
+  const focusTodoIdsSet = useMemo(
+    () => new Set(focusTodos.map((t) => t.id)),
+    [focusTodos]
+  );
 
-  // Don't show due todos which are already in focus
   const filteredDueTodos = useMemo(
-    () => dueTodos.filter((t) => !focusTodoIdsSet.has(t.id)).sort((a, b) => compareAsc(Date.parse(a.dueDate), Date.parse(b.dueDate))),
+    () =>
+      dueTodos
+        // Don't show due todos which are already in focus
+        .filter((t) => !focusTodoIdsSet.has(t.id))
+
+        // Sort by most overdue first
+        .sort((a, b) =>
+          compareAsc(Date.parse(a.dueDate), Date.parse(b.dueDate))
+        ),
     [dueTodos, focusTodoIdsSet]
   );
 

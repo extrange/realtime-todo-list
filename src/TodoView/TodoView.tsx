@@ -30,11 +30,16 @@ import { ListType } from "../ListContext";
 import { TodoItem } from "../TodoItem/TodoItem";
 import { TodoItemWrapper } from "../TodoItem/TodoItemWrapper";
 import { useAppStore } from "../appStore/appStore";
+import { TodoSlice } from "../appStore/todoSlice";
 import { USER_ID } from "../constants";
 import { useCurrentList } from "../useCurrentList";
 import { useStore } from "../useStore";
 import { Todo } from "../useSyncedStore";
-import { generateKeyBetweenSafe, getMaxSortOrder } from "../util";
+import {
+  generateKeyBetweenSafe,
+  getMaxSortOrder,
+  itemComparator,
+} from "../util";
 import { TodoViewCompleted } from "./TodoViewCompleted";
 import { TodoViewDue } from "./TodoViewDue";
 
@@ -46,14 +51,36 @@ export const TodoView = React.memo(() => {
 
   const store = useStore();
   const [currentList] = useCurrentList();
+  const isFocusList = currentList === ListType.Focus;
   const setEditingId = useAppStore((state) => state.setEditingTodo);
 
   const [draggedTodoId, setDraggedTodoId] = useState<string>();
 
-  const uncompletedTodos = useAppStore((state) => state.uncompletedTodos);
-  const todoIds = useAppStore((state) => state.uncompletedTodoIds);
+  const selectUncompletedTodos = useCallback(
+    (state: TodoSlice) =>
+      isFocusList
+        ? state.focusTodos
+        : (state.todosMap.get(currentList)?.uncompleted as Todo[]),
+    [currentList, isFocusList]
+  );
 
-  const isFocusList = currentList === ListType.Focus;
+  const _uncompletedTodos = useAppStore(selectUncompletedTodos);
+
+  // Sort, filter and apply any setting-related features here
+  const uncompletedTodos = useMemo(
+    () =>
+      // Sorting 100 todos: 1-2ms
+      _uncompletedTodos.sort(
+        itemComparator(isFocusList ? "focusSortOrder" : "sortOrder")
+      ),
+    [_uncompletedTodos, isFocusList]
+  );
+
+  // Used by SortableContext
+  const todoIds = useMemo(
+    () => uncompletedTodos.map((t) => t.id),
+    [uncompletedTodos]
+  );
 
   const createTodo = useCallback((): Todo => {
     const now = Date.now();

@@ -2,7 +2,7 @@ import { Button, Flex } from "@mantine/core";
 
 import { useSyncedStore } from "@syncedstore/react";
 import { generateKeyBetween } from "fractional-indexing";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { ListType } from "./ListContext";
 import { ListItem } from "./ListItem";
@@ -36,8 +36,16 @@ export const ListView = ({ closeNav }: InputProps) => {
   const lists = useSyncedStore(store.lists);
   const [currentList, setCurrentList] = useCurrentList();
 
-  const uncompletedTodosCount = useAppStore(
-    (state) => state.uncompletedTodosCount
+  const todosMap = useAppStore((state) => state.todosMap);
+  const focusTodos = useAppStore((state) => state.focusTodos);
+  const dueTodos = useAppStore((state) => state.dueTodos);
+
+  /* Don't count due todos already in focus */
+  const focusDueTodoCount = useMemo(
+    () =>
+      new Set([...focusTodos.map((t) => t.id), ...dueTodos.map((t) => t.id)])
+        .size,
+    [dueTodos, focusTodos]
   );
 
   /* Sort lists alphabetically
@@ -118,7 +126,7 @@ export const ListView = ({ closeNav }: InputProps) => {
       <ListItem
         editable={false}
         focus
-        uncompletedTodosCount={uncompletedTodosCount.get("focus") || 0}
+        uncompletedTodosCount={focusDueTodoCount}
         selected={currentList === ListType.Focus}
         selectList={selectFocus}
       />
@@ -126,7 +134,7 @@ export const ListView = ({ closeNav }: InputProps) => {
       {/* Uncategorized tasks */}
       <ListItem
         editable={false}
-        uncompletedTodosCount={uncompletedTodosCount.get("uncategorized") || 0}
+        uncompletedTodosCount={todosMap.get(undefined)?.uncompleted.length ?? 0}
         selected={!currentList}
         selectList={selectList}
       />
@@ -135,7 +143,7 @@ export const ListView = ({ closeNav }: InputProps) => {
         <ListItem
           key={list.id}
           editable
-          uncompletedTodosCount={uncompletedTodosCount.get(list.id) || 0}
+          uncompletedTodosCount={todosMap.get(list.id)?.uncompleted.length ?? 0}
           selected={list.id === currentList}
           list={list}
           renameList={renameList}

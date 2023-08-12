@@ -109,7 +109,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
         id: todo.id,
         autoClose: 3000,
         withCloseButton: false,
-        ...(todo.completed && { icon: <IconCheck size={"1.1rem"} /> }),
+        ...(!originalCompleted && { icon: <IconCheck size={"1.1rem"} /> }),
         message: (
           <Flex sx={{ justifyContent: "space-between" }} align={"center"}>
             <div

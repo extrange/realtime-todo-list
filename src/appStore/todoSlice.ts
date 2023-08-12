@@ -2,52 +2,49 @@ import { StateCreator } from "zustand";
 import { Todo } from "../useSyncedStore";
 import { WithRequired } from "../util";
 
+export type TodosMap = Map<
+  string | undefined,
+  {
+    completed: Todo[];
+    uncompleted: Todo[];
+  }
+>;
+
 /**
  * This is done for performance optimization, to avoid iterating
  * over the todos array twice (once in ListView and again in TodoView)
  */
 export type TodoSlice = {
-  /**Map of <listId, uncompletedTodosCount> */
-  uncompletedTodosCount: Map<string, number>;
-  setUncompletedTodosCount: (counts: Map<string, number>) => void;
+  /**
+   * Map of listId to `{completed, uncompleted}` todos.
+   *
+   * Uncategorized todos have a key of `undefined`.
+   */
+  todosMap: TodosMap;
+  setTodosMap: (todosMap: TodosMap) => void;
 
-  /**Uncompleted todos in current list */
-  uncompletedTodos: Todo[];
-  setUncompletedTodos: (todos: Todo[]) => void;
+  /**Due/overdue todos, across all lists, that are uncompleted*/
+  dueTodos: WithRequired<Todo, "dueDate">[];
+  setDueTodos: (todos: WithRequired<Todo, "dueDate">[]) => void;
 
-  /**Uncompleted todo ids in current list */
-  uncompletedTodoIds: string[];
-  setUncompletedTodoIds: (ids: string[]) => void;
-
-  /**Completed todos in current list */
-  completedTodos: Todo[];
-  setCompletedTodos: (todos: Todo[]) => void;
+  /**Focus todos, across all lists, that are uncompleted*/
+  focusTodos: Todo[];
+  setFocusTodos: (todos: Todo[]) => void;
 
   editingTodo?: Todo;
   setEditingTodo: (todo?: Todo) => void;
-
-  /**Due and overdue todos */
-  dueTodos: WithRequired<Todo, "dueDate">[];
-  setDueTodos: (todos: WithRequired<Todo, "dueDate">[]) => void;
 };
 
 export const createTodoSlice: StateCreator<TodoSlice> = (set) => ({
-  uncompletedTodosCount: new Map(),
-  setUncompletedTodosCount: (uncompletedTodosCount) =>
-    set({ uncompletedTodosCount }),
-
-  completedTodos: [],
-  setCompletedTodos: (completedTodos) => set({ completedTodos }),
-
-  uncompletedTodos: [],
-  setUncompletedTodos: (uncompletedTodos) => set({ uncompletedTodos }),
-
-  uncompletedTodoIds: [],
-  setUncompletedTodoIds: (uncompletedTodoIds) => set({ uncompletedTodoIds }),
-
-  editingTodo: undefined,
-  setEditingTodo: (editingTodo) => set({ editingTodo }),
+  todosMap: new Map(),
+  setTodosMap: (todosMap) => set({ todosMap }),
 
   dueTodos: [],
   setDueTodos: (dueTodos) => set({ dueTodos }),
+
+  focusTodos: [],
+  setFocusTodos: (focusTodos) => set({ focusTodos }),
+
+  editingTodo: undefined,
+  setEditingTodo: (editingTodo) => set({ editingTodo }),
 });
