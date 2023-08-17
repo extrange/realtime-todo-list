@@ -23,7 +23,13 @@ import {
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
-import React, { Profiler, useCallback, useMemo, useState } from "react";
+import React, {
+  Profiler,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
 import { ListType } from "../ListContext";
@@ -43,7 +49,7 @@ import {
   itemComparator,
 } from "../util";
 import { TodoViewCompleted } from "./TodoViewCompleted";
-import { TodoViewDue } from "./TodoViewDue";
+import { TodoViewDueUpcoming } from "./TodoViewDueUpcoming";
 
 /**
  * Shows todos in selected, uncategorized, focus or completed lists.
@@ -54,6 +60,7 @@ export const TodoView = React.memo(() => {
   const store = useStore();
   const [currentList] = useCurrentList();
   const setEditingId = useAppStore((state) => state.setEditingTodo);
+  const setNumTodosHidden = useAppStore((state) => state.setNumTodosHidden);
   const [draggedTodoId, setDraggedTodoId] = useState<string>();
 
   //Settings
@@ -75,12 +82,21 @@ export const TodoView = React.memo(() => {
   const uncompletedTodos = useMemo(
     () =>
       // Sorting 100 todos: 1-2ms
-      filterTodosBasedOnSettings({
-        todos: _uncompletedTodos,
-        settings,
-        isFocus: isFocusList,
-      }).sort(itemComparator(isFocusList ? "focusSortOrder" : "sortOrder")),
+      (isFocusList
+        ? _uncompletedTodos // Don't filter the focus list
+        : filterTodosBasedOnSettings({
+            todos: _uncompletedTodos,
+            settings,
+          })
+      ).sort(itemComparator(isFocusList ? "focusSortOrder" : "sortOrder")),
     [_uncompletedTodos, isFocusList, settings]
+  );
+
+  // Set and update number of hidden todos
+  const numHiddenTodos = _uncompletedTodos.length - uncompletedTodos.length;
+  useEffect(
+    () => setNumTodosHidden(numHiddenTodos),
+    [numHiddenTodos, setNumTodosHidden]
   );
 
   // Used by SortableContext
@@ -275,16 +291,18 @@ export const TodoView = React.memo(() => {
         </Center>
       )}
 
-      {/* Show due todos only in Focus */}
+      {/* Show due/upcoming todos only in Focus/Due */}
       {currentList === "focus" && (
-        <Profiler
-          id={"DueTodos"}
-          onRender={(id, phase, duration) =>
-            duration > 5 && console.info(id, phase, duration)
-          }
-        >
-          <TodoViewDue />
-        </Profiler>
+        <>
+          <Profiler
+            id={"TodoViewDueUpcoming"}
+            onRender={(id, phase, duration) =>
+              duration > 5 && console.info(id, phase, duration)
+            }
+          >
+            <TodoViewDueUpcoming />
+          </Profiler>
+        </>
       )}
 
       {/* Don't show completed todos in Focus */}

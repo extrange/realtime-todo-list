@@ -100,7 +100,9 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
             />
             day(s) away
             <Tooltip
-              label="Todos without due dates will still be shown."
+              multiline
+              width={300}
+              label="Todos without due dates will still be shown. Will not affect todos marked Focus from showing in the Focus/Due list."
               withinPortal
               color="gray"
             >
@@ -118,7 +120,9 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
           <Text>
             Hide repeating todos that are not yet due
             <Tooltip
-              label="They will still appear in Focus/Due."
+              multiline
+              width={300}
+              label="Will not affect todos marked Focus from showing in the Focus/Due list."
               withinPortal
               color="gray"
             >
@@ -134,7 +138,7 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
 
           <div />
           <Text>
-            Upcoming: Show todos due at most
+            Upcoming: Show todos due within
             <NumberInput
               value={upcomingDays}
               onChange={onUpcomingChange}
@@ -146,12 +150,12 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
               mx={10}
               display={"inline-block"}
             />
-            day(s) away
+            day(s)
           </Text>
         </StyledGrid>
 
         <Text mt={10} c="dimmed">
-          Filters will be applied sequentially to each todo
+          Filters will be applied sequentially to each todo.
         </Text>
       </Modal>
     </>

@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   ActionIcon,
+  Avatar,
   Flex,
   Menu,
   Overlay,
@@ -45,7 +46,7 @@ type StyledProps = {
 
 /**Div containing the StyledListContent */
 const StyledFlex = styled(Flex)<StyledProps>`
-  ${({ selected }) => selected && "background-color: rgb(57, 57, 63)"};
+  ${({ selected}) => selected && "background-color: rgb(57, 57, 63)"};
 
   :hover {
     ${({ selected }) => !selected && "background-color: rgb(44, 46, 51)"}
@@ -115,11 +116,18 @@ export const ListItem = React.memo(
       <StyledFlex selected={selected} align={"center"} pl={5}>
         {focus && <IconTargetArrow style={{ marginRight: 5 }} />}
         <StyledListContent onClick={onClick} fw={selected ? 700 : "normal"}>
-          {focus
-            ? `Focus/Due (${uncompletedTodosCount})`
-            : !list?.name
-            ? `Uncategorized (${uncompletedTodosCount})`
-            : `${list.name} (${uncompletedTodosCount})`}
+          <Flex align={"center"}>
+            {focus
+              ? `Focus/Due`
+              : !list?.name
+              ? `Uncategorized`
+              : `${list.name} `}{" "}
+            {uncompletedTodosCount ? (
+              <Avatar color="primary" size="sm" mx={10} variant="light">
+                {uncompletedTodosCount}
+              </Avatar>
+            ) : null}
+          </Flex>
         </StyledListContent>
         {menu}
       </StyledFlex>

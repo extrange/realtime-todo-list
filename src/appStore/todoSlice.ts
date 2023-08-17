@@ -27,9 +27,17 @@ export type TodoSlice = {
   dueTodos: WithRequired<Todo, "dueDate">[];
   setDueTodos: (todos: WithRequired<Todo, "dueDate">[]) => void;
 
+  /**Upcoming todos, across all lists, that are uncompleted */
+  upcomingTodos: WithRequired<Todo, "dueDate">[];
+  setUpcomingTodos: (todos: WithRequired<Todo, "dueDate">[]) => void;
+
   /**Focus todos, across all lists, that are uncompleted*/
   focusTodos: Todo[];
   setFocusTodos: (todos: Todo[]) => void;
+
+  /**Number of todos hidden in current list */
+  numTodosHidden: number;
+  setNumTodosHidden: (num: number) => void;
 
   editingTodo?: Todo;
   setEditingTodo: (todo?: Todo) => void;
@@ -42,8 +50,14 @@ export const createTodoSlice: StateCreator<TodoSlice> = (set) => ({
   dueTodos: [],
   setDueTodos: (dueTodos) => set({ dueTodos }),
 
+  upcomingTodos: [],
+  setUpcomingTodos: (upcomingTodos) => set({ upcomingTodos }),
+
   focusTodos: [],
   setFocusTodos: (focusTodos) => set({ focusTodos }),
+
+  numTodosHidden: 0,
+  setNumTodosHidden: (numTodosHidden) => set({ numTodosHidden }),
 
   editingTodo: undefined,
   setEditingTodo: (editingTodo) => set({ editingTodo }),

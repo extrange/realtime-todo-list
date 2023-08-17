@@ -5,27 +5,20 @@ import { Todo } from "../useSyncedStore";
 type Params = {
   todos: Todo[];
   settings: SettingsStore;
-  /**Focus todos will bypass any filters.*/
-  isFocus: boolean;
 };
 
 /**
  * Filter todos based on settings.
+ * 
+ * Not applicable to the Focus list (focus todos will always be shown).
  *
  * Each setting is applied stepwise, and any setting which filters out the todo
  * will trump all other filters.
  */
-export const filterTodosBasedOnSettings = ({
-  todos,
-  settings,
-  isFocus = false,
-}: Params) => {
+export const filterTodosBasedOnSettings = ({ todos, settings }: Params) => {
   const { hideDueTodos, hideRepeating, hideDueTodosDays } = settings;
 
   return todos.filter((t) => {
-    // Focus todos are exempt from filtering always
-    if (isFocus) return true;
-
     /* Start by showing all todos by default. Subsquently, this can
     only be set to false, never back to true. */
     let shouldShow = true;

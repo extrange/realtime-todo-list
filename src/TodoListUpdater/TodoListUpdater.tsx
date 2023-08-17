@@ -11,6 +11,7 @@ import { useStore } from "../useStore";
 import { Todo } from "../useSyncedStore";
 import { WithRequired } from "../util";
 import { eventHaskeys } from "./filterEvent";
+import { useRerenderDaily } from "../useRerenderDaily";
 
 /**
  * Updates todo lists in the Zustand store.
@@ -18,6 +19,8 @@ import { eventHaskeys } from "./filterEvent";
  * Triggered when todos/lists change, ignoring text
  * change events. This loops through all todos once.
  * This is much more performant than filtering todos in each ListItem.
+ * 
+ * Also triggered on initial sync, and daily at 12mn.
  *
  * Here, we run through todos in a single pass, sorting them
  * into their respective bins (focus, completed, etc).
@@ -36,10 +39,19 @@ export const TodoListUpdater = () => {
   // Used to trigger run on initial sync event
   const synced = useProviderEvent("synced");
 
-  const [setTodosMap, setFocusTodos, setDueTodos] = useAppStore(
-    (state) => [state.setTodosMap, state.setFocusTodos, state.setDueTodos],
-    shallow
-  );
+  // Used to trigger a re-render daily at 12mn
+  const time = useRerenderDaily();
+
+  const [setTodosMap, setFocusTodos, setDueTodos, setUpcomingTodos] =
+    useAppStore(
+      (state) => [
+        state.setTodosMap,
+        state.setFocusTodos,
+        state.setDueTodos,
+        state.setUpcomingTodos,
+      ],
+      shallow
+    );
 
   const todoItemKeysToCheck: Array<keyof Todo> = useMemo(
     () => [
@@ -78,6 +90,7 @@ export const TodoListUpdater = () => {
       ]);
       const focusTodos: Todo[] = [];
       const dueTodos: WithRequired<Todo, "dueDate">[] = [];
+      const upcomingTodos: WithRequired<Todo, "dueDate">[] = [];
 
       /* Looping through the allTodos array is not expensive (1-2ms).
       - The expensive operation is the .get for the yjs map objects.
@@ -88,7 +101,7 @@ export const TodoListUpdater = () => {
         (t, idx) => {
           const listId = t.get("listId") as Todo["listId"];
 
-          // Named and uncategorized lists
+          // 1. Named and uncategorized lists
           todosMap
             .get(listId)
             ?.[
@@ -97,23 +110,37 @@ export const TodoListUpdater = () => {
                 : "uncompleted"
             ].push(todos[idx]);
 
-          // Focus, uncompleted
+          // 2. Focus, uncompleted
           (t.get("focus") as Todo["focus"]) && focusTodos.push(todos[idx]);
 
-          // Due/overdue uncompleted
+          // 3. Due/overdue uncompleted
           const dueDate = t.get("dueDate") as Todo["dueDate"];
           dueDate &&
             differenceInCalendarDays(new Date(), Date.parse(dueDate)) >= 0 &&
             dueTodos.push(todos[idx] as WithRequired<Todo, "dueDate">);
+
+          // 4. Upcoming uncompleted
+          dueDate &&
+            differenceInCalendarDays(new Date(), Date.parse(dueDate)) < 0 &&
+            upcomingTodos.push(todos[idx] as WithRequired<Todo, "dueDate">);
         }
       );
 
       setTodosMap(todosMap);
       setFocusTodos(focusTodos);
       setDueTodos(dueTodos);
+      setUpcomingTodos(upcomingTodos);
       console.log("TodoListUpdater", performance.now() - start);
     },
-    [lists, setDueTodos, setFocusTodos, setTodosMap, todoItemKeysToCheck, todos]
+    [
+      lists,
+      setDueTodos,
+      setFocusTodos,
+      setTodosMap,
+      setUpcomingTodos,
+      todoItemKeysToCheck,
+      todos,
+    ]
   );
 
   useEffect(
@@ -130,6 +157,12 @@ export const TodoListUpdater = () => {
   useEffect(
     () => void (synced && handleTodosUpdate()),
     [handleTodosUpdate, synced]
+  );
+
+  // Rerender daily
+  useEffect(
+    () => void (time && handleTodosUpdate()),
+    [handleTodosUpdate, time]
   );
 
   return null;

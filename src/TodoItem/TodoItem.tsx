@@ -37,11 +37,11 @@ import { TodoItemMenuDropdown } from "./TodoItemMenuDropdown";
 import { TodoItemTextContent } from "./TodoItemTextContent";
 import { TodoItemProps } from "./TodoItemWrapper";
 
-const StyledFlex = styled(Flex)`
+const TodoContainer = styled(Flex)`
   border-bottom: 0.0625rem solid rgb(55, 58, 64);
 
   :hover {
-    background-color: rgb(44, 46, 51);
+    background-color: ${({ theme }) => theme.colors.gray[9]};
   }
 `;
 
@@ -216,7 +216,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
   );
 
   return (
-    <StyledFlex
+    <TodoContainer
       direction={"column"}
       w="100%"
       py={10}
@@ -239,7 +239,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
         </Menu>
       </Flex>
       {dueDateRepeat}
-    </StyledFlex>
+    </TodoContainer>
   );
 });
 

@@ -20,6 +20,12 @@ import { AppHeader } from "./AppHeader/AppHeader";
 import { AppNavbar } from "./AppNavbar";
 import { EditTodoWrapper } from "./EditTodoWrapper";
 import { TodoView } from "./TodoView/TodoView";
+import "@emotion/react";
+import type { MantineTheme } from "@mantine/core";
+
+declare module "@emotion/react" {
+  export interface Theme extends MantineTheme {}
+}
 
 export type User = {
   name?: string;
@@ -88,7 +94,6 @@ export const App = () => {
         <EditTodoWrapper />
         <ScrollArea
           h={`calc(${height}px - var(--mantine-footer-height) - var(--mantine-header-height))`}
-          offsetScrollbars
         >
           <Profiler
             id={"TodoView"}
