@@ -109,7 +109,9 @@ export const TodoListUpdater = () => {
             ?.[completed ? "completed" : "uncompleted"].push(todos[idx]);
 
           // 2. Focus, uncompleted
-          (t.get("focus") as Todo["focus"]) && focusTodos.push(todos[idx]);
+          !completed &&
+            (t.get("focus") as Todo["focus"]) &&
+            focusTodos.push(todos[idx]);
 
           // 3. Due/overdue uncompleted
           const dueDate = t.get("dueDate") as Todo["dueDate"];
