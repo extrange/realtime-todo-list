@@ -1,16 +1,15 @@
 import styled from "@emotion/styled";
 import {
   ActionIcon,
-  Checkbox,
   Modal,
   NumberInput,
+  Switch,
   Text,
   Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconInfoCircle, IconSettings } from "@tabler/icons-react";
 import React, { useCallback } from "react";
-import { shallow } from "zustand/shallow";
 import { useSettingsStore } from "../appStore/settingsStore";
 
 type InputProps = {
@@ -28,26 +27,54 @@ const StyledGrid = styled.div`
 export const Settings = React.memo(({ closeNav }: InputProps) => {
   const [opened, { open, close }] = useDisclosure(false);
 
-  const [hideDueTodos, setHideDueTodos] = useSettingsStore(
-    (state) => [state.hideDueTodos, state.setHideDueTodos],
-    shallow
-  );
+  // At present, this will cause a rerender on every setting change
+  const {
+    hideDueTodos,
+    hideDueTodosDays,
+    hideRepeating,
+    upcomingDays,
+    setUpcomingDays,
+    setHideDueTodos,
+    setHideRepeating,
+    setHideDueTodosDays,
+  } = useSettingsStore();
 
-  const [onlyHideRepeating, setOnlyHideRepeating] = useSettingsStore(
-    (state) => [state.onlyHideRepeating, state.setOnlyHideRepeating]
-  );
-
-  const onClick = useCallback(() => {
+  const onClickOpen = useCallback(() => {
     open();
     closeNav();
   }, [closeNav, open]);
+
+  const onDaysChange = useCallback(
+    // If empty string is given, default to 0
+    (days: number | string) => setHideDueTodosDays(Number(days)),
+    [setHideDueTodosDays]
+  );
+
+  const onHideDueTodosChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      setHideDueTodos(e.currentTarget.checked),
+    [setHideDueTodos]
+  );
+
+  const onHideRepeatingChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      setHideRepeating(e.currentTarget.checked),
+    [setHideRepeating]
+  );
+
+  const onUpcomingChange = useCallback(
+    (days: number | string) =>
+      // Do not allow days < 1
+      setUpcomingDays(Number(days) < 1 ? 1 : Number(days)),
+    [setUpcomingDays]
+  );
 
   return (
     <>
       <Tooltip label="Settings" color="gray">
         <ActionIcon
           size="lg"
-          onClick={onClick}
+          onClick={onClickOpen}
           variant="light"
           color="primary"
           ml={10}
@@ -57,15 +84,15 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
       </Tooltip>
       <Modal opened={opened} onClose={close} title="Settings" size={"lg"}>
         <StyledGrid>
-          <Checkbox
-            checked={hideDueTodos}
-            onChange={(e) => setHideDueTodos(e.currentTarget.checked)}
-          />
+          <Switch checked={hideDueTodos} onChange={onHideDueTodosChange} />
           <Text>
-            Hide Todos due more than
+            Hide todos due more than
             <NumberInput
+              value={hideDueTodosDays}
+              onChange={onDaysChange}
               hideControls
               min={0}
+              removeTrailingZeros
               precision={0}
               maw={50}
               mx={10}
@@ -87,16 +114,45 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
             </Tooltip>
           </Text>
 
-          {hideDueTodos && (
-            <>
-              <Checkbox
-                checked={onlyHideRepeating}
-                onChange={(e) => setOnlyHideRepeating(e.currentTarget.checked)}
+          <Switch checked={hideRepeating} onChange={onHideRepeatingChange} />
+          <Text>
+            Hide repeating todos that are not yet due
+            <Tooltip
+              label="They will still appear in Focus/Due."
+              withinPortal
+              color="gray"
+            >
+              <IconInfoCircle
+                style={{
+                  flexShrink: 0,
+                  verticalAlign: "middle",
+                  margin: "0 5px",
+                }}
               />
-              <Text>Only hide repeating Todos</Text>
-            </>
-          )}
+            </Tooltip>
+          </Text>
+
+          <div />
+          <Text>
+            Upcoming: Show todos due at most
+            <NumberInput
+              value={upcomingDays}
+              onChange={onUpcomingChange}
+              hideControls
+              min={1}
+              removeTrailingZeros
+              precision={0}
+              maw={50}
+              mx={10}
+              display={"inline-block"}
+            />
+            day(s) away
+          </Text>
         </StyledGrid>
+
+        <Text mt={10} c="dimmed">
+          Filters will be applied sequentially to each todo
+        </Text>
       </Modal>
     </>
   );

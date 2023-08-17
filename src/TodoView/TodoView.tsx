@@ -27,9 +27,11 @@ import React, { Profiler, useCallback, useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
 import { ListType } from "../ListContext";
+import { filterTodosBasedOnSettings } from "../Settings/util";
 import { TodoItem } from "../TodoItem/TodoItem";
 import { TodoItemWrapper } from "../TodoItem/TodoItemWrapper";
 import { useAppStore } from "../appStore/appStore";
+import { useSettingsStore } from "../appStore/settingsStore";
 import { TodoSlice } from "../appStore/todoSlice";
 import { USER_ID } from "../constants";
 import { useCurrentList } from "../useCurrentList";
@@ -51,10 +53,13 @@ export const TodoView = React.memo(() => {
 
   const store = useStore();
   const [currentList] = useCurrentList();
-  const isFocusList = currentList === ListType.Focus;
   const setEditingId = useAppStore((state) => state.setEditingTodo);
-
   const [draggedTodoId, setDraggedTodoId] = useState<string>();
+
+  //Settings
+  const settings = useSettingsStore();
+
+  const isFocusList = currentList === ListType.Focus;
 
   const selectUncompletedTodos = useCallback(
     (state: TodoSlice) =>
@@ -70,10 +75,12 @@ export const TodoView = React.memo(() => {
   const uncompletedTodos = useMemo(
     () =>
       // Sorting 100 todos: 1-2ms
-      _uncompletedTodos.sort(
-        itemComparator(isFocusList ? "focusSortOrder" : "sortOrder")
-      ),
-    [_uncompletedTodos, isFocusList]
+      filterTodosBasedOnSettings({
+        todos: _uncompletedTodos,
+        settings,
+        isFocus: isFocusList,
+      }).sort(itemComparator(isFocusList ? "focusSortOrder" : "sortOrder")),
+    [_uncompletedTodos, isFocusList, settings]
   );
 
   // Used by SortableContext

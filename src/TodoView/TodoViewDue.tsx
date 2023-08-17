@@ -51,3 +51,5 @@ export const TodoViewDue = React.memo(() => {
     </Accordion>
   );
 });
+
+TodoViewDue.displayName = "TodoViewDue";
