@@ -7,11 +7,11 @@ import { shallow } from "zustand/shallow";
 import { useAppStore } from "../appStore/appStore";
 import { TodosMap } from "../appStore/todoSlice";
 import { useProviderEvent } from "../useProviderEvent";
+import { useRerenderDaily } from "../useRerenderDaily";
 import { useStore } from "../useStore";
 import { Todo } from "../useSyncedStore";
 import { WithRequired } from "../util";
 import { eventHaskeys } from "./filterEvent";
-import { useRerenderDaily } from "../useRerenderDaily";
 
 /**
  * Updates todo lists in the Zustand store.
@@ -19,7 +19,7 @@ import { useRerenderDaily } from "../useRerenderDaily";
  * Triggered when todos/lists change, ignoring text
  * change events. This loops through all todos once.
  * This is much more performant than filtering todos in each ListItem.
- * 
+ *
  * Also triggered on initial sync, and daily at 12mn.
  *
  * Here, we run through todos in a single pass, sorting them
@@ -101,26 +101,26 @@ export const TodoListUpdater = () => {
         (t, idx) => {
           const listId = t.get("listId") as Todo["listId"];
 
+          const completed = t.get("completed") as Todo["completed"];
+
           // 1. Named and uncategorized lists
           todosMap
             .get(listId)
-            ?.[
-              (t.get("completed") as Todo["completed"])
-                ? "completed"
-                : "uncompleted"
-            ].push(todos[idx]);
+            ?.[completed ? "completed" : "uncompleted"].push(todos[idx]);
 
           // 2. Focus, uncompleted
           (t.get("focus") as Todo["focus"]) && focusTodos.push(todos[idx]);
 
           // 3. Due/overdue uncompleted
           const dueDate = t.get("dueDate") as Todo["dueDate"];
-          dueDate &&
+          !completed &&
+            dueDate &&
             differenceInCalendarDays(new Date(), Date.parse(dueDate)) >= 0 &&
             dueTodos.push(todos[idx] as WithRequired<Todo, "dueDate">);
 
           // 4. Upcoming uncompleted
-          dueDate &&
+          !completed &&
+            dueDate &&
             differenceInCalendarDays(new Date(), Date.parse(dueDate)) < 0 &&
             upcomingTodos.push(todos[idx] as WithRequired<Todo, "dueDate">);
         }
