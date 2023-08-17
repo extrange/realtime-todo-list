@@ -60,7 +60,12 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
     setMenuOpened(true);
   }, []);
 
-  /**Note: this can be clicked on either a completed or uncompleted todo */
+  /**
+   * Completing a Focus todo will also unmark it from Focus.
+   *
+   * Note: this can be clicked on either a completed or uncompleted todo,
+   * so we have to handle both cases.
+   * */
   const completeTodo = useCallback(
     (e: SyntheticEvent<HTMLButtonElement>) => {
       e.stopPropagation();
@@ -84,9 +89,15 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
         todo.completed = false;
       } else {
         // Completing a todo
-        if (todo.repeatDays && !todo.completed) {
-          /* Repeating todo:
+        if (todo.focus) {
+          // Focus todo: also remove Focus
+          todo.focus = false;
+          undoActions.push(() => (todo.focus = true));
+        }
+
+        /* Repeating todo:
         - do not mark as completed, just update due date */
+        if (todo.repeatDays && !todo.completed) {
           const originalDueDate = todo.dueDate;
           todo.dueDate = formatISO(addDays(new Date(), todo.repeatDays), {
             representation: "date",
