@@ -23,12 +23,8 @@ export const SavedRoomsView = ({ onCloseHandler }: InputProps) => {
     defaultValue: {},
   });
 
-  const [currentRoomId] = useLocalStorage({
-    key: CURRENT_ROOM_LOCALSTORAGE_KEY,
-  });
-
   /* Will cause RoomProvider to reload StoreProvider */
-  const [, setCurrentRoomId] = useLocalStorage({
+  const [currentRoomId, setCurrentRoomId] = useLocalStorage({
     key: CURRENT_ROOM_LOCALSTORAGE_KEY,
   });
 

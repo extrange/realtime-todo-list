@@ -1,21 +1,15 @@
-import styled from "@emotion/styled";
-import { Flex } from "@mantine/core";
+import { Accordion, useMantineTheme } from "@mantine/core";
 import { IconCalendarDue, IconSparkles } from "@tabler/icons-react";
 import { compareAsc, differenceInCalendarDays } from "date-fns";
 import React, { useMemo } from "react";
+import { Counter } from "../Counter";
 import { TodoItem } from "../TodoItem/TodoItem";
 import { useAppStore } from "../appStore/appStore";
 import { useSettingsStore } from "../appStore/settingsStore";
 
-const Header = styled(Flex)`
-  border-bottom: 0.0625rem solid rgb(55, 58, 64);
-  padding: 10px;
-  user-select: none;
-  background-color: ${({ theme }) => theme.colors.dark[5]};
-`;
-
 /**Due/overdue and upcoming todos, unsortable. */
 export const TodoViewDueUpcoming = React.memo(() => {
+  const theme = useMantineTheme();
   const upcomingDays = useSettingsStore((state) => state.upcomingDays);
 
   const dueTodos = useAppStore((state) => state.dueTodos);
@@ -61,22 +55,53 @@ export const TodoViewDueUpcoming = React.memo(() => {
   );
 
   return (
-    <>
-      <Header>
-        <IconCalendarDue style={{ marginRight: 5 }} />
-        Due
-      </Header>
-      {filteredDueTodos.map((t) => (
-        <TodoItem todo={t} key={t.id} />
-      ))}
-      <Header>
-        <IconSparkles style={{ marginRight: 5 }} />
-        Upcoming
-      </Header>
-      {filteredUpcomingTodos.map((t) => (
-        <TodoItem todo={t} key={t.id} />
-      ))}
-    </>
+    <Accordion
+      multiple
+      defaultValue={["due"]}
+      styles={(theme) => ({
+        content: { padding: 0 },
+        control: { backgroundColor: theme.colors.dark[5] },
+      })}
+      chevronPosition="right"
+    >
+      <Accordion.Item value="due">
+        <Accordion.Control icon={<IconCalendarDue />}>
+          Due
+          {filteredDueTodos.length ? (
+            <Counter
+              ml={theme.spacing.sm}
+              inline
+              span
+              count={filteredDueTodos.length}
+            />
+          ) : null}
+        </Accordion.Control>
+        <Accordion.Panel>
+          {filteredDueTodos.map((t) => (
+            <TodoItem todo={t} key={t.id} />
+          ))}
+        </Accordion.Panel>
+      </Accordion.Item>
+
+      <Accordion.Item value="upcoming">
+        <Accordion.Control icon={<IconSparkles />}>
+          Upcoming
+          {filteredUpcomingTodos.length ? (
+            <Counter
+              ml={theme.spacing.sm}
+              inline
+              span
+              count={filteredUpcomingTodos.length}
+            />
+          ) : null}
+        </Accordion.Control>
+        <Accordion.Panel>
+          {filteredUpcomingTodos.map((t) => (
+            <TodoItem todo={t} key={t.id} />
+          ))}
+        </Accordion.Panel>
+      </Accordion.Item>
+    </Accordion>
   );
 });
 

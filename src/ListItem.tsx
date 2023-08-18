@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import {
   ActionIcon,
-  Avatar,
+  Box,
   Flex,
   Menu,
   Overlay,
@@ -13,6 +13,7 @@ import {
 } from "@mantine/core";
 import { IconDotsVertical, IconTargetArrow } from "@tabler/icons-react";
 import React, { useCallback, useMemo, useState, useTransition } from "react";
+import { Counter } from "./Counter";
 import { List } from "./useSyncedStore";
 
 type CommonProps = {
@@ -46,7 +47,7 @@ type StyledProps = {
 
 /**Div containing the StyledListContent */
 const StyledFlex = styled(Flex)<StyledProps>`
-  ${({ selected}) => selected && "background-color: rgb(57, 57, 63)"};
+  ${({ selected }) => selected && "background-color: rgb(57, 57, 63)"};
 
   :hover {
     ${({ selected }) => !selected && "background-color: rgb(44, 46, 51)"}
@@ -95,7 +96,9 @@ export const ListItem = React.memo(
               <Menu.Item onClick={() => renameList(list.id)}>Rename</Menu.Item>
             </Menu.Dropdown>
           </Menu>
-        ) : null,
+        ) : (
+          <Box w={28} />
+        ),
       [
         deleteList,
         editable,
@@ -116,19 +119,16 @@ export const ListItem = React.memo(
       <StyledFlex selected={selected} align={"center"} pl={5}>
         {focus && <IconTargetArrow style={{ marginRight: 5 }} />}
         <StyledListContent onClick={onClick} fw={selected ? 700 : "normal"}>
-          <Flex align={"center"}>
-            {focus
-              ? `Focus/Due`
-              : !list?.name
-              ? `Uncategorized`
-              : `${list.name} `}{" "}
-            {uncompletedTodosCount ? (
-              <Avatar color="primary" size="sm" mx={10} variant="light">
-                {uncompletedTodosCount}
-              </Avatar>
-            ) : null}
-          </Flex>
+          {focus
+            ? `Focus/Due`
+            : !list?.name
+            ? `Uncategorized`
+            : `${list.name} `}
         </StyledListContent>
+
+        {uncompletedTodosCount ? (
+          <Counter count={uncompletedTodosCount} small />
+        ) : null}
         {menu}
       </StyledFlex>
     );

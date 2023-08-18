@@ -1,4 +1,4 @@
-import { Button } from "@mantine/core";
+import { Button, Text } from "@mantine/core";
 import React, { useCallback, useMemo, useState } from "react";
 import { USER_ID } from "./constants";
 import { selectTodos, useSyncedStoreCustomImpl } from "./useSyncedStore";
@@ -58,8 +58,11 @@ export const MarkAllRead = React.memo(
         variant="outline"
         onClick={markAllRead}
         fullWidth
+        styles={{
+          root: { minWidth: 0 },
+        }}
       >
-        Mark all read
+        <Text truncate>Mark all read</Text>
       </Button>
     );
   }
