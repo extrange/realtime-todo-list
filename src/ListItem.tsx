@@ -97,7 +97,7 @@ export const ListItem = React.memo(
             </Menu.Dropdown>
           </Menu>
         ) : (
-          <Box w={28} />
+          <Box w={28} sx={{ flexShrink: 0 }} />
         ),
       [
         deleteList,

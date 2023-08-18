@@ -138,7 +138,7 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
 
           <div />
           <Text>
-            Upcoming: Show todos due within
+            Upcoming: Show todos due in the next
             <NumberInput
               value={upcomingDays}
               onChange={onUpcomingChange}
