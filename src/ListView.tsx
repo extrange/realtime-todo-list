@@ -101,8 +101,11 @@ export const ListView = ({ closeNav }: InputProps) => {
       /* Then delete the list */
       const storeLists = selectLists(store);
       storeLists.splice(storeLists.findIndex((l) => l.id === listId, 1));
+
+      // Switch to Uncategorized
+      setCurrentList(undefined);
     },
-    [lists, store]
+    [lists, setCurrentList, store]
   );
 
   const renameList = useCallback(

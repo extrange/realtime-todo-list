@@ -36,6 +36,7 @@ import { TodoItemAvatar } from "./TodoItemAvatar";
 import { TodoItemMenuDropdown } from "./TodoItemMenuDropdown";
 import { TodoItemTextContent } from "./TodoItemTextContent";
 import { TodoItemProps } from "./TodoItemWrapper";
+import { TodoItemSubtaskCount } from "./TodoItemSubtaskCount";
 
 const TodoContainer = styled(Flex)`
   border-bottom: 0.0625rem solid rgb(55, 58, 64);
@@ -189,7 +190,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
         : undefined;
 
     return (
-      <Flex mt={5} sx={{ userSelect: "none" }}>
+      <>
         {todo.dueDate && (
           <Badge
             color={color}
@@ -214,7 +215,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
             {todo.repeatDays} days
           </Badge>
         )}
-      </Flex>
+      </>
     );
   }, [todo.dueDate, todo.repeatDays]);
 
@@ -249,7 +250,11 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
           {menuOpened && <TodoItemMenuDropdown todo={todo} />}
         </Menu>
       </Flex>
-      {dueDateRepeat}
+
+      <Flex mt={5} sx={{ userSelect: "none" }}>
+        {dueDateRepeat}
+        <TodoItemSubtaskCount todo={todo} />
+      </Flex>
     </TodoContainer>
   );
 });

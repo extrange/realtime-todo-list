@@ -18,7 +18,7 @@ import { useCurrentList } from "./useCurrentList";
 import { useProvider } from "./useProvider";
 import { useStore } from "./useStore";
 import { Store } from "./useSyncedStore";
-import { getMaxSortOrder } from "./util";
+import { getMaxSortOrder, getRandomInt } from "./util";
 
 declare global {
   interface Window {
@@ -193,6 +193,7 @@ export default function DebugTools() {
         ]);
         content.insert(0, [title]);
 
+        // Add random sentences
         if (Math.random() > 0.3) {
           const sentences = faker.lorem.sentences({ min: 1, max: 5 }, "\n");
           content.insert(
@@ -204,6 +205,17 @@ export default function DebugTools() {
             })
           );
         }
+
+        // Add todoItems
+        const taskList = new Y.XmlElement("taskList");
+        [...Array(getRandomInt(0, 10))].forEach(() => {
+          const task = new Y.XmlElement("taskItem");
+          const paragraph = new Y.XmlElement("paragraph");
+          paragraph.insert(0, [new Y.XmlText(faker.lorem.words())]);
+          task.insert(0, [paragraph]);
+          taskList.insert(0, [task]);
+        });
+        taskList.length && content.insert(content.length, [taskList]);
 
         const repeatDays = Math.random() > 0.5 ? undefined : 5;
         const dueDate =
@@ -279,6 +291,11 @@ export default function DebugTools() {
         [
           () => generateTodos(100),
           "Generate 100 todos in 10 new lists (slow)",
+          true,
+        ] as const,
+        [
+          () => generateTodos(1, true),
+          "Generate 1 todos in current list",
           true,
         ] as const,
         [

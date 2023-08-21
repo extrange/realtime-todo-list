@@ -48,7 +48,7 @@ Notes:
 
 ### Tooltip
 
-Tooltip causes `React.memo` to fail presumably because it uses `React.cloneElement`l [on its children][tooltip-clone-element].
+Tooltip causes `React.memo` to fail presumably because it uses `React.cloneElement` [on its children][tooltip-clone-element].
 
 ### Performance
 
