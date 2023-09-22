@@ -1,6 +1,7 @@
 import { USER_ID } from "./constants";
 import { AwarenessMap, AwarenessState } from "./useAwareness";
-import { Store, UserData } from "./useSyncedStore";
+import { Store } from "./types/Store";
+import { UserData } from "./types/UserData";
 import { WithRequired } from "./util";
 
 /**

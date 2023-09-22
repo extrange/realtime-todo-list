@@ -42,7 +42,7 @@ import { TodoSlice } from "../appStore/todoSlice";
 import { USER_ID } from "../constants";
 import { useCurrentList } from "../useCurrentList";
 import { useStore } from "../useStore";
-import { Todo } from "../useSyncedStore";
+import { Todo } from "../types/Todo";
 import {
   generateKeyBetweenSafe,
   getMaxSortOrder,

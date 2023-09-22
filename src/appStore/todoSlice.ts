@@ -1,5 +1,5 @@
 import { StateCreator } from "zustand";
-import { Todo } from "../useSyncedStore";
+import { Todo } from "../types/Todo";
 import { WithRequired } from "../util";
 
 export type TodosMap = Map<

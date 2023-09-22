@@ -9,7 +9,7 @@ import { TodosMap } from "../appStore/todoSlice";
 import { useProviderEvent } from "../useProviderEvent";
 import { useRerenderDaily } from "../useRerenderDaily";
 import { useStore } from "../useStore";
-import { Todo } from "../useSyncedStore";
+import { Todo } from "../types/Todo";
 import { WithRequired } from "../util";
 import { eventHaskeys } from "./filterEvent";
 

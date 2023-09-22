@@ -1,5 +1,5 @@
 import { YMapEvent, YXmlEvent } from "yjs";
-import { Todo } from "../useSyncedStore";
+import { Todo } from "../types/Todo";
 
 /**
  * Returns true if event has specified keys/is a todo addition/deletion.

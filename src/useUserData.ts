@@ -2,7 +2,7 @@ import { useLocalStorage } from "@mantine/hooks";
 import { useEffect } from "react";
 import { USER_ID } from "./constants";
 import { useStore } from "./useStore";
-import { UserData } from "./useSyncedStore";
+import { UserData } from "./types/UserData";
 import { generateUser } from "./util";
 
 const defaultUser: Required<UserData> = {

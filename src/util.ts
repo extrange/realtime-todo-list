@@ -3,9 +3,9 @@ import { differenceInCalendarDays } from "date-fns";
 import { generateKeyBetween } from "fractional-indexing";
 import sanitizeHtml from "sanitize-html";
 import { v4 as uuidv4 } from "uuid";
-import { User } from "./App";
+import { User } from "./types/User";
 import { colors } from "./constants";
-import { Todo } from "./useSyncedStore";
+import { Todo } from "./types/Todo";
 
 type Sortable = {
   [T in keyof Pick<Todo, "focusSortOrder" | "sortOrder">]: string;

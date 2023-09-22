@@ -4,7 +4,7 @@ import { TodoItem } from "../TodoItem/TodoItem";
 import { useAppStore } from "../appStore/appStore";
 import { TodoSlice } from "../appStore/todoSlice";
 import { useCurrentList } from "../useCurrentList";
-import { Todo } from "../useSyncedStore";
+import { Todo } from "../types/Todo";
 
 /**Accordion of completed todos, unsortable */
 export const TodoViewCompleted = React.memo(() => {

@@ -17,7 +17,7 @@ import { CURRENT_ROOM_LOCALSTORAGE_KEY, USER_ID } from "./constants";
 import { useCurrentList } from "./useCurrentList";
 import { useProvider } from "./useProvider";
 import { useStore } from "./useStore";
-import { Store } from "./useSyncedStore";
+import { Store } from "./types/Store";
 import { getMaxSortOrder, getRandomInt } from "./util";
 
 declare global {

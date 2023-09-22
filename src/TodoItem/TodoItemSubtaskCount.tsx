@@ -13,7 +13,7 @@ import {
     YXmlFragment,
     YXmlText,
 } from "yjs/dist/src/internals";
-import { Todo } from "../useSyncedStore";
+import { Todo } from "../types/Todo";
 
 type InputProps = {
   todo: Todo;

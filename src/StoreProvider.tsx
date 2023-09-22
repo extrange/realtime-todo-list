@@ -9,7 +9,7 @@ import { ProviderContext } from "./ProviderContext";
 import { RoomContext } from "./RoomContext";
 import { StoreContext } from "./StoreContext";
 import { USER_ID } from "./constants";
-import { Store } from "./useSyncedStore";
+import { Store } from "./types/Store";
 
 /**
  * Supplies contexts for Hocuspocus Provider and SyncedStore. Also updates

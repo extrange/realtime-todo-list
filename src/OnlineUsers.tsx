@@ -5,7 +5,7 @@ import { UserStatus } from "./UserStatus";
 import { getUserStatus } from "./getUserStatus";
 import { useAwareness } from "./useAwareness";
 import { useStore } from "./useStore";
-import { UserData } from "./useSyncedStore";
+import { UserData } from "./types/UserData";
 
 const sortUsers = <T extends UserData>(users: Map<string, T>) =>
   [...users].sort(

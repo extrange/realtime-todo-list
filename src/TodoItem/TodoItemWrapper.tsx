@@ -3,7 +3,7 @@ import { CSS } from "@dnd-kit/utilities";
 import styled from "@emotion/styled";
 import { Flex } from "@mantine/core";
 import React, { useMemo } from "react";
-import { Todo } from "../useSyncedStore";
+import { Todo } from "../types/Todo";
 import { TodoItem } from "./TodoItem";
 
 const StyledFlex = styled(Flex)`

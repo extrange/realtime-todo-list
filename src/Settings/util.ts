@@ -1,6 +1,6 @@
 import { differenceInCalendarDays } from "date-fns";
 import { SettingsStore } from "../appStore/settingsStore";
-import { Todo } from "../useSyncedStore";
+import { Todo } from "../types/Todo";
 
 type Params = {
   todos: Todo[];

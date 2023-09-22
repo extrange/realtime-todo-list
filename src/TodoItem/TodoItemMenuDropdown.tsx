@@ -4,7 +4,7 @@ import { IconCheck, IconTargetArrow, IconTrash } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
 import React, { SyntheticEvent, useCallback } from "react";
 import { useStore } from "../useStore";
-import { Todo } from "../useSyncedStore";
+import { Todo } from "../types/Todo";
 import { getMaxSortOrder } from "../util";
 
 type InputProps = {

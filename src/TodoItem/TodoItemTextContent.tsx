@@ -7,7 +7,7 @@ import {
 } from "@mantine/core";
 import { observeDeep } from "@syncedstore/core";
 import React, { useCallback, useEffect, useState } from "react";
-import { Todo } from "../useSyncedStore";
+import { Todo } from "../types/Todo";
 import { getNotes, getTodoTitle } from "../util";
 
 const _StyledText = styled(Text)`

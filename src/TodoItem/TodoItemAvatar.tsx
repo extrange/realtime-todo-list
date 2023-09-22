@@ -3,7 +3,7 @@ import { useSyncedStore } from "@syncedstore/react";
 import React, { useEffect, useState } from "react";
 import { USER_ID } from "../constants";
 import { useStore } from "../useStore";
-import { Todo } from "../useSyncedStore";
+import { Todo } from "../types/Todo";
 
 type InputProps = {
   todo: Todo;

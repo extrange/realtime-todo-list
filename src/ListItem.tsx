@@ -14,7 +14,7 @@ import {
 import { IconDotsVertical, IconTargetArrow } from "@tabler/icons-react";
 import React, { useCallback, useMemo, useState, useTransition } from "react";
 import { Counter } from "./Counter";
-import { List } from "./useSyncedStore";
+import { List } from "./types/List";
 
 type CommonProps = {
   selected?: boolean;
