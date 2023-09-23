@@ -7,7 +7,7 @@ import { Y, getYjsDoc } from "@syncedstore/core";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import { useSyncedStore } from "@syncedstore/react";
 import { formatISO } from "date-fns";
-import { generateKeyBetween } from "fractional-indexing";
+import { generateKeyBetween, generateNKeysBetween } from "fractional-indexing";
 import { Suspense, lazy, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import { v4 as uuidv4 } from "uuid";
@@ -175,16 +175,19 @@ export default function DebugTools() {
     }
 
     lists.forEach((l) => {
-      [...Array(n)].forEach(() => {
+      const sortKeys = generateNKeysBetween(
+        getMaxSortOrder(
+          store.todos.filter((t) => t.listId === l),
+          "sortOrder"
+        ),
+        undefined,
+        n
+      ).reverse();
+
+      [...Array(n)].forEach((_, idx) => {
         const id = uuidv4();
         const now = Date.now();
-        const sortOrder = generateKeyBetween(
-          getMaxSortOrder(
-            store.todos.filter((t) => t.id === l),
-            "sortOrder"
-          ),
-          undefined
-        );
+        const sortOrder = sortKeys[idx];
         const content = new Y.XmlFragment();
         const title = new Y.XmlElement("title");
         title.setAttribute("level", "1");
