@@ -58,26 +58,26 @@ export const generateKeys = (todoOrListArray: Array<Partial<Sortable>>) =>
  * Suboptimal, but works.
  */
 export const generateKeyBetweenSafe = <T extends keyof Sortable>(
-  a: Sortable | undefined,
-  b: Sortable | undefined,
+  first: Sortable | undefined,
+  second: Sortable | undefined,
   sortKey: T
 ) => {
   try {
-    return generateKeyBetween(a?.[sortKey], b?.[sortKey]);
+    return generateKeyBetween(first?.[sortKey], second?.[sortKey]);
   } catch (e) {
     // Only handle the case where the sortOrders are the same
     // The order looks weird because we sort by descending...
-    if (a?.[sortKey] && b?.[sortKey] && a[sortKey] === b[sortKey]) {
-      const upperKey = generateKeyBetween(b[sortKey], undefined);
-      b[sortKey] = upperKey;
-      return generateKeyBetween(a[sortKey], upperKey);
+    if (first?.[sortKey] && second?.[sortKey] && first[sortKey] === second[sortKey]) {
+      const upperKey = generateKeyBetween(second[sortKey], undefined);
+      second[sortKey] = upperKey;
+      return generateKeyBetween(first[sortKey], upperKey);
     }
 
     // Otherwise, throw
     throw new Error(
       `Error while generating sort keys for ${JSON.stringify(
-        a
-      )} and ${JSON.stringify(b)} : ${JSON.stringify(e)}`
+        first
+      )} and ${JSON.stringify(second)} : ${JSON.stringify(e)}`
     );
   }
 };

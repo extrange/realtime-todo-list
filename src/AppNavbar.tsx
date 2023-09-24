@@ -20,6 +20,7 @@ import { SavedRoomsView } from "./SavedRoomsView";
 import { Settings } from "./Settings/Settings";
 import { CURRENT_ROOM_LOCALSTORAGE_KEY } from "./constants";
 import "./editor.css";
+import { Import } from "./Import/Import";
 
 type InputProps = {
   navOpen?: boolean;
@@ -74,6 +75,7 @@ export const AppNavbar = React.memo(({ navOpen, closeNav }: InputProps) => {
             </ActionIcon>
           </Tooltip>
           <MarkAllRead closeNav={closeNav} />
+          <Import closeNav={closeNav}/>
           <Settings closeNav={closeNav} />
         </Flex>
       </Navbar>

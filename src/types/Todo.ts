@@ -5,7 +5,6 @@ export type Todo = {
   /**The content of the task, used by the TipTap editor. */
   content: XmlFragment;
 
-  /**Whether the task is completed or not */
   completed: boolean;
 
   /**UTC timestamp of the last modification. This includes
