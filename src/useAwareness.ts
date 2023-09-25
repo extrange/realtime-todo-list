@@ -33,13 +33,13 @@ export type AwarenessMap = Map<number, AwarenessState>;
  */
 export const useAwareness = () => {
   const provider = useProvider();
-  const [state, setState] = useState<{ value: AwarenessMap }>({
-    value: provider.awareness.states,
+  const [state, setState] = useState<{ value: AwarenessMap}>({
+    value: provider.awareness?.states ?? new Map(),
   });
 
   useEffect(() => {
     const debouncedUpdate = debounce(
-      () => setState({ value: provider.awareness.states }),
+      () => setState({ value: provider.awareness?.states ?? new Map() }),
       1000,
       { maxWait: 1000 }
     );
