@@ -15,6 +15,11 @@ export const colors = [
 /**How long before user is considered idle */
 export const IDLE_TIMEOUT = 60000;
 
+/**Maximum interval between messages sent from the server.
+ * If no messages received for longer than this, user is offline.
+ */
+export const FORCE_SYNC_INTERVAL = 5000;
+
 export const RELEASE_DATE = new Date(
   import.meta.env.VITE_COMMIT_DATE ?? new Date()
 );

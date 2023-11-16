@@ -32,13 +32,6 @@ type Options = {
 /**
  * Subscribe to a HocusPocus Provider event. Debounced by default.
  *
- * In short:
- *
- * - Online: synced: True, unsyncedChanges: 0
- * - Offline: synced: False OR unsyncedChanges > 0
- * - when `status` is disconnected, the app needs to be reminded to connect
- * (in such a state it's 'given up`)
- *
  * State diagram:
  *
  * onConnect -> onSynced: {state: true} -> onDisconnect ->
@@ -46,16 +39,16 @@ type Options = {
  *
  * Notes:
  * - onClose is not used because it tends to send a lot of messages
- * - possible to be connected, but not synced (i.e. `unsyncedChanges` > 0).
- * In such a case, `connect()` needs to be called. `forceSync()` seems to have no effect.
+ * - `unsyncedChanges` is not reliable anymore: it is > 0 even after syncing.
  * - sometimes, `synced` becomes false after reconnection, even though changes
- * are still being synced.
- * - Chrome (at least desktop) doesn't set `navigator.onLine` to false when
- * disconnected, as a result, `synced`, `status` and `isConnected` all return
- * true. However, `unsyncedChanges` continues to increase.
+ *   are still being synced.
+ * - Chrome doesn't set `navigator.onLine` to false when disconnected, as a
+ *   result, `synced`, `status` and `isConnected` all return true. However,
+ *   `unsyncedChanges` continues to increase.
  * - After reconnecting, Firefox sometimes only receives changes, and doesn't
  * send changes.
- * - Causes a re-render on events
+ * - when `status` is disconnected, the app needs to be reminded to connect
+ * (in such a state it's 'given up`)
  * */
 export const useProviderEvent = <T extends keyof SupportedProviderEvent>(
   event: T,

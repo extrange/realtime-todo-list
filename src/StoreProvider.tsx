@@ -8,7 +8,7 @@ import * as Y from "yjs";
 import { ProviderContext } from "./ProviderContext";
 import { RoomContext } from "./RoomContext";
 import { StoreContext } from "./StoreContext";
-import { USER_ID } from "./constants";
+import { FORCE_SYNC_INTERVAL, USER_ID } from "./constants";
 import { Store } from "./types/Store";
 
 /**
@@ -49,6 +49,7 @@ export const StoreProvider = ({ children }: React.PropsWithChildren) => {
       url: "wss://tasks-server.nicholaslyz.com",
       document: yDoc.current,
       name: roomId,
+      forceSyncInterval: FORCE_SYNC_INTERVAL
     });
 
     setProvider(_provider);

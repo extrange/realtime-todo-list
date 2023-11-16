@@ -1,19 +1,34 @@
-import { useProviderEvent } from "./useProviderEvent";
+import { useEffect, useState } from "react";
+import { FORCE_SYNC_INTERVAL } from "./constants";
+import { useProvider } from "./useProvider";
 
 /**
- * Use 'synced' and 'unsyncedChanges' < tolerance to determine connectivity.
+ * Uses FORCE_SYNC_INTERVAL to determine whether the user is connected.
+ *
+ * This resolves all the issues with `Provider.synced` and `Provider.unsyncedChanges`.
  *
  * Notes:
- * - It appears (at least from UpdateStoredRoomName) safe to assume that
- * the store has been fully synced if this returns true.
- * - Causes re-renders (especially when `unsyncedChanges` crosses a tolerance)
+ * - Causes re-renders
  *
- * @param tolerance how many unsynced changes before considering as unsynced
  * @returns whether the client is truly connected to the server
  */
-export const useIsConnected = ({ tolerance = 10 } = {}) => {
-  const synced = useProviderEvent("synced");
-  const unsyncedChanges = useProviderEvent("unsyncedChanges");
+export const useIsConnected = () => {
+  const provider = useProvider();
 
-  return synced && unsyncedChanges < tolerance;
+  const [isConnected, setIsConnected] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(
+      () =>
+        Date.now() -
+          provider.configuration.websocketProvider.lastMessageReceived >
+        FORCE_SYNC_INTERVAL
+          ? setIsConnected(false)
+          : setIsConnected(true),
+      3000
+    );
+    return () => clearInterval(interval);
+  }, [provider]);
+
+  return isConnected;
 };

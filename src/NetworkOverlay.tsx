@@ -1,7 +1,7 @@
 import { Badge, Center, Loader, Overlay, Transition } from "@mantine/core";
+import { useNetwork } from "@mantine/hooks";
 import React, { useEffect, useMemo, useState } from "react";
 import { useIsConnected } from "./useIsConnected";
-import { useReconnect } from "./useReconnect";
 
 /**Handles reconnection, and shows an overlay.
  *
@@ -10,8 +10,8 @@ import { useReconnect } from "./useReconnect";
  * Takes up 100% of parent height and width.
  */
 export const NetworkOverlay = React.memo(() => {
-  const isReconnecting = useReconnect();
   const isConnected = useIsConnected();
+  const { online } = useNetwork();
 
   /* Controls transition when moving from true to false */
   const [justReconnected, setJustReconnected] = useState(false);
@@ -59,7 +59,11 @@ export const NetworkOverlay = React.memo(() => {
       {(styles) => (
         <Overlay color="red" blur={2} style={styles} opacity={0}>
           <Center h="100%">
-            {isConnected ? connected : isReconnecting ? reconnecting : offline}
+            {isConnected
+              ? connected
+              : online && !isConnected
+              ? reconnecting
+              : offline}
           </Center>
         </Overlay>
       )}
