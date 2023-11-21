@@ -61,12 +61,20 @@ export const SavedRoomsView = ({ onCloseHandler }: InputProps) => {
   return (
     <Group>
       {import.meta.env.VITE_TEST_ROOM && (
-        <Button
-          variant="light"
-          onClick={selectRoom(import.meta.env.VITE_TEST_ROOM)}
-        >
-          Test Room
-        </Button>
+        <>
+          <Button
+            variant="light"
+            onClick={selectRoom(import.meta.env.VITE_TEST_ROOM)}
+          >
+            Test Room
+          </Button>
+          <Button
+            variant="light"
+            onClick={selectRoom(import.meta.env.VITE_TEST_ROOM_LITE)}
+          >
+            Test Room (lite)
+          </Button>
+        </>
       )}
       {Object.entries(savedRooms)
         /* Exclude current room*/
