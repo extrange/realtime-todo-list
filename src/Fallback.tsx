@@ -10,6 +10,7 @@ import {
 import { IconAlertCircle, IconAlertTriangle } from "@tabler/icons-react";
 import { lazy, useState } from "react";
 import { FallbackProps } from "react-error-boundary";
+import classes from "./Fallback.module.css";
 
 type InputProps = {
   /**Whether to use DebugTools (will require StoreProvider to supply
@@ -33,7 +34,7 @@ const FallbackBase = ({
         title="Oops, encountered an error"
         color="red"
       >
-        <Code block sx={{ whiteSpace: "pre-wrap" }}>
+        <Code block className={classes.code}>
           {error.message}
         </Code>
       </Alert>
@@ -43,7 +44,7 @@ const FallbackBase = ({
           <Accordion.Control>Stack Trace</Accordion.Control>
           <Accordion.Panel>
             <ScrollArea h={300}>
-              <Code block sx={{ whiteSpace: "pre-wrap" }}>
+              <Code block className={classes.code}>
                 {error.stack}
               </Code>
             </ScrollArea>
@@ -59,7 +60,7 @@ const FallbackBase = ({
               </Button>
               {withDebugTools && !debug && (
                 <Button
-                  leftIcon={<IconAlertTriangle />}
+                  leftSection={<IconAlertTriangle />}
                   variant="subtle"
                   onClick={() => setDebug(true)}
                   color={"yellow"}

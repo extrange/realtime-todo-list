@@ -6,7 +6,7 @@ export const ClearFormattingControl = () => {
   const { editor } = useRichTextEditorContext();
 
   const onClick = useCallback(
-    () => editor.chain().focus().clearNodes().unsetAllMarks().run(),
+    () => editor?.chain().focus().clearNodes().unsetAllMarks().run(),
     [editor]
   );
 

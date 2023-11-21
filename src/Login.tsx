@@ -1,17 +1,17 @@
 import {
   Button,
-  Center,
   Image,
   Modal,
   Stack,
   Text,
-  TextInput,
+  TextInput
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useLocalStorage } from "@mantine/hooks";
 import React, { FormEvent, useCallback, useContext } from "react";
 import { TypeAnimation } from "react-type-animation";
 import { v4 as uuidv4 } from "uuid";
+import classes from "./Login.module.css";
 import { ProviderContext } from "./ProviderContext";
 import { RoomContext } from "./RoomContext";
 import { SavedRoomsView } from "./SavedRoomsView";
@@ -85,10 +85,10 @@ export const Login = ({ children }: React.PropsWithChildren) => {
       )
     ) : (
       <Modal opened onClose={() => void 0} withCloseButton={false}>
-        <h1 style={{ textAlign: "center", marginBottom: 10 }}>Todo</h1>
-        <div style={{ height: "2rem" }}>
+        <h1 className={classes.h1}>Todo</h1>
+        <div className={classes.div}>
           <TypeAnimation
-            style={{ fontSize: "0.8rem" }}
+            className={classes.TypeAnimation}
             sequence={[
               "Stay organized and get things done!",
               "Your to-do list, your way!",
@@ -116,9 +116,7 @@ export const Login = ({ children }: React.PropsWithChildren) => {
             repeat={Infinity}
           />
         </div>
-        <Center>
-          <Image height={150} width={200} fit="contain" src={bugcat} />
-        </Center>
+        <Image height={150} width={200} fit="contain" src={bugcat} />
 
         <form onSubmit={onSubmit}>
           <TextInput

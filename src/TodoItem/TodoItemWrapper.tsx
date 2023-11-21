@@ -1,25 +1,11 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import styled from "@emotion/styled";
 import { Flex } from "@mantine/core";
+import clsx from "clsx";
 import React, { useMemo } from "react";
 import { Todo } from "../types/Todo";
 import { TodoItem } from "./TodoItem";
-
-const StyledFlex = styled(Flex)`
-  @keyframes pop {
-    0% {
-      transform: scale(1);
-      box-shadow: var(--box-shadow);
-    }
-    100% {
-      transform: scale(var(--scale));
-      box-shadow: var(--box-shadow-picked-up);
-    }
-  }
-  animation: pop 200ms cubic-bezier(0.18, 0.67, 0.6, 1.22);
-  transform: scale(var(--scale));
-`;
+import classes from "./TodoItemWrapper.module.css";
 
 export type TodoItemProps = {
   todo: Todo;
@@ -56,23 +42,24 @@ export const TodoItemWrapper = React.memo((props: TodoItemProps) => {
       ({
         transform: CSS.Transform.toString(transform),
         transition,
-
-        // isDragging: the 'shadow' of the active item (follows overlay)
-        ...(isDragging && { opacity: 0.5, cursor: "grab" }),
-
-        // dragging: the overlay of the dragged thing
-        ...(dragging && {
-          "--scale": 1.05,
-          backgroundColor: "rgb(44, 46, 51)",
-        }),
       } as React.CSSProperties),
-    [dragging, isDragging, transform, transition]
+    [transform, transition]
   );
 
   return (
-    <StyledFlex {...listeners} ref={setNodeRef} {...attributes} style={style}>
+    <Flex
+      {...listeners}
+      ref={setNodeRef}
+      {...attributes}
+      style={style}
+      className={clsx({
+        [classes.isDragging]: isDragging,
+        [classes.dragging]: dragging,
+        [classes.wrapper]: true,
+      })}
+    >
       <TodoItem {...props} />
-    </StyledFlex>
+    </Flex>
   );
 });
 

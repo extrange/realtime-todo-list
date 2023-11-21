@@ -74,14 +74,8 @@ export const Import = ({ closeNav }: InputProps) => {
 
   return (
     <>
-      <Tooltip label="Import Todos" color="gray">
-        <ActionIcon
-          size="lg"
-          onClick={onClickOpen}
-          variant="light"
-          color="primary"
-          ml={10}
-        >
+      <Tooltip label="Import Todos">
+        <ActionIcon size="lg" onClick={onClickOpen} variant="light" ml={10}>
           <LuImport />
         </ActionIcon>
       </Tooltip>

@@ -1,25 +1,12 @@
-import styled from "@emotion/styled";
 import {
   Text,
-  TextProps,
-  createPolymorphicComponent,
-  useMantineTheme,
+  useMantineTheme
 } from "@mantine/core";
 import { observeDeep } from "@syncedstore/core";
 import React, { useCallback, useEffect, useState } from "react";
 import { Todo } from "../types/Todo";
 import { getNotes, getTodoTitle } from "../util";
-
-const _StyledText = styled(Text)`
-  flex-grow: 1;
-  overflow: hidden;
-  cursor: default;
-  user-select: none;
-  overflow-wrap: anywhere;
-`;
-
-//https://mantine.dev/styles/styled/#polymorphic-components
-const StyledText = createPolymorphicComponent<"div", TextProps>(_StyledText);
+import classes from "./TodoItemTextContent.module.css";
 
 type InputProps = {
   todo: Todo;
@@ -45,14 +32,18 @@ export const TodoItemTextContent = React.memo(({ todo }: InputProps) => {
   );
 
   return (
-    <StyledText lineClamp={2} c={todo.completed ? "dimmed" : undefined}>
-      <Text italic={!title} c={!title ? "dimmed" : undefined}>
+    <Text component="div" className={classes.text} lineClamp={2} c={todo.completed ? "dimmed" : undefined}>
+      <Text fs={title ? undefined : "italic"} c={!title ? "dimmed" : undefined}>
         {title || "(untitled)"}
       </Text>
-      <Text fz={theme.fontSizes.sm} italic c={"dimmed"}>
+      <Text
+        fz={theme.fontSizes.sm}
+        fs={title ? "italic" : undefined}
+        c={"dimmed"}
+      >
         {notes}
       </Text>
-    </StyledText>
+    </Text>
   );
 });
 

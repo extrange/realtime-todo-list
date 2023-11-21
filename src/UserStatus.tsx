@@ -3,6 +3,7 @@ import { IconPencil } from "@tabler/icons-react";
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import { UserBadge } from "./UserBadge";
+import classes from "./UserStatus.module.css";
 import { OfflineUser, OnlineUser } from "./getUserStatus";
 import { useStore } from "./useStore";
 import { getTodoTitle } from "./util";
@@ -86,7 +87,7 @@ export const UserStatus = ({ online, userData }: InputProps) => {
               <IconPencil size={14} style={{ flexShrink: 0 }} />
               <Text lineClamp={1} fz={"sm"}>
                 {title || (
-                  <Text component="span" italic fz={"sm"}>
+                  <Text component="span" fs='italic' fz={"sm"}>
                     unnamed
                   </Text>
                 )}
@@ -118,7 +119,7 @@ export const UserStatus = ({ online, userData }: InputProps) => {
   }, [isIdle, online, store.todos, userData]);
 
   return (
-    <Container sx={{ cursor: "default", userSelect: "none" }} p={"xs"}>
+    <Container className={classes.container} p={"xs"}>
       <Flex direction={"column"}>
         {badgeWithIndicator}
         {statusSection}

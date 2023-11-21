@@ -1,0 +1,11 @@
+.counter {
+    white-space: nowrap;
+}
+
+.small {
+    font-size: var(--mantine-font-size-sm);
+}
+
+.medium {
+    font-size: var(--mantine-font-size-md);
+}

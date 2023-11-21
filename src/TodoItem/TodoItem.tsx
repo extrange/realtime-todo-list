@@ -1,4 +1,3 @@
-import styled from "@emotion/styled";
 import {
   ActionIcon,
   Anchor,
@@ -32,19 +31,12 @@ import { DueDateString } from "../DueDateString";
 import { useAppStore } from "../appStore/appStore";
 import { USER_ID } from "../constants";
 import { getTodoTitle } from "../util";
+import classes from "./TodoItem.module.css";
 import { TodoItemAvatar } from "./TodoItemAvatar";
 import { TodoItemMenuDropdown } from "./TodoItemMenuDropdown";
+import { TodoItemSubtaskCount } from "./TodoItemSubtaskCount";
 import { TodoItemTextContent } from "./TodoItemTextContent";
 import { TodoItemProps } from "./TodoItemWrapper";
-import { TodoItemSubtaskCount } from "./TodoItemSubtaskCount";
-
-const TodoContainer = styled(Flex)`
-  border-bottom: 0.0625rem solid rgb(55, 58, 64);
-
-  :hover {
-    background-color: ${({ theme }) => theme.colors.gray[9]};
-  }
-`;
 
 export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
   const theme = useMantineTheme();
@@ -123,7 +115,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
         withCloseButton: false,
         ...(!originalCompleted && { icon: <IconCheck size={"1.1rem"} /> }),
         message: (
-          <Flex sx={{ justifyContent: "space-between" }} align={"center"}>
+          <Flex className={classes.notification} align={"center"}>
             <div
               style={{
                 whiteSpace: "nowrap",
@@ -163,7 +155,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
 
   const checkbox = useMemo(
     () => (
-      <ActionIcon onClick={completeTodo} mr={10}>
+      <ActionIcon variant='subtle' onClick={completeTodo} mr={10}>
         {todo.completed ? (
           <IconCheckbox color={theme.colors.gray[6]} />
         ) : (
@@ -228,12 +220,10 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
   );
 
   return (
-    <TodoContainer
+    <Flex
       direction={"column"}
-      w="100%"
-      py={10}
-      px={5}
       onClick={onOpenTodo}
+      className={classes.todoContainer}
     >
       <Flex align={"center"}>
         {checkbox}
@@ -243,7 +233,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
         <Menu opened={menuOpened} onChange={setMenuOpened} withinPortal>
           <Portal>{menuOpened && <Overlay opacity={0} />}</Portal>
           <Menu.Target>
-            <ActionIcon onClick={openMenu}>
+            <ActionIcon variant='subtle' onClick={openMenu}>
               <IconDotsVertical color={theme.colors.gray[6]} />
             </ActionIcon>
           </Menu.Target>
@@ -251,11 +241,11 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
         </Menu>
       </Flex>
 
-      <Flex mt={5} sx={{ userSelect: "none" }}>
+      <Flex mt={5} className={classes.dueDateRepeat}>
         {dueDateRepeat}
         <TodoItemSubtaskCount todo={todo} />
       </Flex>
-    </TodoContainer>
+    </Flex>
   );
 });
 

@@ -1,7 +1,11 @@
 import "@fontsource/inter";
 import "@fontsource/jetbrains-mono";
 import { MantineProvider } from "@mantine/core";
+import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
 import { Notifications } from "@mantine/notifications";
+import "@mantine/notifications/styles.css";
+import "@mantine/tiptap/styles.css";
 import React, { Profiler } from "react";
 import ReactDOM from "react-dom/client";
 import { App } from "./App.tsx";
@@ -22,16 +26,13 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <ErrorBoundary fallback={<div>Application Error encountered.</div>}>
       <MantineProvider
-        withNormalizeCSS
-        withGlobalStyles
+        defaultColorScheme="dark"
         theme={{
-          colorScheme: "dark",
           fontFamily:
             "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji",
           fontFamilyMonospace:
             "JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace",
           primaryColor: "blue",
-          loader: "bars",
         }}
       >
         <ReloadPrompt />

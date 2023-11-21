@@ -81,7 +81,7 @@ const _ReloadPrompt = () => {
         message: (
           <Button
             onClick={() => updateServiceWorker()}
-            leftIcon={<IconReload />}
+            leftSection={<IconReload />}
           >
             Reload now
           </Button>

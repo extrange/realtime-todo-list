@@ -3,9 +3,10 @@ import { useSyncedStore } from "@syncedstore/react";
 import { IconCheck, IconTargetArrow, IconTrash } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
 import React, { SyntheticEvent, useCallback } from "react";
-import { useStore } from "../useStore";
 import { Todo } from "../types/Todo";
+import { useStore } from "../useStore";
 import { getMaxSortOrder } from "../util";
+import classes from "./TodoItemMenuDropdown.module.css";
 
 type InputProps = {
   todo: Todo;
@@ -55,17 +56,20 @@ export const TodoItemMenuDropdown = React.memo(({ todo }: InputProps) => {
 
   return (
     <Menu.Dropdown onClick={stopPropagation}>
-      <Menu.Item icon={<IconTargetArrow size={16} />} onClick={toggleFocus}>
+      <Menu.Item
+        leftSection={<IconTargetArrow size={16} />}
+        onClick={toggleFocus}
+      >
         {todo.focus ? "Remove from Focus" : "Add to Focus"}
       </Menu.Item>
-      <Menu.Item icon={<IconTrash size={16} />} onClick={deleteTodo}>
+      <Menu.Item leftSection={<IconTrash size={16} />} onClick={deleteTodo}>
         Delete
       </Menu.Item>
       <Menu.Divider />
       <ScrollArea h={250} type="auto">
         <Menu.Item
           onClick={moveToList(undefined)}
-          icon={!todo.listId && <IconCheck size={16} />}
+          leftSection={!todo.listId && <IconCheck size={16} />}
           fs={"italic"}
         >
           Uncategorized
@@ -74,9 +78,9 @@ export const TodoItemMenuDropdown = React.memo(({ todo }: InputProps) => {
           <Menu.Item
             key={l.id}
             onClick={moveToList(l.id)}
-            icon={todo.listId === l.id && <IconCheck size={16} />}
+            leftSection={todo.listId === l.id && <IconCheck size={16} />}
             maw={300}
-            sx={{ overflowWrap: "anywhere" }}
+            className={classes.menuItem}
           >
             {l.name}
           </Menu.Item>

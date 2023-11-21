@@ -4,8 +4,8 @@ import { IconX } from "@tabler/icons-react";
 import React, { useCallback } from "react";
 import { SavedRooms } from "./Login";
 import {
-    CURRENT_ROOM_LOCALSTORAGE_KEY,
-    SAVED_ROOMS_LOCALSTORAGE_KEY,
+  CURRENT_ROOM_LOCALSTORAGE_KEY,
+  SAVED_ROOMS_LOCALSTORAGE_KEY,
 } from "./constants";
 
 type InputProps = {
@@ -74,7 +74,7 @@ export const SavedRoomsView = ({ onCloseHandler }: InputProps) => {
         .map(([id, name]) => (
           <Button
             key={id}
-            rightIcon={<IconX onClick={onDelete(id, name)} />}
+            rightSection={<IconX onClick={onDelete(id, name)} />}
             variant="light"
             onClick={selectRoom(id)}
           >

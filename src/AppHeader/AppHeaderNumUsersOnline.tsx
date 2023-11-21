@@ -24,7 +24,7 @@ export const AppHeaderNumUsersOnline = React.memo(
     const onClick = useCallback(() => setAsideOpen((o) => !o), [setAsideOpen]);
 
     return (
-      <ActionIcon onClick={onClick}>
+      <ActionIcon variant='subtle' onClick={onClick}>
         <Indicator disabled={!numberOnline} inline label={numberOnline}>
           <IconUsers color={theme.colors.gray[6]} />
         </Indicator>

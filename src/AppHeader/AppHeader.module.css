@@ -1,0 +1,25 @@
+.modal {
+    backdrop-filter: blur(2px);
+}
+
+.code {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 var(--mantine-spacing-xs);
+}
+
+.headerFlex {
+    flex: 1 1;
+}
+
+.headerText {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}

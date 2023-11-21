@@ -1,9 +1,9 @@
 import {
   ActionIcon,
+  AppShellNavbar,
   Button,
   Flex,
   Modal,
-  Navbar,
   ScrollArea,
   Tooltip,
   Transition,
@@ -14,13 +14,13 @@ import { IconLogout } from "@tabler/icons-react";
 import React, { CSSProperties, Profiler, useCallback, useState } from "react";
 import { EditRoom } from "./EditRoom";
 import { EditUser } from "./EditUser";
+import { Import } from "./Import/Import";
 import { ListView } from "./ListView";
 import { MarkAllRead } from "./MarkAllRead";
 import { SavedRoomsView } from "./SavedRoomsView";
 import { Settings } from "./Settings/Settings";
 import { CURRENT_ROOM_LOCALSTORAGE_KEY } from "./constants";
 import "./editor.css";
-import { Import } from "./Import/Import";
 
 type InputProps = {
   navOpen?: boolean;
@@ -38,7 +38,7 @@ export const AppNavbar = React.memo(({ navOpen, closeNav }: InputProps) => {
 
   const render = useCallback(
     (styles?: CSSProperties) => (
-      <Navbar style={styles} p="xs" width={{ sm: 200, lg: 300 }}>
+      <AppShellNavbar style={styles} p="xs">
         <Modal
           title="Change Room"
           opened={changeRoom}
@@ -63,10 +63,9 @@ export const AppNavbar = React.memo(({ navOpen, closeNav }: InputProps) => {
           </Profiler>
         </ScrollArea>
         <Flex align="center" justify={"space-between"} mt={10}>
-          <Tooltip label="Change room" color="gray">
+          <Tooltip label="Change room">
             <ActionIcon
               variant="light"
-              color="primary"
               onClick={() => setChangeRoom(true)}
               mr={10}
               size="lg"
@@ -75,10 +74,10 @@ export const AppNavbar = React.memo(({ navOpen, closeNav }: InputProps) => {
             </ActionIcon>
           </Tooltip>
           <MarkAllRead closeNav={closeNav} />
-          <Import closeNav={closeNav}/>
+          <Import closeNav={closeNav} />
           <Settings closeNav={closeNav} />
         </Flex>
-      </Navbar>
+      </AppShellNavbar>
     ),
     [changeRoom, closeNav, setCurrentRoomId]
   );

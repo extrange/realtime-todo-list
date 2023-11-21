@@ -6,7 +6,7 @@ export const ToggleCodeBlockControl = React.memo(() => {
   const { editor } = useRichTextEditorContext();
 
   const onClick = useCallback(
-    () => editor.commands.toggleCodeBlock(),
+    () => editor?.commands.toggleCodeBlock(),
     [editor]
   );
   return (

@@ -32,7 +32,7 @@ export const EditRoom = () => {
         />
       </Modal>
       <Button
-        rightIcon={<IconPencil color={"white"} />}
+        rightSection={<IconPencil color={"white"} />}
         variant={"subtle"}
         onClick={() => setOpen(true)}
         fullWidth

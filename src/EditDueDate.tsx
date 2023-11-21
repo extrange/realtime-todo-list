@@ -1,8 +1,9 @@
-import { CSSObject, Group, Indicator, NumberInput } from "@mantine/core";
+import { Group, Indicator, NumberInput } from "@mantine/core";
 import { DatePickerInput, DateValue } from "@mantine/dates";
 import { useSyncedStore } from "@syncedstore/react";
 import { formatISO, isToday } from "date-fns";
 import React, { useCallback, useMemo } from "react";
+import classes from './EditDueDate.module.css';
 import { useAppStore } from "./appStore/appStore";
 
 /**Flexbox containing inputs for editing the due date and p */
@@ -29,14 +30,13 @@ export const EditDueDate = React.memo(() => {
   );
 
   const onRepeatDaysChange = useCallback(
-    (newVal: number | "") =>
+    (newVal: number | string) =>
       newVal
-        ? (editingTodo.repeatDays = newVal)
-        : (editingTodo.repeatDays = undefined),
+        ? (editingTodo.repeatDays = typeof newVal === 'string' ? parseInt(newVal) : newVal)
+        : (editingTodo.repeatDays = undefined), // empty string is falsy
     [editingTodo]
   );
 
-  const inputStyles = useMemo((): CSSObject => ({ flexGrow: 1 }), []);
 
   const popoverProps = useMemo(() => ({ withinPortal: true }), []);
 
@@ -50,10 +50,10 @@ export const EditDueDate = React.memo(() => {
   );
 
   return (
-    <Group noWrap mb={"xs"}>
+    <Group wrap={'nowrap'} mb={"xs"}>
       <DatePickerInput
-        sx={inputStyles}
         maw={200}
+        className={classes.datePickerInput}
         label="Due"
         placeholder="Enter a date"
         clearable
@@ -63,7 +63,7 @@ export const EditDueDate = React.memo(() => {
         renderDay={renderDay}
       />
       <NumberInput
-        sx={inputStyles}
+        className={classes.datePickerInput}
         placeholder="None"
         maw={100}
         hideControls

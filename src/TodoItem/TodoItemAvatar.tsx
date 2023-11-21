@@ -1,9 +1,10 @@
-import { Avatar, useMantineTheme } from "@mantine/core";
+import { Avatar } from "@mantine/core";
 import { useSyncedStore } from "@syncedstore/react";
 import React, { useEffect, useState } from "react";
 import { USER_ID } from "../constants";
 import { useStore } from "../useStore";
 import { Todo } from "../types/Todo";
+import {darken, lighten} from "@mantine/core"
 
 type InputProps = {
   todo: Todo;
@@ -11,7 +12,6 @@ type InputProps = {
 
 export const TodoItemAvatar = React.memo(({ todo }: InputProps) => {
   const store = useStore();
-  const theme = useMantineTheme();
   const storedUsers = useSyncedStore(store.storedUsers);
 
   const [showAvatar, setShowAvatar] = useState(false);
@@ -45,8 +45,8 @@ export const TodoItemAvatar = React.memo(({ todo }: InputProps) => {
       size={"sm"}
       styles={{
         placeholder: {
-          background: theme.fn.darken(byUser?.color || "#000000", 0.3),
-          color: theme.fn.lighten(byUser?.color || "#FFFFFF", 0.5),
+          background: darken(byUser?.color || "#000000", 0.3),
+          color: lighten(byUser?.color || "#FFFFFF", 0.5),
         },
       }}
     >

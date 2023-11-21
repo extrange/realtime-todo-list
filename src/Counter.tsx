@@ -1,5 +1,7 @@
-import { Text, TextProps, useMantineTheme } from "@mantine/core";
+import { Text, TextProps } from "@mantine/core";
 import React from "react";
+import classes from './Counter.module.css';
+import clsx from "clsx";
 
 type InputProps = {
   count: number;
@@ -11,14 +13,13 @@ type InputProps = {
 /**Counter that shows 99+ when count is 100 or more. */
 export const Counter = React.memo(
   ({ count, small, ...props }: InputProps & TextProps) => {
-    const theme = useMantineTheme();
     return (
       <Text
         c="dimmed"
-        sx={{
-          whiteSpace: "nowrap",
-          fontSize: small ? theme.fontSizes.sm : theme.fontSizes.md,
-        }}
+        className={clsx({
+          [classes.small]: small,
+          [classes.counter]: true,
+        })}
         {...props}
       >
         {count > 99 ? "99+" : count}

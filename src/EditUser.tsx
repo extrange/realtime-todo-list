@@ -37,7 +37,7 @@ export const EditUser = React.memo(() => {
         styles={{ overlay: { backdropFilter: "blur(2px)" } }}
       >
         <Container>
-          <Center sx={{ paddingBottom: "10px" }}>
+          <Center pb={10}>
             <UserBadge name={userData.user.name} color={userData.user.color} />
           </Center>
           <TextInput
@@ -59,7 +59,7 @@ export const EditUser = React.memo(() => {
 
       {/* Content starts here */}
       <Button
-        rightIcon={<IconPencil color={"white"} />}
+        rightSection={<IconPencil color={"white"} />}
         variant={"subtle"}
         onClick={() => setEdit(true)}
         fullWidth

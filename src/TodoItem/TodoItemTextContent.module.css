@@ -1,0 +1,7 @@
+.text {
+  flex-grow: 1;
+  overflow: hidden;
+  cursor: default;
+  user-select: none;
+  overflow-wrap: anywhere;
+}

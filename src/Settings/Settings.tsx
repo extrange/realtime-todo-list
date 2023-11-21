@@ -1,4 +1,3 @@
-import styled from "@emotion/styled";
 import {
   ActionIcon,
   Modal,
@@ -11,17 +10,11 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconInfoCircle, IconSettings } from "@tabler/icons-react";
 import React, { useCallback } from "react";
 import { useSettingsStore } from "../appStore/settingsStore";
+import classes from "./Settings.module.css";
 
 type InputProps = {
   closeNav: () => void;
 };
-
-const StyledGrid = styled.div`
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-gap: 10px;
-  align-items: center;
-`;
 
 /**Button and modal for accessing settings */
 export const Settings = React.memo(({ closeNav }: InputProps) => {
@@ -71,29 +64,22 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
 
   return (
     <>
-      <Tooltip label="Settings" color="gray">
-        <ActionIcon
-          size="lg"
-          onClick={onClickOpen}
-          variant="light"
-          color="primary"
-          ml={10}
-        >
+      <Tooltip label="Settings">
+        <ActionIcon size="lg" onClick={onClickOpen} variant="light" ml={10}>
           <IconSettings />
         </ActionIcon>
       </Tooltip>
       <Modal opened={opened} onClose={close} title="Settings" size={"lg"}>
-        <StyledGrid>
+        <div className={classes.grid}>
           <Switch checked={hideDueTodos} onChange={onHideDueTodosChange} />
           <Text>
             Hide todos due more than
             <NumberInput
+              allowDecimal={false}
               value={hideDueTodosDays}
               onChange={onDaysChange}
               hideControls
               min={0}
-              removeTrailingZeros
-              precision={0}
               maw={50}
               mx={10}
               display={"inline-block"}
@@ -101,10 +87,8 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
             day(s) away
             <Tooltip
               multiline
-              width={300}
+              maw={300}
               label="Todos without due dates will still be shown. Will not affect todos marked Focus from showing in the Focus/Due list."
-              withinPortal
-              color="gray"
             >
               <IconInfoCircle
                 style={{
@@ -121,10 +105,8 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
             Hide repeating todos that are not yet due
             <Tooltip
               multiline
-              width={300}
+              maw={300}
               label="Will not affect todos marked Focus from showing in the Focus/Due list."
-              withinPortal
-              color="gray"
             >
               <IconInfoCircle
                 style={{
@@ -140,19 +122,18 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
           <Text>
             Upcoming: Show todos due in the next
             <NumberInput
+              allowDecimal={false}
               value={upcomingDays}
               onChange={onUpcomingChange}
               hideControls
               min={1}
-              removeTrailingZeros
-              precision={0}
               maw={50}
               mx={10}
               display={"inline-block"}
             />
             day(s)
           </Text>
-        </StyledGrid>
+        </div>
 
         <Text mt={10} c="dimmed">
           Filters will be applied sequentially to each todo.

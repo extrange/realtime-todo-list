@@ -1,6 +1,7 @@
 import { Badge, Center, Loader, Overlay, Transition } from "@mantine/core";
 import { useNetwork } from "@mantine/hooks";
 import React, { useEffect, useMemo, useState } from "react";
+import classes from "./NetworkOverlay.module.css";
 import { useIsConnected } from "./useIsConnected";
 
 /**Handles reconnection, and shows an overlay.
@@ -36,10 +37,10 @@ export const NetworkOverlay = React.memo(() => {
       <Badge
         color="orange"
         variant="filled"
-        styles={{ inner: { display: "flex", alignItems: "center" } }}
+        classNames={{ label: classes.badge }}
       >
         Reconnecting
-        <Loader size="xs" ml={5} color="white" />
+        <Loader type="dots" size="xs" ml={5} color="white" />
       </Badge>
     ),
     []
@@ -57,7 +58,7 @@ export const NetworkOverlay = React.memo(() => {
     /* Show if: justReconnected, or reconnecting/offline */
     <Transition transition={"fade"} mounted={justReconnected || !isConnected}>
       {(styles) => (
-        <Overlay color="red" blur={2} style={styles} opacity={0}>
+        <Overlay color="red" blur={2} style={styles} backgroundOpacity={0}>
           <Center h="100%">
             {isConnected
               ? connected

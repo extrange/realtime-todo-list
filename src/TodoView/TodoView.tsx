@@ -18,8 +18,7 @@ import {
   Affix,
   Center,
   Text,
-  rem,
-  useMantineTheme,
+  rem
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
@@ -40,14 +39,15 @@ import { useAppStore } from "../appStore/appStore";
 import { useSettingsStore } from "../appStore/settingsStore";
 import { TodoSlice } from "../appStore/todoSlice";
 import { USER_ID } from "../constants";
+import { Todo } from "../types/Todo";
 import { useCurrentList } from "../useCurrentList";
 import { useStore } from "../useStore";
-import { Todo } from "../types/Todo";
 import {
   generateKeyBetweenSafe,
   getMaxSortOrder,
   itemComparator,
 } from "../util";
+import classes from "./TodoView.module.css";
 import { TodoViewCompleted } from "./TodoViewCompleted";
 import { TodoViewDueUpcoming } from "./TodoViewDueUpcoming";
 
@@ -55,7 +55,6 @@ import { TodoViewDueUpcoming } from "./TodoViewDueUpcoming";
  * Shows todos in selected, uncategorized, focus or completed lists.
  */
 export const TodoView = React.memo(() => {
-  const theme = useMantineTheme();
 
   const store = useStore();
   const [currentList] = useCurrentList();
@@ -238,12 +237,11 @@ export const TodoView = React.memo(() => {
         {/* Modal zIndex is 200 */}
         <Affix
           withinPortal={false}
-          sx={{ position: "absolute", pointerEvents: "auto" }}
+          className={classes.affix}
           position={{ bottom: rem(20), right: rem(20) }}
           zIndex={50}
         >
           <ActionIcon
-            color={theme.primaryColor}
             variant="filled"
             size={"xl"}
             onClick={onClickCreateTodo}
@@ -282,7 +280,7 @@ export const TodoView = React.memo(() => {
       ) : (
         <Center h={50}>
           <Text
-            italic
+            fs="italic"
             c={"dimmed"}
             style={{ cursor: "default", userSelect: "none" }}
           >

@@ -1,0 +1,5 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  background: var(--mantine-colors-dark-8);
+}

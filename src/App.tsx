@@ -1,21 +1,13 @@
-import "@emotion/react";
-import type { MantineTheme } from "@mantine/core";
-import {
-  AppShell,
-  AppShellStylesNames,
-  CSSObject,
-  ScrollArea,
-  Styles,
-  useMantineTheme,
-} from "@mantine/core";
+import { AppShell, ScrollArea } from "@mantine/core";
 import { useViewportSize } from "@mantine/hooks";
 import {
   Profiler,
+  ProfilerOnRenderCallback,
   SetStateAction,
   useCallback,
-  useMemo,
   useState,
 } from "react";
+import classes from "./App.module.css";
 import { AppAside } from "./AppAside";
 import { AppFooter } from "./AppFooter";
 import { AppHeader } from "./AppHeader/AppHeader";
@@ -23,13 +15,10 @@ import { AppNavbar } from "./AppNavbar";
 import { EditTodoWrapper } from "./EditTodoWrapper";
 import { TodoView } from "./TodoView/TodoView";
 
-declare module "@emotion/react" {
-  export interface Theme extends MantineTheme {}
-}
+const HEADER_HEIGHT = 48;
+const FOOTER_HEIGHT = 30;
 
 export const App = () => {
-  const theme = useMantineTheme();
-
   const [navOpen, setNavOpen] = useState(false);
   const [asideOpen, setAsideOpen] = useState(false);
   const { height } = useViewportSize();
@@ -47,49 +36,38 @@ export const App = () => {
 
   const closeNav = useCallback(() => setNavOpen(false), [setNavOpen]);
 
-  /* Memoized components */
-  const appShellStyles = useMemo(
-    (): Styles<AppShellStylesNames, CSSObject> => ({
-      main: {
-        background:
-          theme.colorScheme === "dark"
-            ? theme.colors.dark[8]
-            : theme.colors.gray[0],
-        display: "flex",
-        flexDirection: "column",
-      },
-    }),
-    [theme.colorScheme, theme.colors.dark, theme.colors.gray]
-  );
-
-  const navbar = useMemo(
-    () => <AppNavbar navOpen={navOpen} closeNav={closeNav} />,
-    [closeNav, navOpen]
-  );
-
-  const footer = useMemo(
-    () => (
-      <Profiler
-        id={"AppFooter"}
-        onRender={(id, phase, duration) =>
-          duration > 10 && console.info(id, phase, duration)
-        }
-      >
-        <AppFooter />
-      </Profiler>
-    ),
+  const logRender: ProfilerOnRenderCallback = useCallback(
+    (id, phase, duration) => duration > 10 && console.info(id, phase, duration),
     []
   );
 
-  const aside = useMemo(() => <AppAside asideOpen={asideOpen} />, [asideOpen]);
-
-  const content = useMemo(
-    () => (
-      <>
+  return (
+    <AppShell
+      navbar={{
+        width: { sm: 200, lg: 300 },
+        breakpoint: "sm",
+      }}
+      aside={{
+        width: { sm: 200, lg: 300 },
+        breakpoint: "sm",
+      }}
+      header={{ height: HEADER_HEIGHT }}
+      footer={{ height: FOOTER_HEIGHT }}
+    >
+      <AppHeader
+        navOpen={navOpen}
+        setNavOpen={_setNavOpen}
+        asideOpen={asideOpen}
+        setAsideOpen={_setAsideOpen}
+      />
+      <AppAside asideOpen={asideOpen} />
+      <AppNavbar navOpen={navOpen} closeNav={closeNav} />
+      <Profiler id={"AppFooter"} onRender={logRender}>
+        <AppFooter />
+      </Profiler>
+      <AppShell.Main className={classes.main}>
         <EditTodoWrapper />
-        <ScrollArea
-          h={`calc(${height}px - var(--mantine-footer-height) - var(--mantine-header-height))`}
-        >
+        <ScrollArea h={height - HEADER_HEIGHT - FOOTER_HEIGHT}>
           <Profiler
             id={"TodoView"}
             onRender={(id, phase, duration) =>
@@ -99,30 +77,7 @@ export const App = () => {
             <TodoView />
           </Profiler>
         </ScrollArea>
-      </>
-    ),
-    [height]
-  );
-
-  return (
-    <AppShell
-      padding={0}
-      styles={appShellStyles}
-      navbarOffsetBreakpoint="sm"
-      asideOffsetBreakpoint="sm"
-      header={
-        <AppHeader
-          navOpen={navOpen}
-          setNavOpen={_setNavOpen}
-          asideOpen={asideOpen}
-          setAsideOpen={_setAsideOpen}
-        />
-      }
-      navbar={navbar}
-      aside={aside}
-      footer={footer}
-    >
-      {content}
+      </AppShell.Main>
     </AppShell>
   );
 };

@@ -1,4 +1,4 @@
-import { Center, Footer, Text } from "@mantine/core";
+import { AppShell, Center, Text } from "@mantine/core";
 import React from "react";
 import { NetworkOverlay } from "./NetworkOverlay";
 import { useAppStore } from "./appStore/appStore";
@@ -14,14 +14,14 @@ export const AppFooter = React.memo(() => {
   const numTodosHidden = useAppStore((state) => state.numTodosHidden);
 
   return (
-    <Footer height={30}>
+    <AppShell.Footer>
       <Center h="100%">
         <Text c="dimmed" fz="sm">
           {getTodosHiddenString(numTodosHidden)}
         </Text>
       </Center>
-      <NetworkOverlay />
-    </Footer>
+        <NetworkOverlay />
+    </AppShell.Footer>
   );
 });
 

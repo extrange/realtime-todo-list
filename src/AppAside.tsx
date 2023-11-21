@@ -1,4 +1,5 @@
-import { Aside, ScrollArea, Transition, useMantineTheme } from "@mantine/core";
+import {  ScrollArea, Transition, useMantineTheme } from "@mantine/core";
+import { AppShell } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import React, { CSSProperties, useCallback } from "react";
 import { OnlineUsers } from "./OnlineUsers";
@@ -14,13 +15,13 @@ export const AppAside = React.memo(({ asideOpen }: InputProps) => {
   const theme = useMantineTheme();
   const isDesktop = useMediaQuery(`(min-width: ${theme.breakpoints.sm})`);
 
-  const getContent = useCallback(
+  const render = useCallback(
     (styles?: CSSProperties) => (
-      <Aside style={styles} p="none" width={{ sm: 200, lg: 300 }}>
+      <AppShell.Aside style={styles} p="none">
         <ScrollArea>
           <OnlineUsers />
         </ScrollArea>
-      </Aside>
+      </AppShell.Aside>
     ),
     []
   );
@@ -31,7 +32,7 @@ export const AppAside = React.memo(({ asideOpen }: InputProps) => {
       mounted={isDesktop || !!asideOpen}
       transition="slide-left"
     >
-      {getContent}
+      {render}
     </Transition>
   );
 });

@@ -1,4 +1,3 @@
-import styled from "@emotion/styled";
 import {
   ActionIcon,
   Box,
@@ -7,13 +6,13 @@ import {
   Overlay,
   Portal,
   Text,
-  TextProps,
-  createPolymorphicComponent,
-  useMantineTheme,
+  useMantineTheme
 } from "@mantine/core";
 import { IconDotsVertical, IconTargetArrow } from "@tabler/icons-react";
+import clsx from "clsx";
 import React, { useCallback, useMemo, useState, useTransition } from "react";
 import { Counter } from "./Counter";
+import classes from "./ListItem.module.css";
 import { List } from "./types/List";
 
 type CommonProps = {
@@ -40,32 +39,6 @@ type OptionalProps =
       renameList?: never;
     };
 
-type StyledProps = {
-  /**Whether this is the currently selected list */
-  selected?: boolean;
-};
-
-/**Div containing the StyledListContent */
-const StyledFlex = styled(Flex)<StyledProps>`
-  ${({ selected }) => selected && "background-color: rgb(57, 57, 63)"};
-
-  :hover {
-    ${({ selected }) => !selected && "background-color: rgb(44, 46, 51)"}
-  }
-`;
-
-const _StyledListContent = styled(Text)`
-  width: 100%;
-  padding: 10px 0 10px 0px;
-  user-select: none;
-  cursor: default;
-  overflow-wrap: anywhere;
-`;
-
-const StyledListContent = createPolymorphicComponent<"div", TextProps>(
-  _StyledListContent
-);
-
 export const ListItem = React.memo(
   ({
     list,
@@ -84,10 +57,10 @@ export const ListItem = React.memo(
     const menu = useMemo(
       () =>
         editable ? (
-          <Menu opened={menuOpened} onChange={setMenuOpened} withinPortal>
+          <Menu opened={menuOpened} onChange={setMenuOpened}>
             <Portal>{menuOpened && <Overlay opacity={0} />}</Portal>
             <Menu.Target>
-              <ActionIcon>
+              <ActionIcon variant="subtle">
                 <IconDotsVertical color={theme.colors.gray[6]} />
               </ActionIcon>
             </Menu.Target>
@@ -97,7 +70,7 @@ export const ListItem = React.memo(
             </Menu.Dropdown>
           </Menu>
         ) : (
-          <Box w={28} sx={{ flexShrink: 0 }} />
+          <Box className={classes.box} />
         ),
       [
         deleteList,
@@ -116,21 +89,29 @@ export const ListItem = React.memo(
     );
 
     return (
-      <StyledFlex selected={selected} align={"center"} pl={5}>
-        {focus && <IconTargetArrow style={{ marginRight: 5 }} />}
-        <StyledListContent onClick={onClick} fw={selected ? 700 : "normal"}>
+      <Flex
+        className={clsx({ [classes.selected]: selected, [classes.listItem]: !selected })}
+        align={"center"}
+        pl={5}
+      >
+        {focus && <IconTargetArrow className={classes.iconTargetArrow} />}
+        <Text
+          className={classes.listContent}
+          onClick={onClick}
+          fw={selected ? 700 : "normal"}
+        >
           {focus
             ? `Focus/Due`
             : !list?.name
             ? `Uncategorized`
             : `${list.name} `}
-        </StyledListContent>
+        </Text>
 
         {uncompletedTodosCount ? (
           <Counter count={uncompletedTodosCount} small />
         ) : null}
         {menu}
-      </StyledFlex>
+      </Flex>
     );
   }
 );

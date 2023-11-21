@@ -1,0 +1,17 @@
+.todoContainer {
+  border-bottom: 0.0625rem solid rgb(55, 58, 64);
+  padding: 10px 5px;
+  width: 100%;
+
+  &:hover {
+    background-color: var(--mantine-color-gray-9);
+  }
+}
+
+.notification {
+    justify-content: space-between;
+}
+
+.dueDateRepeat {
+    user-select: none;
+}

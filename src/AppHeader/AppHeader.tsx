@@ -1,14 +1,14 @@
 import {
   Accordion,
   ActionIcon,
+  AppShellHeader,
+  Box,
   Burger,
   Button,
   CloseButton,
   Code,
   CopyButton,
   Flex,
-  Header,
-  MediaQuery,
   Modal,
   Stack,
   Table,
@@ -35,6 +35,7 @@ import {
 import { useCurrentList } from "../useCurrentList";
 import { useStore } from "../useStore";
 import { formatBytes } from "../util";
+import classes from "./AppHeader.module.css";
 import { AppHeaderNumUsersOnline } from "./AppHeaderNumUsersOnline";
 
 type InputProps = {
@@ -89,7 +90,7 @@ export const AppHeader = React.memo(
           opened={showInfo}
           onClose={() => setShowInfo(false)}
           withCloseButton={false}
-          styles={{ overlay: { backdropFilter: "blur(2px)" } }}
+          classNames={{ overlay: classes.modal }}
         >
           <Table>
             <tbody>
@@ -97,15 +98,12 @@ export const AppHeader = React.memo(
                 <td>Room ID:</td>
                 <td>
                   <Flex align={"center"}>
-                    <Code
-                      block
-                      sx={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
-                    >
+                    <Code block className={classes.code}>
                       {roomId}
                     </Code>
                     <CopyButton value={roomId}>
                       {({ copied, copy }) => (
-                        <ActionIcon onClick={copy} mx={10}>
+                        <ActionIcon variant='subtle' onClick={copy} mx={10}>
                           {copied ? <IconCheck /> : <IconCopy />}
                         </ActionIcon>
                       )}
@@ -118,10 +116,7 @@ export const AppHeader = React.memo(
                   <Text>Commit hash:</Text>
                 </td>
                 <td>
-                  <Code
-                    block
-                    sx={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
-                  >
+                  <Code block className={classes.code}>
                     {COMMIT_HASH}
                   </Code>
                 </td>
@@ -141,10 +136,7 @@ export const AppHeader = React.memo(
               <tr>
                 <td>Changes:</td>
                 <td>
-                  <Code
-                    block
-                    sx={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
-                  >
+                  <Code block className={classes.code}>
                     {COMMIT_MSG}
                   </Code>
                 </td>
@@ -162,7 +154,7 @@ export const AppHeader = React.memo(
             </tbody>
           </Table>
           <Button
-            leftIcon={<IconBrandGithub />}
+            leftSection={<IconBrandGithub />}
             component="a"
             target="_blank"
             rel="noopener noreferrer"
@@ -188,47 +180,30 @@ export const AppHeader = React.memo(
         </Modal>
 
         {/* Main content */}
-        <Header
-          height={48}
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-          px={theme.spacing.xs}
-        >
-          <MediaQuery largerThan="sm" styles={{ visibility: "hidden" }}>
-            <Burger
-              opened={navOpen}
-              onClick={() => setNavOpen((o) => !o)}
-              size="sm"
-              color={theme.colors.gray[6]}
-            />
-          </MediaQuery>
+        <AppShellHeader className={classes.header}>
+          <Burger
+            opened={navOpen}
+            onClick={() => setNavOpen((o) => !o)}
+            size="sm"
+            color={theme.colors.gray[6]}
+            hiddenFrom="sm"
+          />
           <Flex
             justify={"center"}
             align={"center"}
-            sx={{ flex: "1 1" }}
+            className={classes.headerFlex}
             /* https://stackoverflow.com/questions/43934648/how-to-make-flexbox-items-shrink-correctly-when-in-a-nested-container */
             miw={0}
             px={"xs"}
           >
-            <Text
-              fz={"xl"}
-              ta={"center"}
-              sx={{
-                textOverflow: "ellipsis",
-                overflow: "hidden",
-                whiteSpace: "nowrap",
-              }}
-            >
+            <Text fz={"xl"} ta={"center"} className={classes.headerText}>
               {currentListName}
             </Text>
-            <ActionIcon mx={5} onClick={() => setShowInfo(true)}>
+            <ActionIcon variant='subtle' mx={5} onClick={() => setShowInfo(true)}>
               <IconInfoCircle color={"grey"} />
             </ActionIcon>
           </Flex>
-          <MediaQuery largerThan="sm" styles={{ visibility: "hidden" }}>
+          <Box hiddenFrom="sm">
             {asideOpen ? (
               <CloseButton
                 variant="subtle"
@@ -239,8 +214,8 @@ export const AppHeader = React.memo(
             ) : (
               <AppHeaderNumUsersOnline setAsideOpen={setAsideOpen} />
             )}
-          </MediaQuery>
-        </Header>
+          </Box>
+        </AppShellHeader>
       </>
     );
   }
