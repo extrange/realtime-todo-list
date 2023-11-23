@@ -1,4 +1,11 @@
-import { Container, Flex, Indicator, Text } from "@mantine/core";
+import {
+  BadgeProps,
+  Box,
+  BoxProps,
+  Flex,
+  Indicator,
+  Text,
+} from "@mantine/core";
 import { IconPencil } from "@tabler/icons-react";
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
@@ -18,17 +25,32 @@ type InputProps =
       userData: OfflineUser;
     };
 
+type OtherProps = {
+  /**Whether to only show the badge, and omit last seen/idle/editing status. */
+  details?: boolean;
+  badgeProps?: BadgeProps;
+  boxProps?: BoxProps;
+};
+
 /**How long since lastActive a user is considered to be idle */
 const CONSIDERED_IDLE_MS = 30000;
 
 /**Display refresh rate */
 const REFRESH_INTERVAL = 5000;
 
-/**Expands on UserBadge, showing if online, offline or idle.
+/**Expands on UserBadge, showing indicators if online, offline or idle.
+ *
+ * Optionally also shows more information if `details` is true:
  * If online, shows if idle, and what they are editing.
  * If offline, shows last seen.
  */
-export const UserStatus = ({ online, userData }: InputProps) => {
+export const UserStatus = ({
+  online,
+  userData,
+  details = true,
+  badgeProps,
+  boxProps,
+}: InputProps & OtherProps) => {
   /* This is necessary so that calculation of idle users is updated */
   const [time, setTime] = useState<number>(Date.now());
   const store = useStore();
@@ -52,6 +74,7 @@ export const UserStatus = ({ online, userData }: InputProps) => {
         small
         name={userData.user?.name}
         color={online ? userData.user?.color : "grey"}
+        {...badgeProps}
       />
     );
 
@@ -66,7 +89,7 @@ export const UserStatus = ({ online, userData }: InputProps) => {
         {badge}
       </Indicator>
     );
-  }, [isIdle, online, userData.user?.color, userData.user?.name]);
+  }, [badgeProps, isIdle, online, userData.user?.color, userData.user?.name]);
 
   /* 
   If online - show if editing or not, followed by idle status
@@ -87,7 +110,7 @@ export const UserStatus = ({ online, userData }: InputProps) => {
               <IconPencil size={14} style={{ flexShrink: 0 }} />
               <Text lineClamp={1} fz={"sm"}>
                 {title || (
-                  <Text component="span" fs='italic' fz={"sm"}>
+                  <Text component="span" fs="italic" fz={"sm"}>
                     unnamed
                   </Text>
                 )}
@@ -119,11 +142,11 @@ export const UserStatus = ({ online, userData }: InputProps) => {
   }, [isIdle, online, store.todos, userData]);
 
   return (
-    <Container className={classes.container} p={"xs"}>
+    <Box className={classes.container} p={"xs"} {...boxProps}>
       <Flex direction={"column"}>
         {badgeWithIndicator}
-        {statusSection}
+        {details && statusSection}
       </Flex>
-    </Container>
+    </Box>
   );
 };

@@ -1,3 +1,4 @@
+import { px, useMantineTheme } from "@mantine/core";
 import { RichTextEditor } from "@mantine/tiptap";
 import { useSyncedStore } from "@syncedstore/react";
 import Collaboration from "@tiptap/extension-collaboration";
@@ -35,10 +36,11 @@ Title.name = "title";
 /**Tiptap Editor with collaborative features */
 export const Editor = React.memo(() => {
   const store = useStore();
+  const theme = useMantineTheme();
   const todo = useAppStore((state) => state.editingTodo);
 
   /* To update lastModified */
-  const user = useSyncedStore(store.storedUsers[USER_ID]?.user);
+  const user = useSyncedStore(store).storedUsers[USER_ID]?.user;
 
   if (!todo || !user) {
     throw new Error(`EditTodo: todo or user is undefined!`);
@@ -64,11 +66,10 @@ export const Editor = React.memo(() => {
       }),
       Title,
       Document.extend({ content: "title block+" }),
-      ...(todo ? [Collaboration.configure({ fragment: todo.content })] : []),
-      ...(user
-        ? // Uses user.name and user.color for rendering
-          [CollaborationCursor.configure({ provider: provider, user })]
-        : []),
+      Collaboration.configure({ fragment: todo.content }),
+
+      // Uses user.name and user.color for rendering
+      CollaborationCursor.configure({ provider, user }),
       Placeholder.configure({
         placeholder: ({ node }) => {
           if (node.type.name === "title") {
@@ -109,7 +110,10 @@ export const Editor = React.memo(() => {
 
   const toolbar = useMemo(
     () => (
-      <RichTextEditor.Toolbar sticky stickyOffset={60}>
+      <RichTextEditor.Toolbar
+        sticky
+        stickyOffset={4 * (px(theme.spacing.md) as number)}
+      >
         <RichTextEditor.ControlsGroup>
           <UndoControl />
           <RichTextEditor.Bold />
@@ -145,7 +149,7 @@ export const Editor = React.memo(() => {
         </RichTextEditor.ControlsGroup>
       </RichTextEditor.Toolbar>
     ),
-    []
+    [theme.spacing.md]
   );
 
   return (

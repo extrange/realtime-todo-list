@@ -12,6 +12,8 @@ An app to manage tasks within multiple lists, with realtime + offline synchroniz
 
 ### `useSyncedStore`
 
+- `useSyncedStore` just adds a listener on any valid proxied object. This means that property access either inside `useSyncedStore` or outside work similarly (e.g. `useSyncedStore(store.todos[0])` vs `useSyncedStore(store).todos[0]`)
+  - `Editor.tsx` is an exception here
 - If a value is conditionally accessed, and during a render it is not accessed, it stops being updated for future renders.
 - Accessing an array (e.g. `state.todos`) can result in either a shallow or deep listener depending on what properties were accessed
   - In `state.todos.length`, it is a shallow listener

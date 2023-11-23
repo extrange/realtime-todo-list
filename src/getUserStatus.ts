@@ -29,6 +29,8 @@ export type OfflineUser = UserData;
  * localStorage, which is then synced to storedUsers.
  *
  * For now, we reduce editingId, by converting it to an array.
+ * 
+ * The map key is the user's userId.
  */
 export const getUserStatus = (
   awareness: AwarenessMap,

@@ -107,6 +107,10 @@ export default function DebugTools() {
     alert(JSON.stringify(store.storedUsers, undefined, 2));
   };
 
+  const dumpAwarenessStates = () => {
+    alert(JSON.stringify(provider.awareness?.states, undefined, 2))
+  }
+
   const dumpLocalStorage = () => {
     alert(JSON.stringify(Object.entries(localStorage), undefined, 2));
   };
@@ -281,6 +285,7 @@ export default function DebugTools() {
           "Make YDoc and store available in window",
         ] as const,
         [dumpStoredUsers, "Dump storedUsers"] as const,
+        [dumpAwarenessStates, "Dump awareness.states"] as const,
         [dumpLocalStorage, "Dump localStorage"] as const,
         [dumpStore, "Dump entire store"] as const,
         [dumpOrphanedTodos, "Dump orphaned todos"] as const,

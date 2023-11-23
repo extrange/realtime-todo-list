@@ -72,7 +72,7 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
       <Modal opened={opened} onClose={close} title="Settings" size={"lg"}>
         <div className={classes.grid}>
           <Switch checked={hideDueTodos} onChange={onHideDueTodosChange} />
-          <Text>
+          <Text component="div">
             Hide todos due more than
             <NumberInput
               allowDecimal={false}
@@ -119,7 +119,7 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
           </Text>
 
           <div />
-          <Text>
+          <Text component="div">
             Upcoming: Show todos due in the next
             <NumberInput
               allowDecimal={false}

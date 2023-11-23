@@ -12,7 +12,7 @@ import { AppAside } from "./AppAside";
 import { AppFooter } from "./AppFooter";
 import { AppHeader } from "./AppHeader/AppHeader";
 import { AppNavbar } from "./AppNavbar";
-import { EditTodoWrapper } from "./EditTodoWrapper";
+import { EditTodoWrapper } from "./EditTodoWrapper/EditTodoWrapper";
 import { TodoView } from "./TodoView/TodoView";
 
 const HEADER_HEIGHT = 48;

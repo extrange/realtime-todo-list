@@ -1,0 +1,20 @@
+.overlay {
+  backdrop-filter: blur(2px);
+}
+
+.header {
+  align-items: flex-start;
+}
+
+.closeButton {
+  position: relative;
+  align-self: flex-start;
+}
+
+.editingUsers {
+  flex-grow: 1;
+  justify-content: flex-start;
+  min-height: calc(2 * var(--mantine-spacing-md));
+  align-items: center;
+  overflow: auto;
+}
