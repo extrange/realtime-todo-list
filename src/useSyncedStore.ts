@@ -21,6 +21,7 @@ import { Store } from "./types/Store";
  * - Doesn't work with `.filter` (yet)
  *
  * @returns `toJSON` representation of the observed Yjs type
+ * @deprecated
  */
 export const useSyncedStoreCustomImpl = <T>(
   selector: (s: MappedTypeDescription<Store>) => T,

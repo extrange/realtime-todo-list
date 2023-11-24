@@ -17,7 +17,7 @@ import TaskList from "@tiptap/extension-task-list";
 import Underline from "@tiptap/extension-underline";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useAppStore } from "./appStore/appStore";
 import { USER_ID } from "./constants";
 import { ClearFormattingControl } from "./controls/ClearFormattingControl";
@@ -47,7 +47,6 @@ export const Editor = React.memo(() => {
   }
 
   const provider = useProvider();
-  const edited = useRef(false);
 
   const editor = useEditor({
     extensions: [
@@ -86,20 +85,14 @@ export const Editor = React.memo(() => {
     /* Autofocus only if title is not set */
     autofocus: !getTodoTitle(todo),
 
-    onUpdate: () => {
-      if (!edited.current) {
-        // This is to disregard the initial onUpdate, which is fired on focus
-        edited.current = true;
-        return;
-      }
-      todo.modified = Date.now();
-      todo.by = USER_ID;
-    },
+    /* Note for onUpdate: Due to this bug https://github.com/ueberdosis/tiptap/issues/4649, onUpdate is called even on mounting (twice in Strictmode) */
+
     onCreate: () => {
       /* To announce to other users the todo this user is editing */
       provider.setAwarenessField("editingId", todo.id);
     },
-    onDestroy: () => provider.setAwarenessField("editingId", undefined),
+
+    onDestroy: () => void provider.setAwarenessField("editingId", undefined),
   });
 
   /* Update user live cursor on changes while editing */

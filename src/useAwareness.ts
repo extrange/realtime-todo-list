@@ -29,11 +29,13 @@ export type AwarenessMap = Map<number, AwarenessState>;
  *
  * Awareness disappears on desktop browser close, or after ~30s of closing browser on mobile.
  *
+ * Yjs seems to fire an awareness update every few seconds.
+ *
  * Not (yet) suitable for use in dependency arrays.
  */
 export const useAwareness = () => {
   const provider = useProvider();
-  const [state, setState] = useState<{ value: AwarenessMap}>({
+  const [state, setState] = useState<{ value: AwarenessMap }>({
     value: provider.awareness?.states ?? new Map(),
   });
 

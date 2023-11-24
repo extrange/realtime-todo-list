@@ -3,9 +3,9 @@ import { differenceInCalendarDays } from "date-fns";
 import { generateKeyBetween } from "fractional-indexing";
 import sanitizeHtml from "sanitize-html";
 import { v4 as uuidv4 } from "uuid";
-import { User } from "./types/User";
 import { colors } from "./constants";
 import { Todo } from "./types/Todo";
+import { User } from "./types/User";
 
 type Sortable = {
   [T in keyof Pick<Todo, "focusSortOrder" | "sortOrder">]: string;
@@ -67,7 +67,11 @@ export const generateKeyBetweenSafe = <T extends keyof Sortable>(
   } catch (e) {
     // Only handle the case where the sortOrders are the same
     // The order looks weird because we sort by descending...
-    if (first?.[sortKey] && second?.[sortKey] && first[sortKey] === second[sortKey]) {
+    if (
+      first?.[sortKey] &&
+      second?.[sortKey] &&
+      first[sortKey] === second[sortKey]
+    ) {
       const upperKey = generateKeyBetween(second[sortKey], undefined);
       second[sortKey] = upperKey;
       return generateKeyBetween(first[sortKey], upperKey);
@@ -235,4 +239,16 @@ export const getRandomInt = (min: number, max: number) => {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+/**Show 'just now' for durations < 1min ago */
+export const reactTimeAgoFormatter = (
+  value: number,
+  unit: string,
+  suffix: string
+) => {
+  if (unit === "second") {
+    return "just now";
+  }
+  return `${value} ${unit}${value !== 1 ? "s" : ""} ${suffix}`;
 };

@@ -6,7 +6,7 @@ import "@mantine/dates/styles.css";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
 import "@mantine/tiptap/styles.css";
-import React, { Profiler } from "react";
+import { Profiler } from "react";
 import ReactDOM from "react-dom/client";
 import { App } from "./App.tsx";
 
@@ -23,7 +23,6 @@ import { UpdateStoredRoomName } from "./UpdateStoredRoomName.tsx";
 import "./app.css";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
     <ErrorBoundary fallback={<div>Application Error encountered.</div>}>
       <MantineProvider
         defaultColorScheme="dark"
@@ -63,5 +62,4 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         </ErrorBoundary>
       </MantineProvider>
     </ErrorBoundary>
-  </React.StrictMode>
 );

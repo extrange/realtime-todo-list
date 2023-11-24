@@ -10,6 +10,7 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
+import { getYjsValue } from "@syncedstore/core";
 import { useSyncedStore } from "@syncedstore/react";
 import {
   IconCheck,
@@ -26,10 +27,18 @@ import {
   formatISO,
   isValid,
 } from "date-fns";
-import React, { SyntheticEvent, useCallback, useMemo, useState } from "react";
+import React, {
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { YMap, YMapEvent } from "yjs/dist/src/internals";
 import { DueDateString } from "../DueDateString";
 import { useAppStore } from "../appStore/appStore";
 import { USER_ID } from "../constants";
+import { Todo } from "../types/Todo";
 import { getTodoTitle } from "../util";
 import classes from "./TodoItem.module.css";
 import { TodoItemAvatar } from "./TodoItemAvatar";
@@ -45,6 +54,32 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
   // Necessary to make this reactive
   // Causes extra rerender only in strict mode (hook 1 changed)
   const todo = useSyncedStore(_todo);
+
+  const yTodo = getYjsValue(todo) as YMap<Todo>;
+
+  /* Update modified/by whenever properties of the Todo are changed
+  Performance notes:
+  - doesn't seem to fire on initial load (fortunately)
+  - keysChanged seems to always be a singleton set*/
+  useEffect(() => {
+    const listener = (ymapEventArray: YMapEvent<YMap<keyof Todo>>[]) => {
+      ymapEventArray.forEach((e) => {
+        // Ignore remote events
+        if (!e.transaction.local) return;
+
+        // Ignore updates to modified/by to prevent loops
+        const keysChanged: Set<keyof Todo> = e.keysChanged;
+        if (keysChanged.has("modified") || keysChanged.has("by")) return;
+
+        todo.modified = Date.now();
+        todo.by = USER_ID;
+      });
+    };
+    //@ts-expect-error YMapEvent somehow isn't allowed even though it subclasses YEvent
+    yTodo.observeDeep(listener);
+    //@ts-expect-error ignore
+    return () => yTodo.unobserveDeep(listener);
+  }, [todo, yTodo]);
 
   const [menuOpened, setMenuOpened] = useState(false);
 
@@ -63,24 +98,19 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
     (e: SyntheticEvent<HTMLButtonElement>) => {
       e.stopPropagation();
       const originalCompleted = todo.completed;
-      const originalModified = todo.modified;
-      const originalBy = todo.by;
 
       todo.modified = Date.now();
       todo.by = USER_ID;
 
-      const undoActions = [
-        () => {
-          todo.modified = originalModified;
-          todo.by = originalBy;
-        },
-      ];
+      // Array of actions to take, when 'undo' is clicked on the notification
+      const undoActions: Array<() => unknown> = [];
 
+      // Uncompleting a todo
       if (todo.completed) {
-        // Uncompleting a todo
         undoActions.push(() => (todo.completed = true));
         todo.completed = false;
       } else {
+
         // Completing a todo
         if (todo.focus) {
           // Focus todo: also remove Focus
@@ -155,7 +185,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
 
   const checkbox = useMemo(
     () => (
-      <ActionIcon variant='subtle' onClick={completeTodo} mr={10}>
+      <ActionIcon variant="subtle" onClick={completeTodo} mr={10}>
         {todo.completed ? (
           <IconCheckbox color={theme.colors.gray[6]} />
         ) : (
@@ -233,7 +263,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
         <Menu opened={menuOpened} onChange={setMenuOpened} withinPortal>
           <Portal>{menuOpened && <Overlay opacity={0} />}</Portal>
           <Menu.Target>
-            <ActionIcon variant='subtle' onClick={openMenu}>
+            <ActionIcon variant="subtle" onClick={openMenu}>
               <IconDotsVertical color={theme.colors.gray[6]} />
             </ActionIcon>
           </Menu.Target>
