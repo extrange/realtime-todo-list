@@ -208,9 +208,9 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
     const color =
       typeof daysToDue === "number"
         ? daysToDue < 1
-          ? "red"
+          ? theme.colors.red[7]
           : daysToDue < 4
-          ? "yellow"
+          ? theme.colors.orange[8]
           : "gray"
         : undefined;
 
@@ -242,7 +242,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
         )}
       </>
     );
-  }, [todo.dueDate, todo.repeatDays]);
+  }, [theme, todo.dueDate, todo.repeatDays]);
 
   const todoFocus = useMemo(
     () =>
