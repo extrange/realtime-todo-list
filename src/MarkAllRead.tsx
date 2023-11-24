@@ -3,21 +3,6 @@ import React, { useCallback, useMemo, useState } from "react";
 import { USER_ID } from "./constants";
 import { selectTodos, useSyncedStoreCustomImpl } from "./useSyncedStore";
 
-type MarkAllRead = "markAllRead";
-
-declare global {
-  interface Document {
-    addEventListener<K extends MarkAllRead>(
-      type: K,
-      listener: (this: Document, ev: Event) => void
-    ): void;
-    removeEventListener<K extends MarkAllRead>(
-      type: K,
-      listener: (this: Document, ev: Event) => void
-    ): void;
-  }
-}
-
 export const MarkAllRead = React.memo(
   ({ closeNav }: { closeNav: () => void }) => {
     const todosReadonly = useSyncedStoreCustomImpl(selectTodos, 1000);
@@ -47,7 +32,6 @@ export const MarkAllRead = React.memo(
       todosReadonly.forEach((t) =>
         localStorage.setItem(t.id, Date.now().toString())
       );
-      document.dispatchEvent(new Event("markAllRead"));
       forceRender({});
       closeNav();
     }, [todosReadonly, closeNav]);

@@ -55,12 +55,32 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
   // Causes extra rerender only in strict mode (hook 1 changed)
   const todo = useSyncedStore(_todo);
 
-  const yTodo = getYjsValue(todo) as YMap<Todo>;
+  const [lastOpened, setLastOpened] = useState<number | undefined>(() => {
+    // Fetch lastOpened on first render
+    const lastOpenedStr = localStorage.getItem(todo.id);
+    return lastOpenedStr ? parseInt(lastOpenedStr) : undefined;
+  });
+
+  /* Show avatar if all are true:
+    - todo.by exists and is not the current user
+    - there is no lastOpened, or lastOpened < todo.modified */
+  const modified = todo.modified; // to force a listener
+  const shouldShowAvatar =
+    todo.by && todo.by !== USER_ID && (!lastOpened || lastOpened < modified);
+
+  // Listen to read events and stop displaying avatar accordingly
+  useEffect(() => {
+    const handler = () => setLastOpened(Date.now());
+
+    document.addEventListener(todo.id, handler);
+    return () => document.removeEventListener(todo.id, handler);
+  }, [todo.id]);
 
   /* Update modified/by whenever properties of the Todo are changed
   Performance notes:
   - doesn't seem to fire on initial load (fortunately)
   - keysChanged seems to always be a singleton set*/
+  const yTodo = getYjsValue(todo) as YMap<Todo>;
   useEffect(() => {
     const listener = (ymapEventArray: YMapEvent<YMap<keyof Todo>>[]) => {
       ymapEventArray.forEach((e) => {
@@ -180,9 +200,12 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
     [todo]
   );
 
-  /* Mark todo as read on open */
+  /* Mark todo as read on open.
+  Note: custom events required - localStorage events don't fire in the same tab
+  https://developer.mozilla.org/en-US/docs/Web/API/Window/storage_event */
   const onOpenTodo = useCallback(() => {
     localStorage.setItem(todo.id, Date.now().toString());
+    document.dispatchEvent(new Event(todo.id));
     setEditingTodo(todo);
   }, [setEditingTodo, todo]);
 
@@ -262,7 +285,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
         {checkbox}
         {todoFocus}
         <TodoItemTextContent todo={todo} />
-        <TodoItemAvatar todo={todo} />
+        {shouldShowAvatar && <TodoItemAvatar todo={todo} />}
         <Menu opened={menuOpened} onChange={setMenuOpened} withinPortal>
           <Portal>{menuOpened && <Overlay opacity={0} />}</Portal>
           <Menu.Target>
