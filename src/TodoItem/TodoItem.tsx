@@ -69,7 +69,11 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
 
         // Ignore updates to modified/by to prevent loops
         const keysChanged: Set<keyof Todo> = e.keysChanged;
-        if (keysChanged.has("modified") || keysChanged.has("by")) return;
+        if (
+          keysChanged && // undefined when typing in Editor
+          (keysChanged.has("modified") || keysChanged.has("by"))
+        )
+          return;
 
         todo.modified = Date.now();
         todo.by = USER_ID;
@@ -110,7 +114,6 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
         undoActions.push(() => (todo.completed = true));
         todo.completed = false;
       } else {
-
         // Completing a todo
         if (todo.focus) {
           // Focus todo: also remove Focus
