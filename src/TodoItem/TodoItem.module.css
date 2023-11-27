@@ -12,6 +12,17 @@
     justify-content: space-between;
 }
 
+.notificationDiv {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .dueDateRepeat {
     user-select: none;
+}
+
+.focus {
+  margin-right: 10px;
+  flex-shrink: 0;
 }

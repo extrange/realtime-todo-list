@@ -47,6 +47,11 @@ import { TodoItemSubtaskCount } from "./TodoItemSubtaskCount";
 import { TodoItemTextContent } from "./TodoItemTextContent";
 import { TodoItemProps } from "./TodoItemWrapper";
 
+const getLastOpened = (todo: Todo) => {
+  const lastOpenedStr = localStorage.getItem(todo.id);
+  return lastOpenedStr ? parseInt(lastOpenedStr) : undefined;
+};
+
 export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
   const theme = useMantineTheme();
   const setEditingTodo = useAppStore((state) => state.setEditingTodo);
@@ -55,11 +60,11 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
   // Causes extra rerender only in strict mode (hook 1 changed)
   const todo = useSyncedStore(_todo);
 
-  const [lastOpened, setLastOpened] = useState<number | undefined>(() => {
+  // Used to determine whether to show avatar, updated on todo open
+  const [lastOpened, setLastOpened] = useState<number | undefined>(
     // Fetch lastOpened on first render
-    const lastOpenedStr = localStorage.getItem(todo.id);
-    return lastOpenedStr ? parseInt(lastOpenedStr) : undefined;
-  });
+    () => getLastOpened(todo)
+  );
 
   /* Show avatar if all are true:
     - todo.by exists and is not the current user
@@ -68,12 +73,15 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
   const shouldShowAvatar =
     todo.by && todo.by !== USER_ID && (!lastOpened || lastOpened < modified);
 
-  // Listen to read events and stop displaying avatar accordingly
+  // Listen to read/markAllRead events and stop displaying avatar accordingly
   useEffect(() => {
-    const handler = () => setLastOpened(Date.now());
-
-    document.addEventListener(todo.id, handler);
-    return () => document.removeEventListener(todo.id, handler);
+    const handleOnOpen = () => setLastOpened(Date.now());
+    document.addEventListener(todo.id, handleOnOpen);
+    document.addEventListener("markAllRead", handleOnOpen);
+    return () => {
+      document.removeEventListener(todo.id, handleOnOpen);
+      document.removeEventListener("markAllRead", handleOnOpen);
+    };
   }, [todo.id]);
 
   /* Update modified/by whenever properties of the Todo are changed
@@ -169,13 +177,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
         ...(!originalCompleted && { icon: <IconCheck size={"1.1rem"} /> }),
         message: (
           <Flex className={classes.notification} align={"center"}>
-            <div
-              style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
+            <div className={classes.notificationDiv}>
               {!originalCompleted
                 ? getTodoTitle(todo)
                 : "Marked as uncompleted"}
@@ -205,7 +207,8 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
   https://developer.mozilla.org/en-US/docs/Web/API/Window/storage_event */
   const onOpenTodo = useCallback(() => {
     localStorage.setItem(todo.id, Date.now().toString());
-    document.dispatchEvent(new Event(todo.id));
+    document.dispatchEvent(new Event(todo.id)); // Update avatar
+    document.dispatchEvent(new Event("todoItemOpened")); // update MarkAllRead
     setEditingTodo(todo);
   }, [setEditingTodo, todo]);
 
@@ -268,10 +271,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
   }, [theme, todo.dueDate, todo.repeatDays]);
 
   const todoFocus = useMemo(
-    () =>
-      todo.focus && (
-        <IconTargetArrow style={{ marginRight: 10, flexShrink: 0 }} />
-      ),
+    () => todo.focus && <IconTargetArrow className={classes.focus} />,
     [todo.focus]
   );
 
