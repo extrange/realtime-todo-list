@@ -26,7 +26,7 @@
     "@syncedstore/core": "^0.6.0",
     "@syncedstore/react": "^0.6.0",
     "@tabler/icons-react": "^2.44.0",
-    "@tanstack/react-virtual": "^3.0.0-beta.68",
+    "@tanstack/react-virtual": "^3.0.1",
     "@tiptap/extension-code": "^2.1.13",
     "@tiptap/extension-collaboration": "^2.1.13",
     "@tiptap/extension-collaboration-cursor": "^2.1.12",
