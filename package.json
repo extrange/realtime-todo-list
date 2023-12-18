@@ -61,7 +61,7 @@
     "ts-essentials": "^9.4.1",
     "uuid": "^9.0.1",
     "y-indexeddb": "^9.0.12",
-    "y-websocket": "^1.5.0",
+    "y-websocket": "^1.5.1",
     "yjs": "^13.6.10",
     "zod": "^3.22.4",
     "zustand": "^4.4.6"
