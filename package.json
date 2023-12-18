@@ -25,7 +25,7 @@
     "@mantine/tiptap": "^7.3.1",
     "@syncedstore/core": "^0.6.0",
     "@syncedstore/react": "^0.6.0",
-    "@tabler/icons-react": "^2.42.0",
+    "@tabler/icons-react": "^2.44.0",
     "@tanstack/react-virtual": "^3.0.0-beta.68",
     "@tiptap/extension-code": "^2.1.12",
     "@tiptap/extension-collaboration": "^2.1.13",
