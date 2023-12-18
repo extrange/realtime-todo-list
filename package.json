@@ -64,7 +64,7 @@
     "y-websocket": "^1.5.0",
     "yjs": "^13.6.10",
     "zod": "^3.22.4",
-    "zustand": "^4.4.6"
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.3.1",
