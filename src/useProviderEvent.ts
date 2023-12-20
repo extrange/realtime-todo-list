@@ -1,5 +1,5 @@
 import { HocuspocusProvider, WebSocketStatus } from "@hocuspocus/provider";
-import { debounce } from "lodash";
+import { debounce } from "lodash-es";
 import { useCallback, useSyncExternalStore } from "react";
 import { useProvider } from "./useProvider";
 

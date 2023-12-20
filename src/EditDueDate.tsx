@@ -55,6 +55,7 @@ export const EditDueDate = React.memo(() => {
         maw={200}
         className={classes.datePickerInput}
         label="Due"
+        //@ts-expect-error https://github.com/mantinedev/mantine/issues/5407
         placeholder="Enter a date"
         clearable
         popoverProps={popoverProps}

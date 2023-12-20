@@ -1,4 +1,4 @@
-import { debounce } from "lodash";
+import { debounce } from "lodash-es";
 import { useEffect, useState } from "react";
 import { useProvider } from "./useProvider";
 

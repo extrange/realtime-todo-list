@@ -1,6 +1,6 @@
 import { Button, Text } from "@mantine/core";
 import { Y, getYjsValue } from "@syncedstore/core";
-import { debounce } from "lodash";
+import { debounce } from "lodash-es";
 import React, { useCallback, useEffect, useState } from "react";
 import { USER_ID } from "./constants";
 import { Todo } from "./types/Todo";
