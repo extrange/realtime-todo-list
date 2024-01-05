@@ -200,3 +200,8 @@
   cursor: ew-resize;
   cursor: col-resize;
 }
+
+.ProseMirror hr {
+  border-top: 1px solid #ced4da;
+  margin: var(--mantine-font-size-md) 0;
+}
