@@ -1,14 +1,8 @@
-import {
-  Button,
-  Image,
-  Modal,
-  Stack,
-  Text,
-  TextInput
-} from "@mantine/core";
+import { Button, Image, Modal, Stack, Text, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useLocalStorage } from "@mantine/hooks";
-import React, { FormEvent, useCallback, useContext } from "react";
+import { notifications } from "@mantine/notifications";
+import React, { FormEvent, useCallback, useContext, useEffect } from "react";
 import { TypeAnimation } from "react-type-animation";
 import { v4 as uuidv4 } from "uuid";
 import classes from "./Login.module.css";
@@ -48,6 +42,25 @@ export const Login = ({ children }: React.PropsWithChildren) => {
       },
     },
   });
+
+  useEffect(() => {
+    /* If a valid location hash is given, use it. */
+    if (window.location.hash) {
+      const hash = window.location.hash.replace("#", "");
+      if (validateUuid(hash)) {
+        window.history.pushState(
+          window.history.state,
+          "",
+          `${window.location.origin}`
+        );
+        setCurrentRoomId(hash);
+      } else
+        notifications.show({
+          color: "red",
+          message: "Invalid room ID",
+        });
+    }
+  }, [setCurrentRoomId]);
 
   const onSubmit = useCallback(
     (e: FormEvent) => {
