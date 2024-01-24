@@ -95,15 +95,15 @@ export const AppHeader = React.memo(
           <Table>
             <tbody>
               <tr>
-                <td>Room ID:</td>
+                <td>Room URL:</td>
                 <td>
                   <Flex align={"center"}>
                     <Code block className={classes.code}>
-                      {roomId}
+                      {window.location + "#" + roomId}
                     </Code>
-                    <CopyButton value={roomId}>
+                    <CopyButton value={window.location + "#" + roomId}>
                       {({ copied, copy }) => (
-                        <ActionIcon variant='subtle' onClick={copy} mx={10}>
+                        <ActionIcon variant="subtle" onClick={copy} mx={10}>
                           {copied ? <IconCheck /> : <IconCopy />}
                         </ActionIcon>
                       )}
@@ -199,7 +199,11 @@ export const AppHeader = React.memo(
             <Text fz={"xl"} ta={"center"} className={classes.headerText}>
               {currentListName}
             </Text>
-            <ActionIcon variant='subtle' mx={5} onClick={() => setShowInfo(true)}>
+            <ActionIcon
+              variant="subtle"
+              mx={5}
+              onClick={() => setShowInfo(true)}
+            >
               <IconInfoCircle color={"grey"} />
             </ActionIcon>
           </Flex>
