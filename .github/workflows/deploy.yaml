@@ -4,14 +4,16 @@ on:
   push:
     branches:
       - main
+  workflow_call:
+
 jobs:
   build-and-deploy:
-    permissions:
-      contents: write
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Build
         env:
           VITE_COMMIT_DATE: ${{github.event.head_commit.timestamp}}
@@ -20,6 +22,7 @@ jobs:
         run: |
           npm ci
           npm run build
+
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
