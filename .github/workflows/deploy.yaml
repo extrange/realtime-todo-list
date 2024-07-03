@@ -20,8 +20,8 @@ jobs:
           VITE_COMMIT_MSG: ${{github.event.head_commit.message}}
           VITE_COMMIT_HASH: ${{github.event.after}}
         run: |
-          npm ci
-          npm run build
+          npm ci --omit=dev
+          vite build
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
