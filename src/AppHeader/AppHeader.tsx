@@ -69,7 +69,7 @@ export const AppHeader = React.memo(
     );
 
     useEffect(
-      () => void navigator.storage?.estimate().then(setStorageEstimate),
+      () => void navigator.storage?.estimate?.().then(setStorageEstimate),
       []
     );
 
