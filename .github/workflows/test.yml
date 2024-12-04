@@ -1,5 +1,7 @@
 name: Test
 on:
+  push:
+    branches-ignore: main # The deploy.yml action runs this action already
   pull_request:
     branches: main
   workflow_call:
