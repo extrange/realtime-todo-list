@@ -1,0 +1,26 @@
+name: Test
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: main
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test
+        env:
+          VITE_COMMIT_DATE: ${{github.event.head_commit.timestamp}}
+          VITE_COMMIT_MSG: ${{github.event.head_commit.message}}
+          VITE_COMMIT_HASH: ${{github.event.after}}
+        run: |
+          npm ci
+          npm run build
