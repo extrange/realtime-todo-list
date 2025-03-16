@@ -55,7 +55,7 @@
     "react-dom": "^18.3.1",
     "react-error-boundary": "^5.0.0",
     "react-icons": "^5.4.0",
-    "react-timeago": "^7.2.0",
+    "react-timeago": "^8.0.0",
     "react-type-animation": "^3.2.0",
     "sanitize-html": "^2.13.1",
     "ts-essentials": "^10.0.3",
