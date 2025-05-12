@@ -1,32 +1,26 @@
-import { HocuspocusProvider, WebSocketStatus } from "@hocuspocus/provider";
+import type { HocuspocusProvider } from "@hocuspocus/provider";
 import { debounce } from "lodash-es";
 import { useCallback, useSyncExternalStore } from "react";
 import { useProvider } from "./useProvider";
 
 /**Mapped HocusPocus Provider events. */
 export type SupportedProviderEvent = {
-  /** When the connections status changes.
-   *
-   * Unreliable: could be `connected` even if there is no network.
-   */
-  status: WebSocketStatus;
+	/**When sync has been completed.
+	 *
+	 * Unreliable: could be false, despite syncing occuring.
+	 * Could be true even when there is no network (Chrome).
+	 */
+	synced: boolean;
 
-  /**When sync has been completed.
-   *
-   * Unreliable: could be false, despite syncing occuring.
-   * Could be true even when there is no network (Chrome).
-   */
-  synced: boolean;
-
-  /**Number of unsynced changes. 0 if in sync.
-   *
-   * Most reliable of all.
-   */
-  unsyncedChanges: number;
+	/**Number of unsynced changes. 0 if in sync.
+	 *
+	 * Most reliable of all.
+	 */
+	unsyncedChanges: number;
 };
 
 type Options = {
-  delay: number;
+	delay: number;
 };
 
 /**
@@ -51,42 +45,40 @@ type Options = {
  * (in such a state it's 'given up`)
  * */
 export const useProviderEvent = <T extends keyof SupportedProviderEvent>(
-  event: T,
-  { delay }: Options = { delay: 500 }
+	event: T,
+	{ delay }: Options = { delay: 500 },
 ): SupportedProviderEvent[T] => {
-  const provider = useProvider();
+	const provider = useProvider();
 
-  const eventMap = useCallback(
-    (p: HocuspocusProvider): SupportedProviderEvent => ({
-      status: p.status,
-      synced: p.synced,
-      unsyncedChanges: p.unsyncedChanges,
-    }),
-    []
-  );
+	const eventMap = useCallback(
+		(p: HocuspocusProvider): SupportedProviderEvent => ({
+			synced: p.synced,
+			unsyncedChanges: p.unsyncedChanges,
+		}),
+		[],
+	);
 
-  const subscribe = useCallback(
-    (callback: () => void) => {
-      const debouncedCallback = delay
-        ? debounce(callback, delay, { maxWait: delay })
-        : callback;
+	const subscribe = useCallback(
+		(callback: () => void) => {
+			const debouncedCallback = delay
+				? debounce(callback, delay, { maxWait: delay })
+				: callback;
 
-      if (event === "unsyncedChanges") {
-        /* Special case */
-        provider.on("outgoingMessage", debouncedCallback);
-        return () => provider.off("outgoingMessage", debouncedCallback);
-      } else {
-        provider.on(event, debouncedCallback);
-        return () => provider.off(event, debouncedCallback);
-      }
-    },
-    [delay, event, provider]
-  );
+			if (event === "unsyncedChanges") {
+				/* Special case */
+				provider.on("outgoingMessage", debouncedCallback);
+				return () => provider.off("outgoingMessage", debouncedCallback);
+			}
+			provider.on(event, debouncedCallback);
+			return () => provider.off(event, debouncedCallback);
+		},
+		[delay, event, provider],
+	);
 
-  const getSnapshot = useCallback(
-    () => eventMap(provider)[event],
-    [event, eventMap, provider]
-  );
+	const getSnapshot = useCallback(
+		() => eventMap(provider)[event],
+		[event, eventMap, provider],
+	);
 
-  return useSyncExternalStore(subscribe, getSnapshot);
+	return useSyncExternalStore(subscribe, getSnapshot);
 };
