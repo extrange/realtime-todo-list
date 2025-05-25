@@ -83,7 +83,7 @@
     "@typescript-eslint/eslint-plugin": "8.32.1",
     "@typescript-eslint/parser": "8.32.1",
     "@vitejs/plugin-react-swc": "3.9.0",
-    "@welldone-software/why-did-you-render": "8.0.3",
+    "@welldone-software/why-did-you-render": "10.0.1",
     "eslint": "9.26.0",
     "eslint-plugin-react-hooks": "5.2.0",
     "eslint-plugin-react-refresh": "0.4.20",
