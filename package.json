@@ -91,7 +91,7 @@
     "postcss": "8.5.3",
     "postcss-preset-mantine": "1.17.0",
     "postcss-simple-vars": "7.0.1",
-    "rollup-plugin-visualizer": "5.14.0",
+    "rollup-plugin-visualizer": "6.0.3",
     "typescript": "5.8.3",
     "vite": "6.3.5",
     "vite-plugin-pwa": "1.0.0"
