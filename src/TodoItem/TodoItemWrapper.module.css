@@ -1,25 +1,25 @@
 .wrapper {
-  @keyframes pop {
-    0% {
-      transform: scale(1);
-      box-shadow: var(--box-shadow);
-    }
-    100% {
-      transform: scale(var(--scale));
-      box-shadow: var(--box-shadow-picked-up);
-    }
-  }
-  animation: pop 200ms cubic-bezier(0.18, 0.67, 0.6, 1.22);
-  transform: scale(var(--scale));
+	@keyframes pop {
+		0% {
+			transform: scale(1);
+			box-shadow: var(--box-shadow);
+		}
+		100% {
+			transform: scale(var(--scale));
+			box-shadow: var(--box-shadow-picked-up);
+		}
+	}
+	animation: pop 200ms cubic-bezier(0.18, 0.67, 0.6, 1.22);
+	transform: scale(var(--scale));
 }
 /* dragging: the overlay of the dragged thing */
 .dragging {
-  --scale: 1.05;
-  background-color: rgb(44, 46, 51);
+	--scale: 1.05;
+	background-color: rgb(44, 46, 51);
 }
 
 /* isDragging: the 'shadow' of the active item (follows overlay) */
 .isDragging {
-  opacity: 0.5;
-  cursor: grab;
+	opacity: 0.5;
+	cursor: grab;
 }

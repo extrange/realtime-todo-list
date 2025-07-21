@@ -10,31 +10,36 @@ import { FlatCompat } from "@eslint/eslintrc";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
+	baseDirectory: __dirname,
+	recommendedConfig: js.configs.recommended,
+	allConfig: js.configs.all,
 });
 
-export default [...fixupConfigRules(compat.extends(
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:react-hooks/recommended",
-)), {
-    plugins: {
-        "react-refresh": reactRefresh,
-    },
+export default [
+	...fixupConfigRules(
+		compat.extends(
+			"eslint:recommended",
+			"plugin:@typescript-eslint/recommended",
+			"plugin:react-hooks/recommended",
+		),
+	),
+	{
+		plugins: {
+			"react-refresh": reactRefresh,
+		},
 
-    languageOptions: {
-        globals: {
-            ...globals.browser,
-        },
+		languageOptions: {
+			globals: {
+				...globals.browser,
+			},
 
-        parser: tsParser,
-        ecmaVersion: "latest",
-        sourceType: "module",
-    },
+			parser: tsParser,
+			ecmaVersion: "latest",
+			sourceType: "module",
+		},
 
-    rules: {
-        "react-refresh/only-export-components": "warn",
-    },
-}];
+		rules: {
+			"react-refresh/only-export-components": "warn",
+		},
+	},
+];

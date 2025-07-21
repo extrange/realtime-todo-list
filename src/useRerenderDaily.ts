@@ -6,15 +6,15 @@ import { useEffect, useState } from "react";
  * Returns the current time on calling.
  */
 export const useRerenderDaily = () => {
-  const [time, setTime] = useState(Date.now());
+	const [time, setTime] = useState(Date.now());
 
-  useEffect(() => {
-    const secondsToMidnight = differenceInMilliseconds(startOfTomorrow(), time);
-    const id = setTimeout(() => {
-      setTime(Date.now());
-    }, secondsToMidnight);
-    return () => clearTimeout(id);
-  }, [time]);
+	useEffect(() => {
+		const secondsToMidnight = differenceInMilliseconds(startOfTomorrow(), time);
+		const id = setTimeout(() => {
+			setTime(Date.now());
+		}, secondsToMidnight);
+		return () => clearTimeout(id);
+	}, [time]);
 
-  return time;
+	return time;
 };

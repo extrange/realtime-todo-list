@@ -3,5 +3,5 @@ import { createContext } from "react";
 import { Store } from "./types/Store";
 
 export const StoreContext = createContext<
-  MappedTypeDescription<Store> | undefined
+	MappedTypeDescription<Store> | undefined
 >(undefined);

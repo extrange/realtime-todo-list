@@ -7,7 +7,7 @@ import { StoreContext } from "./StoreContext";
  * Not suitable for memoization.
  */
 export const useStore = () => {
-  const store = useContext(StoreContext);
-  if (!store) throw Error("Store context is undefined");
-  return store;
+	const store = useContext(StoreContext);
+	if (!store) throw Error("Store context is undefined");
+	return store;
 };

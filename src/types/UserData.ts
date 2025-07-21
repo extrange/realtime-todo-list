@@ -5,10 +5,10 @@ import { User } from "./User";
  * are synced to this object via useUser. Values could be undefined
  * if store is in the progress of updating. */
 export type UserData = {
-  user?: User;
+	user?: User;
 
-  /**The last time the user was non-idle.
-   * Updated even if the user was offline.
-   */
-  lastActive?: number;
+	/**The last time the user was non-idle.
+	 * Updated even if the user was offline.
+	 */
+	lastActive?: number;
 };

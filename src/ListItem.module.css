@@ -1,26 +1,26 @@
 .box {
-  flex-shrink: 0;
-  width: 28px;
+	flex-shrink: 0;
+	width: 28px;
 }
 
 .listItem {
-  &:hover {
-    background-color: rgb(44, 46, 51);
-  }
+	&:hover {
+		background-color: rgb(44, 46, 51);
+	}
 }
 
 .selected {
-  background-color: rgb(57, 57, 63);
+	background-color: rgb(57, 57, 63);
 }
 
 .iconTargetArrow {
-  margin-right: 5px;
+	margin-right: 5px;
 }
 
 .listContent {
-  width: 100%;
-  padding: 10px 0 10px 0px;
-  user-select: none;
-  cursor: default;
-  overflow-wrap: anywhere;
+	width: 100%;
+	padding: 10px 0 10px 0px;
+	user-select: none;
+	cursor: default;
+	overflow-wrap: anywhere;
 }

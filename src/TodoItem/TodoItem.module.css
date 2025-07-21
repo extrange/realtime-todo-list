@@ -1,28 +1,28 @@
 .todoContainer {
-  border-bottom: 0.0625rem solid rgb(55, 58, 64);
-  padding: 10px 5px;
-  width: 100%;
+	border-bottom: 0.0625rem solid rgb(55, 58, 64);
+	padding: 10px 5px;
+	width: 100%;
 
-  &:hover {
-    background-color: var(--mantine-color-gray-9);
-  }
+	&:hover {
+		background-color: var(--mantine-color-gray-9);
+	}
 }
 
 .notification {
-    justify-content: space-between;
+	justify-content: space-between;
 }
 
 .notificationDiv {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .dueDateRepeat {
-    user-select: none;
+	user-select: none;
 }
 
 .focus {
-  margin-right: 10px;
-  flex-shrink: 0;
+	margin-right: 10px;
+	flex-shrink: 0;
 }

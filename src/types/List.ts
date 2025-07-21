@@ -1,6 +1,5 @@
-
 export type List = {
-  name: string;
-  id: string;
-  sortOrder: string;
+	name: string;
+	id: string;
+	sortOrder: string;
 };

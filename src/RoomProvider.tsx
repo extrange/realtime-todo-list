@@ -11,23 +11,23 @@ import { CURRENT_ROOM_LOCALSTORAGE_KEY } from "./constants";
  * CURRENT_ROOM_LOCALSTORAGE_KEY.
  */
 export const RoomProvider = ({ children }: React.PropsWithChildren) => {
-  const [roomId, setRoomId] = useState<string | undefined>();
-  const [currentRoomId] = useLocalStorage({
-    key: CURRENT_ROOM_LOCALSTORAGE_KEY,
-  });
+	const [roomId, setRoomId] = useState<string | undefined>();
+	const [currentRoomId] = useLocalStorage({
+		key: CURRENT_ROOM_LOCALSTORAGE_KEY,
+	});
 
-  useEffect(() => {
-    setRoomId(currentRoomId);
-  }, [currentRoomId]);
+	useEffect(() => {
+		setRoomId(currentRoomId);
+	}, [currentRoomId]);
 
-  const providerValue = useMemo(
-    () => ({ roomId, setRoomId }),
-    [roomId, setRoomId]
-  );
+	const providerValue = useMemo(
+		() => ({ roomId, setRoomId }),
+		[roomId, setRoomId],
+	);
 
-  return (
-    <RoomContext.Provider value={providerValue}>
-      {children}
-    </RoomContext.Provider>
-  );
+	return (
+		<RoomContext.Provider value={providerValue}>
+			{children}
+		</RoomContext.Provider>
+	);
 };

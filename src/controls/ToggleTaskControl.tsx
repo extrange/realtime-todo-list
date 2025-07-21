@@ -4,12 +4,15 @@ import React from "react";
 import { useCallback } from "react";
 
 export const ToggleTaskControl = React.memo(() => {
-  const { editor } = useRichTextEditorContext();
+	const { editor } = useRichTextEditorContext();
 
-  const onClick = useCallback(() => editor?.commands.toggleTaskList(), [editor]);
-  return (
-    <RichTextEditor.Control onClick={onClick} title="Task List">
-      <IconListCheck size="1rem" stroke={1.5}/>
-    </RichTextEditor.Control>
-  );
+	const onClick = useCallback(
+		() => editor?.commands.toggleTaskList(),
+		[editor],
+	);
+	return (
+		<RichTextEditor.Control onClick={onClick} title="Task List">
+			<IconListCheck size="1rem" stroke={1.5} />
+		</RichTextEditor.Control>
+	);
 });

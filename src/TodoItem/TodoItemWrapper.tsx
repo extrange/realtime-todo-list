@@ -8,10 +8,10 @@ import { TodoItem } from "./TodoItem";
 import classes from "./TodoItemWrapper.module.css";
 
 export type TodoItemProps = {
-  todo: Todo;
+	todo: Todo;
 
-  /** Whether the Todo is being dragged */
-  dragging?: boolean;
+	/** Whether the Todo is being dragged */
+	dragging?: boolean;
 };
 
 /**
@@ -24,43 +24,43 @@ export type TodoItemProps = {
  * (even if the container of the Todo does).
  */
 export const TodoItemWrapper = React.memo((props: TodoItemProps) => {
-  const { dragging, todo } = props;
+	const { dragging, todo } = props;
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: todo.id,
-  });
+	const {
+		attributes,
+		listeners,
+		setNodeRef,
+		transform,
+		transition,
+		isDragging,
+	} = useSortable({
+		id: todo.id,
+	});
 
-  const style = useMemo(
-    () =>
-      ({
-        transform: CSS.Transform.toString(transform),
-        transition,
-      } as React.CSSProperties),
-    [transform, transition]
-  );
+	const style = useMemo(
+		() =>
+			({
+				transform: CSS.Transform.toString(transform),
+				transition,
+			}) as React.CSSProperties,
+		[transform, transition],
+	);
 
-  return (
-    <Flex
-      {...listeners}
-      ref={setNodeRef}
-      {...attributes}
-      style={style}
-      className={clsx({
-        [classes.isDragging]: isDragging,
-        [classes.dragging]: dragging,
-        [classes.wrapper]: true,
-      })}
-    >
-      <TodoItem {...props} />
-    </Flex>
-  );
+	return (
+		<Flex
+			{...listeners}
+			ref={setNodeRef}
+			{...attributes}
+			style={style}
+			className={clsx({
+				[classes.isDragging]: isDragging,
+				[classes.dragging]: dragging,
+				[classes.wrapper]: true,
+			})}
+		>
+			<TodoItem {...props} />
+		</Flex>
+	);
 });
 
 TodoItemWrapper.displayName = "TodoItemWrapper";

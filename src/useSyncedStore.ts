@@ -24,54 +24,54 @@ import { Store } from "./types/Store";
  * @deprecated
  */
 export const useSyncedStoreCustomImpl = <T>(
-  selector: (s: MappedTypeDescription<Store>) => T,
-  debounceMs = 300
+	selector: (s: MappedTypeDescription<Store>) => T,
+	debounceMs = 300,
 ): DeepReadonly<T> => {
-  const store = useStore();
+	const store = useStore();
 
-  /**Attempt to shallowly copy the selected state.
-   *
-   * Performance notes:
-   * - toJSON(): slowest
-   * - [...store.todos] - shallow copy proxied array - slow
-   * - .slice() - fast
-   * - getYjsValue - fast
-   */
-  const unwrapSelectedState = useCallback(() => {
-    const proxiedSlice = selector(store);
-    const yjsSlice = getYjsValue(proxiedSlice);
-    if (yjsSlice instanceof Y.Array) {
-      return (selector(store) as Array<unknown>).slice();
-    } else if (yjsSlice instanceof Y.Map) {
-      return { ...proxiedSlice };
-    } else return yjsSlice?.toJSON();
-  }, [selector, store]);
+	/**Attempt to shallowly copy the selected state.
+	 *
+	 * Performance notes:
+	 * - toJSON(): slowest
+	 * - [...store.todos] - shallow copy proxied array - slow
+	 * - .slice() - fast
+	 * - getYjsValue - fast
+	 */
+	const unwrapSelectedState = useCallback(() => {
+		const proxiedSlice = selector(store);
+		const yjsSlice = getYjsValue(proxiedSlice);
+		if (yjsSlice instanceof Y.Array) {
+			return (selector(store) as Array<unknown>).slice();
+		} else if (yjsSlice instanceof Y.Map) {
+			return { ...proxiedSlice };
+		} else return yjsSlice?.toJSON();
+	}, [selector, store]);
 
-  const now = performance.now();
+	const now = performance.now();
 
-  const [state, setState] = useState(unwrapSelectedState);
+	const [state, setState] = useState(unwrapSelectedState);
 
-  const duration = performance.now() - now;
-  if (DEVELOPMENT && duration >= 10)
-    console.log(`useSyncedStore: ${duration}ms`);
+	const duration = performance.now() - now;
+	if (DEVELOPMENT && duration >= 10)
+		console.log(`useSyncedStore: ${duration}ms`);
 
-  useEffect(() => {
-    const onUpdate = () => {
-      const now = performance.now();
-      setState(unwrapSelectedState());
-      const duration = performance.now() - now;
-      if (DEVELOPMENT && duration >= 10)
-        console.log(`useSyncedStore: ${duration}ms`);
-    };
+	useEffect(() => {
+		const onUpdate = () => {
+			const now = performance.now();
+			setState(unwrapSelectedState());
+			const duration = performance.now() - now;
+			if (DEVELOPMENT && duration >= 10)
+				console.log(`useSyncedStore: ${duration}ms`);
+		};
 
-    const debouncedUpdate = debounceMs
-      ? debounce(onUpdate, debounceMs, { maxWait: debounceMs })
-      : onUpdate;
+		const debouncedUpdate = debounceMs
+			? debounce(onUpdate, debounceMs, { maxWait: debounceMs })
+			: onUpdate;
 
-    return observeDeep(selector ? selector(store) : store, debouncedUpdate);
-  }, [debounceMs, selector, store, unwrapSelectedState]);
+		return observeDeep(selector ? selector(store) : store, debouncedUpdate);
+	}, [debounceMs, selector, store, unwrapSelectedState]);
 
-  return state;
+	return state;
 };
 
 /* Selectors for memoization */
@@ -79,5 +79,5 @@ export const selectStore = (s: MappedTypeDescription<Store>) => s;
 export const selectTodos = (s: MappedTypeDescription<Store>) => s.todos;
 export const selectLists = (s: MappedTypeDescription<Store>) => s.lists;
 export const selectStoredUsers = (s: MappedTypeDescription<Store>) =>
-  s.storedUsers;
+	s.storedUsers;
 export const selectMeta = (s: MappedTypeDescription<Store>) => s.meta;

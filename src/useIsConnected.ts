@@ -13,22 +13,22 @@ import { useProvider } from "./useProvider";
  * @returns whether the client is truly connected to the server
  */
 export const useIsConnected = () => {
-  const provider = useProvider();
+	const provider = useProvider();
 
-  const [isConnected, setIsConnected] = useState(false);
+	const [isConnected, setIsConnected] = useState(false);
 
-  useEffect(() => {
-    const interval = setInterval(
-      () =>
-        Date.now() -
-          provider.configuration.websocketProvider.lastMessageReceived >
-        FORCE_SYNC_INTERVAL
-          ? setIsConnected(false)
-          : setIsConnected(true),
-      3000
-    );
-    return () => clearInterval(interval);
-  }, [provider]);
+	useEffect(() => {
+		const interval = setInterval(
+			() =>
+				Date.now() -
+					provider.configuration.websocketProvider.lastMessageReceived >
+				FORCE_SYNC_INTERVAL
+					? setIsConnected(false)
+					: setIsConnected(true),
+			3000,
+		);
+		return () => clearInterval(interval);
+	}, [provider]);
 
-  return isConnected;
+	return isConnected;
 };

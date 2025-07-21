@@ -30,142 +30,142 @@ import { eventHaskeys } from "./filterEvent";
  * calculating counts).)
  */
 export const TodoListUpdater = () => {
-  const store = useStore();
+	const store = useStore();
 
-  // We don't need reactivity
-  const lists = store.lists;
-  const todos = store.todos;
+	// We don't need reactivity
+	const lists = store.lists;
+	const todos = store.todos;
 
-  // Used to trigger run on initial sync event
-  const synced = useProviderEvent("synced");
+	// Used to trigger run on initial sync event
+	const synced = useProviderEvent("synced");
 
-  // Used to trigger a re-render daily at 12mn
-  const time = useRerenderDaily();
+	// Used to trigger a re-render daily at 12mn
+	const time = useRerenderDaily();
 
-  const [setTodosMap, setFocusTodos, setDueTodos, setUpcomingTodos] =
-    useAppStore(
-      (state) => [
-        state.setTodosMap,
-        state.setFocusTodos,
-        state.setDueTodos,
-        state.setUpcomingTodos,
-      ],
-      shallow
-    );
+	const [setTodosMap, setFocusTodos, setDueTodos, setUpcomingTodos] =
+		useAppStore(
+			(state) => [
+				state.setTodosMap,
+				state.setFocusTodos,
+				state.setDueTodos,
+				state.setUpcomingTodos,
+			],
+			shallow,
+		);
 
-  const todoItemKeysToCheck: Array<keyof Todo> = useMemo(
-    () => [
-      "focus",
-      "completed",
-      "listId",
-      "dueDate",
+	const todoItemKeysToCheck: Array<keyof Todo> = useMemo(
+		() => [
+			"focus",
+			"completed",
+			"listId",
+			"dueDate",
 
-      //Need to listen to sort orders, so that downstream sorting will be re-triggered (since zustand store is updated)
-      "sortOrder",
-      "focusSortOrder",
-    ],
-    []
-  );
+			//Need to listen to sort orders, so that downstream sorting will be re-triggered (since zustand store is updated)
+			"sortOrder",
+			"focusSortOrder",
+		],
+		[],
+	);
 
-  /* Place todos into categories.
+	/* Place todos into categories.
   Will not appear in React Profiler graph.*/
-  const handleTodosUpdate = useCallback(
-    (e?: Array<YMapEvent<Todo> | YXmlEvent>) => {
-      /* If there is an event, only continue if it has required keys
+	const handleTodosUpdate = useCallback(
+		(e?: Array<YMapEvent<Todo> | YXmlEvent>) => {
+			/* If there is an event, only continue if it has required keys
       This function can also be called without an event (on list changes),
       so we also continue if there is no event.*/
-      if (e && !eventHaskeys(todoItemKeysToCheck, e)) return;
+			if (e && !eventHaskeys(todoItemKeysToCheck, e)) return;
 
-      const start = performance.now();
+			const start = performance.now();
 
-      const todosMap: TodosMap = new Map([
-        [undefined, { completed: [], uncompleted: [] }],
-        ...lists.map(
-          (l) =>
-            [l.id, { completed: [], uncompleted: [] }] as [
-              string,
-              TodosMap extends Map<unknown, infer V> ? V : never
-            ]
-        ),
-      ]);
-      const focusTodos: Todo[] = [];
-      const dueTodos: WithRequired<Todo, "dueDate">[] = [];
-      const upcomingTodos: WithRequired<Todo, "dueDate">[] = [];
+			const todosMap: TodosMap = new Map([
+				[undefined, { completed: [], uncompleted: [] }],
+				...lists.map(
+					(l) =>
+						[l.id, { completed: [], uncompleted: [] }] as [
+							string,
+							TodosMap extends Map<unknown, infer V> ? V : never,
+						],
+				),
+			]);
+			const focusTodos: Todo[] = [];
+			const dueTodos: WithRequired<Todo, "dueDate">[] = [];
+			const upcomingTodos: WithRequired<Todo, "dueDate">[] = [];
 
-      /* Looping through the allTodos array is not expensive (1-2ms).
+			/* Looping through the allTodos array is not expensive (1-2ms).
       - The expensive operation is the .get for the yjs map objects.
       - Approx 30ms for 3000 iterations.
       - toJSON() is even more expensive at 100ms+ for 3000 iterations. */
 
-      (getYjsValue(todos) as YArray<YMap<Todo[keyof Todo]>>).forEach(
-        (t, idx) => {
-          const listId = t.get("listId") as Todo["listId"];
+			(getYjsValue(todos) as YArray<YMap<Todo[keyof Todo]>>).forEach(
+				(t, idx) => {
+					const listId = t.get("listId") as Todo["listId"];
 
-          const completed = t.get("completed") as Todo["completed"];
+					const completed = t.get("completed") as Todo["completed"];
 
-          // 1. Named and uncategorized lists
-          todosMap
-            .get(listId)
-            ?.[completed ? "completed" : "uncompleted"].push(todos[idx]);
+					// 1. Named and uncategorized lists
+					todosMap
+						.get(listId)
+						?.[completed ? "completed" : "uncompleted"].push(todos[idx]);
 
-          // 2. Focus, uncompleted
-          !completed &&
-            (t.get("focus") as Todo["focus"]) &&
-            focusTodos.push(todos[idx]);
+					// 2. Focus, uncompleted
+					!completed &&
+						(t.get("focus") as Todo["focus"]) &&
+						focusTodos.push(todos[idx]);
 
-          // 3. Due/overdue uncompleted
-          const dueDate = t.get("dueDate") as Todo["dueDate"];
-          !completed &&
-            dueDate &&
-            differenceInCalendarDays(new Date(), Date.parse(dueDate)) >= 0 &&
-            dueTodos.push(todos[idx] as WithRequired<Todo, "dueDate">);
+					// 3. Due/overdue uncompleted
+					const dueDate = t.get("dueDate") as Todo["dueDate"];
+					!completed &&
+						dueDate &&
+						differenceInCalendarDays(new Date(), Date.parse(dueDate)) >= 0 &&
+						dueTodos.push(todos[idx] as WithRequired<Todo, "dueDate">);
 
-          // 4. Upcoming uncompleted
-          !completed &&
-            dueDate &&
-            differenceInCalendarDays(new Date(), Date.parse(dueDate)) < 0 &&
-            upcomingTodos.push(todos[idx] as WithRequired<Todo, "dueDate">);
-        }
-      );
+					// 4. Upcoming uncompleted
+					!completed &&
+						dueDate &&
+						differenceInCalendarDays(new Date(), Date.parse(dueDate)) < 0 &&
+						upcomingTodos.push(todos[idx] as WithRequired<Todo, "dueDate">);
+				},
+			);
 
-      setTodosMap(todosMap);
-      setFocusTodos(focusTodos);
-      setDueTodos(dueTodos);
-      setUpcomingTodos(upcomingTodos);
-      console.log("TodoListUpdater", performance.now() - start);
-    },
-    [
-      lists,
-      setDueTodos,
-      setFocusTodos,
-      setTodosMap,
-      setUpcomingTodos,
-      todoItemKeysToCheck,
-      todos,
-    ]
-  );
+			setTodosMap(todosMap);
+			setFocusTodos(focusTodos);
+			setDueTodos(dueTodos);
+			setUpcomingTodos(upcomingTodos);
+			console.log("TodoListUpdater", performance.now() - start);
+		},
+		[
+			lists,
+			setDueTodos,
+			setFocusTodos,
+			setTodosMap,
+			setUpcomingTodos,
+			todoItemKeysToCheck,
+			todos,
+		],
+	);
 
-  useEffect(
-    () => observeDeep(todos, handleTodosUpdate),
-    [handleTodosUpdate, todos]
-  );
+	useEffect(
+		() => observeDeep(todos, handleTodosUpdate),
+		[handleTodosUpdate, todos],
+	);
 
-  useEffect(
-    () => observeDeep(lists, handleTodosUpdate),
-    [handleTodosUpdate, lists]
-  );
+	useEffect(
+		() => observeDeep(lists, handleTodosUpdate),
+		[handleTodosUpdate, lists],
+	);
 
-  /* On initial sync */
-  useEffect(
-    () => void (synced && handleTodosUpdate()),
-    [handleTodosUpdate, synced]
-  );
+	/* On initial sync */
+	useEffect(
+		() => void (synced && handleTodosUpdate()),
+		[handleTodosUpdate, synced],
+	);
 
-  // Rerender daily
-  useEffect(
-    () => void (time && handleTodosUpdate()),
-    [handleTodosUpdate, time]
-  );
+	// Rerender daily
+	useEffect(
+		() => void (time && handleTodosUpdate()),
+		[handleTodosUpdate, time],
+	);
 
-  return null;
+	return null;
 };

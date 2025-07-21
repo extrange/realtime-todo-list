@@ -15,46 +15,46 @@ import { TooltipWithTime } from "./TooltipWithTime";
 
 /**Shows badges of users currently editing the todo item, and last modified*/
 export const HeaderContent = React.memo(() => {
-  const editingTodo = useAppStore((state) => state.editingTodo);
+	const editingTodo = useAppStore((state) => state.editingTodo);
 
-  if (!editingTodo) {
-    throw Error("editingId is undefined");
-  }
+	if (!editingTodo) {
+		throw Error("editingId is undefined");
+	}
 
-  const editingId = editingTodo.id;
-  const store = useStore();
-  const awareness = useAwareness();
-  const storedUsers = useSyncedStore(store).storedUsers;
-  const { modified, by } = useSyncedStore(editingTodo);
-  const byUser = useSyncedStore(store).storedUsers[by]?.user;
+	const editingId = editingTodo.id;
+	const store = useStore();
+	const awareness = useAwareness();
+	const storedUsers = useSyncedStore(store).storedUsers;
+	const { modified, by } = useSyncedStore(editingTodo);
+	const byUser = useSyncedStore(store).storedUsers[by]?.user;
 
-  const boxProps: BoxProps = useMemo(() => ({ p: undefined }), []);
+	const boxProps: BoxProps = useMemo(() => ({ p: undefined }), []);
 
-  return (
-    <>
-      <Flex className={classes.editingUsers}>
-        {[...getUserStatus(awareness, storedUsers).onlineUsers]
-          .filter(([, v]) => v.editingIds.has(editingId))
-          .map(([k, userData]) => (
-            <UserStatus
-              key={k}
-              online
-              userData={userData}
-              details={false}
-              boxProps={boxProps}
-            />
-          ))}
-      </Flex>
-      <TooltipWithTime date={modified}>
-        {by === USER_ID ? (
-          "You, "
-        ) : (
-          <UserBadge name={byUser?.name} color={byUser?.color} small />
-        )}
-        <ReactTimeago date={modified} formatter={reactTimeAgoFormatter} />
-      </TooltipWithTime>
-    </>
-  );
+	return (
+		<>
+			<Flex className={classes.editingUsers}>
+				{[...getUserStatus(awareness, storedUsers).onlineUsers]
+					.filter(([, v]) => v.editingIds.has(editingId))
+					.map(([k, userData]) => (
+						<UserStatus
+							key={k}
+							online
+							userData={userData}
+							details={false}
+							boxProps={boxProps}
+						/>
+					))}
+			</Flex>
+			<TooltipWithTime date={modified}>
+				{by === USER_ID ? (
+					"You, "
+				) : (
+					<UserBadge name={byUser?.name} color={byUser?.color} small />
+				)}
+				<ReactTimeago date={modified} formatter={reactTimeAgoFormatter} />
+			</TooltipWithTime>
+		</>
+	);
 });
 
 HeaderContent.displayName = "HeaderContent";

@@ -9,85 +9,85 @@ import { getMaxSortOrder } from "../util";
 import classes from "./TodoItemMenuDropdown.module.css";
 
 type InputProps = {
-  todo: Todo;
+	todo: Todo;
 };
 
 export const TodoItemMenuDropdown = React.memo(({ todo }: InputProps) => {
-  const store = useStore();
-  const state = useSyncedStore(store);
+	const store = useStore();
+	const state = useSyncedStore(store);
 
-  const moveToList = useCallback(
-    (listId?: string) => (e: SyntheticEvent) => {
-      e.stopPropagation();
-      todo.listId = listId;
-    },
-    [todo]
-  );
+	const moveToList = useCallback(
+		(listId?: string) => (e: SyntheticEvent) => {
+			e.stopPropagation();
+			todo.listId = listId;
+		},
+		[todo],
+	);
 
-  const deleteTodo = useCallback(
-    (e: SyntheticEvent) => {
-      e.stopPropagation();
-      confirm("Are you sure?") &&
-        state.todos.splice(
-          state.todos.findIndex((t) => t.id === todo.id),
-          1
-        );
-    },
-    [todo, state]
-  );
+	const deleteTodo = useCallback(
+		(e: SyntheticEvent) => {
+			e.stopPropagation();
+			confirm("Are you sure?") &&
+				state.todos.splice(
+					state.todos.findIndex((t) => t.id === todo.id),
+					1,
+				);
+		},
+		[todo, state],
+	);
 
-  const toggleFocus = useCallback(() => {
-    todo.focus = !todo.focus;
+	const toggleFocus = useCallback(() => {
+		todo.focus = !todo.focus;
 
-    /* Generate focusSortOrder if moving to focus list */
-    if (todo.focus && !todo.focusSortOrder) {
-      const maxSortOrder = getMaxSortOrder(
-        state.todos.filter((t) => t.focus && !t.completed),
-        "focusSortOrder"
-      );
-      todo.focusSortOrder = generateKeyBetween(maxSortOrder, undefined);
-    }
-  }, [state.todos, todo]);
+		/* Generate focusSortOrder if moving to focus list */
+		if (todo.focus && !todo.focusSortOrder) {
+			const maxSortOrder = getMaxSortOrder(
+				state.todos.filter((t) => t.focus && !t.completed),
+				"focusSortOrder",
+			);
+			todo.focusSortOrder = generateKeyBetween(maxSortOrder, undefined);
+		}
+	}, [state.todos, todo]);
 
-  const stopPropagation = useCallback(
-    (e: SyntheticEvent) => e.stopPropagation(),
-    []
-  );
+	const stopPropagation = useCallback(
+		(e: SyntheticEvent) => e.stopPropagation(),
+		[],
+	);
 
-  return (
-    <Menu.Dropdown onClick={stopPropagation}>
-      <Menu.Item
-        leftSection={<IconTargetArrow size={16} />}
-        onClick={toggleFocus}
-      >
-        {todo.focus ? "Remove from Focus" : "Add to Focus"}
-      </Menu.Item>
-      <Menu.Item leftSection={<IconTrash size={16} />} onClick={deleteTodo}>
-        Delete
-      </Menu.Item>
-      <Menu.Divider />
-      <ScrollArea h={250} type="auto">
-        <Menu.Item
-          onClick={moveToList(undefined)}
-          leftSection={!todo.listId && <IconCheck size={16} />}
-          fs={"italic"}
-        >
-          Uncategorized
-        </Menu.Item>
-        {state.lists.map((l) => (
-          <Menu.Item
-            key={l.id}
-            onClick={moveToList(l.id)}
-            leftSection={todo.listId === l.id && <IconCheck size={16} />}
-            maw={300}
-            className={classes.menuItem}
-          >
-            {l.name}
-          </Menu.Item>
-        ))}
-      </ScrollArea>
-    </Menu.Dropdown>
-  );
+	return (
+		<Menu.Dropdown onClick={stopPropagation}>
+			<Menu.Item
+				leftSection={<IconTargetArrow size={16} />}
+				onClick={toggleFocus}
+			>
+				{todo.focus ? "Remove from Focus" : "Add to Focus"}
+			</Menu.Item>
+			<Menu.Item leftSection={<IconTrash size={16} />} onClick={deleteTodo}>
+				Delete
+			</Menu.Item>
+			<Menu.Divider />
+			<ScrollArea h={250} type="auto">
+				<Menu.Item
+					onClick={moveToList(undefined)}
+					leftSection={!todo.listId && <IconCheck size={16} />}
+					fs={"italic"}
+				>
+					Uncategorized
+				</Menu.Item>
+				{state.lists.map((l) => (
+					<Menu.Item
+						key={l.id}
+						onClick={moveToList(l.id)}
+						leftSection={todo.listId === l.id && <IconCheck size={16} />}
+						maw={300}
+						className={classes.menuItem}
+					>
+						{l.name}
+					</Menu.Item>
+				))}
+			</ScrollArea>
+		</Menu.Dropdown>
+	);
 });
 
 TodoItemMenuDropdown.displayName = "TodoItemMenuDropdown";

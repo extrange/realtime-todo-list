@@ -1,7 +1,7 @@
 .editingUsers {
-  flex-grow: 1;
-  justify-content: flex-start;
-  min-height: calc(2 * var(--mantine-spacing-md));
-  align-items: center;
-  overflow: auto;
+	flex-grow: 1;
+	justify-content: flex-start;
+	min-height: calc(2 * var(--mantine-spacing-md));
+	align-items: center;
+	overflow: auto;
 }

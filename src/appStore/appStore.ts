@@ -4,5 +4,5 @@ import { TodoSlice, createTodoSlice } from "./todoSlice";
 type StoreState = TodoSlice;
 
 export const useAppStore = createWithEqualityFn<StoreState>()((...args) => ({
-  ...createTodoSlice(...args),
+	...createTodoSlice(...args),
 }));

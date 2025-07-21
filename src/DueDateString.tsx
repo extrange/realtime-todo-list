@@ -2,7 +2,7 @@ import { useRerenderDaily } from "./useRerenderDaily";
 import { formatDueDate } from "./util";
 
 type InputProps = {
-  dueDate: string;
+	dueDate: string;
 };
 
 /**
@@ -10,7 +10,7 @@ type InputProps = {
  * Rerenders automatically at midnight.
  */
 export const DueDateString = ({ dueDate }: InputProps) => {
-  useRerenderDaily();
+	useRerenderDaily();
 
-  return <span>{formatDueDate(Date.parse(dueDate))}</span>;
+	return <span>{formatDueDate(Date.parse(dueDate))}</span>;
 };

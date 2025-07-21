@@ -4,25 +4,25 @@ import { NetworkOverlay } from "./NetworkOverlay";
 import { useAppStore } from "./appStore/appStore";
 
 const getTodosHiddenString = (numHiddenTodos: number) => {
-  if (!numHiddenTodos) return "";
+	if (!numHiddenTodos) return "";
 
-  return `${numHiddenTodos} todo${numHiddenTodos !== 1 ? "s" : ""} hidden`;
+	return `${numHiddenTodos} todo${numHiddenTodos !== 1 ? "s" : ""} hidden`;
 };
 
 export const AppFooter = React.memo(() => {
-  // will shallow compare improve rendering time?
-  const numTodosHidden = useAppStore((state) => state.numTodosHidden);
+	// will shallow compare improve rendering time?
+	const numTodosHidden = useAppStore((state) => state.numTodosHidden);
 
-  return (
-    <AppShell.Footer>
-      <Center h="100%">
-        <Text c="dimmed" fz="sm">
-          {getTodosHiddenString(numTodosHidden)}
-        </Text>
-      </Center>
-        <NetworkOverlay />
-    </AppShell.Footer>
-  );
+	return (
+		<AppShell.Footer>
+			<Center h="100%">
+				<Text c="dimmed" fz="sm">
+					{getTodosHiddenString(numTodosHidden)}
+				</Text>
+			</Center>
+			<NetworkOverlay />
+		</AppShell.Footer>
+	);
 });
 
 AppFooter.displayName = "AppFooter";

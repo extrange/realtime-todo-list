@@ -9,7 +9,7 @@ import { WithRequired } from "./util";
  * multi-valued properties reduced.
  */
 export type OnlineUser = UserData & {
-  editingIds: Set<NonNullable<AwarenessState["editingId"]>>;
+	editingIds: Set<NonNullable<AwarenessState["editingId"]>>;
 };
 
 export type OfflineUser = UserData;
@@ -29,65 +29,65 @@ export type OfflineUser = UserData;
  * localStorage, which is then synced to storedUsers.
  *
  * For now, we reduce editingId, by converting it to an array.
- * 
+ *
  * The map key is the user's userId.
  */
 export const getUserStatus = (
-  awareness: AwarenessMap,
-  storedUsers: Partial<Store["storedUsers"]>
+	awareness: AwarenessMap,
+	storedUsers: Partial<Store["storedUsers"]>,
 ): {
-  onlineUsers: Map<string, OnlineUser>;
-  offlineUsers: Map<string, OfflineUser>;
+	onlineUsers: Map<string, OnlineUser>;
+	offlineUsers: Map<string, OfflineUser>;
 } => {
-  const onlineUsers = new Map<string, OnlineUser>();
+	const onlineUsers = new Map<string, OnlineUser>();
 
-  [...awareness.entries()]
-    // Exclude ourselves
-    .filter(([, v]) => v.userId !== USER_ID)
+	[...awareness.entries()]
+		// Exclude ourselves
+		.filter(([, v]) => v.userId !== USER_ID)
 
-    // Exclude awareness entries missing UserId (e.g. from old clients)
-    .filter(
-      (e): e is [number, WithRequired<AwarenessState, "userId">] =>
-        !!e[1].userId
-    )
+		// Exclude awareness entries missing UserId (e.g. from old clients)
+		.filter(
+			(e): e is [number, WithRequired<AwarenessState, "userId">] =>
+				!!e[1].userId,
+		)
 
-    // Exclude awareness entries where userData can't be found
-    .filter(([, v]) => !!storedUsers[v.userId])
+		// Exclude awareness entries where userData can't be found
+		.filter(([, v]) => !!storedUsers[v.userId])
 
-    .forEach(([, v]) => {
-      const userId = v.userId;
-      const onlineUser = onlineUsers.get(userId);
+		.forEach(([, v]) => {
+			const userId = v.userId;
+			const onlineUser = onlineUsers.get(userId);
 
-      if (!onlineUser) {
-        // UserId not yet seen, add it
-        const userData = storedUsers[v.userId] as UserData;
-        onlineUsers.set(userId, {
-          editingIds: new Set(v.editingId ? [v.editingId] : undefined),
-          user: userData.user,
-          lastActive: userData.lastActive,
-        });
-      } else {
-        // UserId exists. Reduce properties here
+			if (!onlineUser) {
+				// UserId not yet seen, add it
+				const userData = storedUsers[v.userId] as UserData;
+				onlineUsers.set(userId, {
+					editingIds: new Set(v.editingId ? [v.editingId] : undefined),
+					user: userData.user,
+					lastActive: userData.lastActive,
+				});
+			} else {
+				// UserId exists. Reduce properties here
 
-        // editingId: Add only if present
-        v.editingId && onlineUser.editingIds.add(v.editingId);
-      }
-    });
+				// editingId: Add only if present
+				v.editingId && onlineUser.editingIds.add(v.editingId);
+			}
+		});
 
-  /* Note: if a user has both offline and online states, the online state
+	/* Note: if a user has both offline and online states, the online state
   will be selected preferentially. */
-  const offlineUsers = new Map(
-    Object.entries(storedUsers)
+	const offlineUsers = new Map(
+		Object.entries(storedUsers)
 
-      // Filter ourselves
-      .filter(([k]) => k !== USER_ID)
+			// Filter ourselves
+			.filter(([k]) => k !== USER_ID)
 
-      // Filter empty storedUsers
-      .filter((e): e is [string, UserData] => !!e[1])
+			// Filter empty storedUsers
+			.filter((e): e is [string, UserData] => !!e[1])
 
-      // Filter out online users
-      .filter(([k]) => !onlineUsers.has(k))
-  );
+			// Filter out online users
+			.filter(([k]) => !onlineUsers.has(k)),
+	);
 
-  return { onlineUsers, offlineUsers };
+	return { onlineUsers, offlineUsers };
 };
