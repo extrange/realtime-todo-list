@@ -8,8 +8,8 @@ import {
 } from "@mantine/core";
 import { IconPencil } from "@tabler/icons-react";
 import React, { useState } from "react";
-import { UserBadge } from "./UserBadge";
 import { colors } from "./constants";
+import { UserBadge } from "./UserBadge";
 import { useUserData } from "./useUserData";
 
 /** */

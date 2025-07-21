@@ -1,8 +1,8 @@
 import { USER_ID } from "./constants";
-import { AwarenessMap, AwarenessState } from "./useAwareness";
-import { Store } from "./types/Store";
-import { UserData } from "./types/UserData";
-import { WithRequired } from "./util";
+import type { Store } from "./types/Store";
+import type { UserData } from "./types/UserData";
+import type { AwarenessMap, AwarenessState } from "./useAwareness";
+import type { WithRequired } from "./util";
 
 /**
  * Represents the state of the current user, with certain (possibly)

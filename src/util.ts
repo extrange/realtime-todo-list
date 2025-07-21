@@ -4,8 +4,8 @@ import { generateKeyBetween } from "fractional-indexing";
 import sanitizeHtml from "sanitize-html";
 import { v4 as uuidv4 } from "uuid";
 import { colors } from "./constants";
-import { Todo } from "./types/Todo";
-import { User } from "./types/User";
+import type { Todo } from "./types/Todo";
+import type { User } from "./types/User";
 
 type Sortable = {
 	[T in keyof Pick<Todo, "focusSortOrder" | "sortOrder">]: string;
@@ -22,13 +22,13 @@ export const generateKeys = (todoOrListArray: Array<Partial<Sortable>>) =>
 
 		try {
 			// First item, without key
-			if (idx == 0) {
+			if (idx === 0) {
 				item.sortOrder = generateKeyBetween(null, arr[idx + 1]?.sortOrder);
 				return;
 			}
 
 			// Last item, without key
-			if (idx == todoOrListArray.length) {
+			if (idx === todoOrListArray.length) {
 				item.sortOrder = generateKeyBetween(arr[idx - 1]?.sortOrder, null);
 				return;
 			}
@@ -110,7 +110,7 @@ export const getMaxSortOrder = <T extends keyof Sortable>(
 	arr: Array<Sortable>,
 	sortKey: T,
 ) => {
-	let max: string | undefined = undefined;
+	let max: string | undefined;
 
 	arr
 		.filter((t) => t[sortKey])
@@ -151,7 +151,7 @@ export const formatBytes = (bytes: number, decimals = 2) => {
 
 	const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-	return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+	return `${parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
 };
 
 /**Identity function for memoization. */

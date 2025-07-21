@@ -1,12 +1,12 @@
 import { Y } from "@syncedstore/core";
+import type { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import { generateNKeysBetween } from "fractional-indexing";
 import { v4 as uuidv4 } from "uuid";
 import { USER_ID } from "../constants";
-import { Store } from "../types/Store";
-import { Todo } from "../types/Todo";
+import type { Store } from "../types/Store";
+import type { Todo } from "../types/Todo";
 import { getMaxSortOrder } from "../util";
-import { UploadedTodoArray } from "./Import";
-import { MappedTypeDescription } from "@syncedstore/core/types/doc";
+import type { UploadedTodoArray } from "./Import";
 
 export const addUploadedTodos = (
 	todos: UploadedTodoArray,

@@ -1,7 +1,7 @@
 import { Avatar, darken, lighten } from "@mantine/core";
 import { useSyncedStore } from "@syncedstore/react";
 import React from "react";
-import { Todo } from "../types/Todo";
+import type { Todo } from "../types/Todo";
 import { useStore } from "../useStore";
 
 type InputProps = {

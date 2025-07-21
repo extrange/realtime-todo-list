@@ -1,4 +1,4 @@
-import { SetStateAction, createContext } from "react";
+import { createContext, type SetStateAction } from "react";
 
 export type IRoomContext = {
 	roomId?: string;

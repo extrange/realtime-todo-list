@@ -1,9 +1,9 @@
 import { Button, Text } from "@mantine/core";
-import { Y, getYjsValue } from "@syncedstore/core";
+import { getYjsValue, type Y } from "@syncedstore/core";
 import { debounce } from "lodash-es";
 import React, { useCallback, useEffect, useState } from "react";
 import { USER_ID } from "./constants";
-import { Todo } from "./types/Todo";
+import type { Todo } from "./types/Todo";
 import { useStore } from "./useStore";
 
 type CustomEventMap = {

@@ -4,9 +4,10 @@ import { useSyncedStore } from "@syncedstore/react";
 import { generateKeyBetween } from "fractional-indexing";
 import { useCallback, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useAppStore } from "./appStore/appStore";
 import { ListType } from "./ListContext";
 import { ListItem } from "./ListItem";
-import { useAppStore } from "./appStore/appStore";
+import type { Todo } from "./types/Todo";
 import { useCurrentList } from "./useCurrentList";
 import { useStore } from "./useStore";
 import { selectLists, selectTodos } from "./useSyncedStore";
@@ -92,11 +93,12 @@ export const ListView = ({ closeNav }: InputProps) => {
 			/* First delete all the tasks in the list */
 			const storeTodos = selectTodos(store);
 			storeTodos
-				.filter((t) => t.listId === listId)
-				.forEach((t) =>
-					storeTodos.splice(store.todos.findIndex((t2) => t2.id === t.id)),
-				),
-				1;
+				.filter((t: Todo) => t.listId === listId)
+				.forEach((t: Todo) =>
+					storeTodos.splice(
+						store.todos.findIndex((t2: Todo) => t2.id === t.id),
+					),
+				);
 
 			/* Then delete the list */
 			const storeLists = selectLists(store);
@@ -113,7 +115,9 @@ export const ListView = ({ closeNav }: InputProps) => {
 			const name = prompt("Enter a new name:");
 			if (!name) return;
 			const list = store.lists.find((l) => l.id === listId);
-			list && (list.name = name);
+			if (list) {
+				list.name = name;
+			}
 			document.dispatchEvent(new Event("currentListNameChange"));
 		},
 		[store],

@@ -1,16 +1,16 @@
 import { getYjsValue, observeDeep } from "@syncedstore/core";
 import { differenceInCalendarDays } from "date-fns";
 import { useCallback, useEffect, useMemo } from "react";
-import { YMapEvent, YXmlEvent } from "yjs";
-import { YArray, YMap } from "yjs/dist/src/internals";
+import type { YMapEvent, YXmlEvent } from "yjs";
+import type { YArray, YMap } from "yjs/dist/src/internals";
 import { shallow } from "zustand/shallow";
 import { useAppStore } from "../appStore/appStore";
-import { TodosMap } from "../appStore/todoSlice";
+import type { TodosMap } from "../appStore/todoSlice";
+import type { Todo } from "../types/Todo";
 import { useProviderEvent } from "../useProviderEvent";
 import { useRerenderDaily } from "../useRerenderDaily";
 import { useStore } from "../useStore";
-import { Todo } from "../types/Todo";
-import { WithRequired } from "../util";
+import type { WithRequired } from "../util";
 import { eventHaskeys } from "./filterEvent";
 
 /**

@@ -62,15 +62,8 @@
 	font-size: 85%;
 	color: rgb(173, 186, 199);
 	font-family:
-		JetBrains Mono,
-		ui-monospace,
-		SFMono-Regular,
-		Menlo,
-		Monaco,
-		Consolas,
-		Liberation Mono,
-		Courier New,
-		monospace;
+		"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+		"Liberation Mono", "Courier New", monospace;
 }
 
 .ProseMirror pre {
@@ -205,7 +198,6 @@
 }
 
 .resize-cursor {
-	cursor: ew-resize;
 	cursor: col-resize;
 }
 

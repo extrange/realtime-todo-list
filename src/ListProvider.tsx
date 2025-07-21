@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from "react";
-import { IListContext, ListContext } from "./ListContext";
+import type React from "react";
+import { useMemo, useState } from "react";
+import { type IListContext, ListContext } from "./ListContext";
 
 export const ListProvider = ({ children }: React.PropsWithChildren) => {
 	// Default to 'Focus'

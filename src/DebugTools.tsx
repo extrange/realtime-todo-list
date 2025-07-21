@@ -1,23 +1,23 @@
 import { faker } from "@faker-js/faker";
-import { HocuspocusProvider } from "@hocuspocus/provider";
+import type { HocuspocusProvider } from "@hocuspocus/provider";
 import { Button } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { Y, getYjsDoc } from "@syncedstore/core";
-import { MappedTypeDescription } from "@syncedstore/core/types/doc";
+import { getYjsDoc, Y } from "@syncedstore/core";
+import type { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import { useSyncedStore } from "@syncedstore/react";
 import { formatISO } from "date-fns";
 import { generateKeyBetween, generateNKeysBetween } from "fractional-indexing";
-import { Suspense, lazy, useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import { v4 as uuidv4 } from "uuid";
-import { Doc } from "yjs";
-import { DebugArmedButton } from "./DebugArmedButton";
+import type { Doc } from "yjs";
 import { CURRENT_ROOM_LOCALSTORAGE_KEY, USER_ID } from "./constants";
+import { DebugArmedButton } from "./DebugArmedButton";
+import type { Store } from "./types/Store";
 import { useCurrentList } from "./useCurrentList";
 import { useProvider } from "./useProvider";
 import { useStore } from "./useStore";
-import { Store } from "./types/Store";
 import { getMaxSortOrder, getRandomInt } from "./util";
 
 declare global {
@@ -250,7 +250,9 @@ export default function DebugTools() {
 		currentList &&
 			store.todos
 				.filter((t) => t.listId === currentList)
-				.forEach((t) => (t.completed = true));
+				.forEach((t) => {
+					t.completed = true;
+				});
 	};
 
 	const enableDevTools = () => setDevToolsEnabled(true);
@@ -258,8 +260,7 @@ export default function DebugTools() {
 	const debugLayout = () =>
 		document.querySelectorAll<HTMLElement>("*").forEach((a) => {
 			// https://www.smashingmagazine.com/2021/04/css-overflow-issues/
-			a.style.outline =
-				"1px solid #" + (~~(Math.random() * (1 << 24))).toString(16);
+			a.style.outline = `1px solid #${(~~(Math.random() * (1 << 24))).toString(16)}`;
 		});
 
 	const benchmarkForEach = () => {

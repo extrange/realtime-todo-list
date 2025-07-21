@@ -1,8 +1,8 @@
+import { useRegisterSW } from "virtual:pwa-register/react";
 import { Button } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IconReload } from "@tabler/icons-react";
-import { FC, useEffect } from "react";
-import { useRegisterSW } from "virtual:pwa-register/react";
+import { type FC, useEffect } from "react";
 
 const UPDATE_INTERVAL = 1 * 60 * 1000; //10s
 

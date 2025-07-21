@@ -1,6 +1,7 @@
 import { ActionIcon, Button, JsonInput, Modal, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import React, { useCallback, useRef } from "react";
+import type React from "react";
+import { useCallback, useRef } from "react";
 import { LuImport } from "react-icons/lu";
 import { z } from "zod";
 import { useCurrentList } from "../useCurrentList";
@@ -41,10 +42,10 @@ export const Import = ({ closeNav }: InputProps) => {
 
 		const jsonParse = z
 			.string()
-			.transform((content) => {
+			.transform((content: string) => {
 				try {
 					JSON.parse(content);
-				} catch (e) {
+				} catch {
 					return z.NEVER;
 				}
 				return JSON.parse(content);
@@ -65,9 +66,11 @@ export const Import = ({ closeNav }: InputProps) => {
 			const fileList = e.target.files;
 			if (!fileList?.length) return;
 
-			fileList[0]
-				.text()
-				.then((t) => jsonRef.current && (jsonRef.current.value = t));
+			fileList[0].text().then((t) => {
+				if (jsonRef.current) {
+					jsonRef.current.value = t;
+				}
+			});
 		},
 		[],
 	);

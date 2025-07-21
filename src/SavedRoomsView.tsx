@@ -1,12 +1,13 @@
 import { Button, Group } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
 import { IconX } from "@tabler/icons-react";
-import React, { useCallback } from "react";
-import { SavedRooms } from "./Login";
+import type React from "react";
+import { useCallback } from "react";
 import {
 	CURRENT_ROOM_LOCALSTORAGE_KEY,
 	SAVED_ROOMS_LOCALSTORAGE_KEY,
 } from "./constants";
+import type { SavedRooms } from "./Login";
 
 type InputProps = {
 	/**Optional callback on room selection */

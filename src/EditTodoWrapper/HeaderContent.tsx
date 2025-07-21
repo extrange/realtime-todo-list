@@ -1,12 +1,12 @@
-import { BoxProps, Flex } from "@mantine/core";
+import { type BoxProps, Flex } from "@mantine/core";
 import { useSyncedStore } from "@syncedstore/react";
 import React, { useMemo } from "react";
 import ReactTimeago from "react-timeago";
-import { UserBadge } from "../UserBadge";
-import { UserStatus } from "../UserStatus";
 import { useAppStore } from "../appStore/appStore";
 import { USER_ID } from "../constants";
 import { getUserStatus } from "../getUserStatus";
+import { UserBadge } from "../UserBadge";
+import { UserStatus } from "../UserStatus";
 import { useAwareness } from "../useAwareness";
 import { useStore } from "../useStore";
 import { reactTimeAgoFormatter } from "../util";

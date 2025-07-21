@@ -1,10 +1,10 @@
 import { useLocalStorage } from "@mantine/hooks";
 import { useEffect, useMemo } from "react";
-import { SavedRooms } from "./Login";
 import {
 	CURRENT_ROOM_LOCALSTORAGE_KEY,
 	SAVED_ROOMS_LOCALSTORAGE_KEY,
 } from "./constants";
+import type { SavedRooms } from "./Login";
 import { useIsConnected } from "./useIsConnected";
 import { useStore } from "./useStore";
 import { selectMeta, useSyncedStoreCustomImpl } from "./useSyncedStore";

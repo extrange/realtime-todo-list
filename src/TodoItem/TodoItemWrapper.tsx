@@ -3,7 +3,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Flex } from "@mantine/core";
 import clsx from "clsx";
 import React, { useMemo } from "react";
-import { Todo } from "../types/Todo";
+import type { Todo } from "../types/Todo";
 import { TodoItem } from "./TodoItem";
 import classes from "./TodoItemWrapper.module.css";
 

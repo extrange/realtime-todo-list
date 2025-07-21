@@ -1,9 +1,10 @@
 /* Prompt user the room to join, or load from localStorage if present. */
 
 import { useLocalStorage } from "@mantine/hooks";
-import React, { useEffect, useMemo, useState } from "react";
-import { RoomContext } from "./RoomContext";
+import type React from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CURRENT_ROOM_LOCALSTORAGE_KEY } from "./constants";
+import { RoomContext } from "./RoomContext";
 
 /**Reacts to changes in the stored current room in localStorage.
  *
@@ -20,10 +21,7 @@ export const RoomProvider = ({ children }: React.PropsWithChildren) => {
 		setRoomId(currentRoomId);
 	}, [currentRoomId]);
 
-	const providerValue = useMemo(
-		() => ({ roomId, setRoomId }),
-		[roomId, setRoomId],
-	);
+	const providerValue = useMemo(() => ({ roomId, setRoomId }), [roomId]);
 
 	return (
 		<RoomContext.Provider value={providerValue}>

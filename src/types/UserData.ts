@@ -1,4 +1,4 @@
-import { User } from "./User";
+import type { User } from "./User";
 
 /**
  * The master copy is stored in localStorage, and changes

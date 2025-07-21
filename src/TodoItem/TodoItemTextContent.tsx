@@ -1,7 +1,7 @@
 import { Text, useMantineTheme } from "@mantine/core";
 import { observeDeep } from "@syncedstore/core";
 import React, { useCallback, useEffect, useState } from "react";
-import { Todo } from "../types/Todo";
+import type { Todo } from "../types/Todo";
 import { getNotes, getTodoTitle } from "../util";
 import classes from "./TodoItemTextContent.module.css";
 

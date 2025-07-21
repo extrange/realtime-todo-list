@@ -1,11 +1,11 @@
 import {
+	closestCenter,
 	DndContext,
-	DragEndEvent,
+	type DragEndEvent,
 	DragOverlay,
-	DragStartEvent,
+	type DragStartEvent,
 	MouseSensor,
 	TouchSensor,
-	closestCenter,
 	useSensor,
 	useSensors,
 } from "@dnd-kit/core";
@@ -13,7 +13,7 @@ import {
 	SortableContext,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { ActionIcon, Affix, Center, Text, rem } from "@mantine/core";
+import { ActionIcon, Affix, Center, rem, Text } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
 import React, {
@@ -25,15 +25,15 @@ import React, {
 } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { XmlFragment } from "yjs";
+import { useAppStore } from "../appStore/appStore";
+import { useSettingsStore } from "../appStore/settingsStore";
+import type { TodoSlice } from "../appStore/todoSlice";
+import { USER_ID } from "../constants";
 import { ListType } from "../ListContext";
 import { filterTodosBasedOnSettings } from "../Settings/util";
 import { TodoItem } from "../TodoItem/TodoItem";
 import { TodoItemWrapper } from "../TodoItem/TodoItemWrapper";
-import { useAppStore } from "../appStore/appStore";
-import { useSettingsStore } from "../appStore/settingsStore";
-import { TodoSlice } from "../appStore/todoSlice";
-import { USER_ID } from "../constants";
-import { Todo } from "../types/Todo";
+import type { Todo } from "../types/Todo";
 import { useCurrentList } from "../useCurrentList";
 import { useStore } from "../useStore";
 import {
@@ -280,16 +280,14 @@ export const TodoView = React.memo(() => {
 
 			{/* Show due/upcoming todos only in Focus/Due */}
 			{currentList === "focus" && (
-				<>
-					<Profiler
-						id={"TodoViewDueUpcoming"}
-						onRender={(id, phase, duration) =>
-							duration > 5 && console.info(id, phase, duration)
-						}
-					>
-						<TodoViewDueUpcoming />
-					</Profiler>
-				</>
+				<Profiler
+					id={"TodoViewDueUpcoming"}
+					onRender={(id, phase, duration) =>
+						duration > 5 && console.info(id, phase, duration)
+					}
+				>
+					<TodoViewDueUpcoming />
+				</Profiler>
 			)}
 
 			{/* Don't show completed todos in Focus */}

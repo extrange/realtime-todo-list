@@ -1,6 +1,6 @@
-import { StateCreator } from "zustand";
-import { Todo } from "../types/Todo";
-import { WithRequired } from "../util";
+import type { StateCreator } from "zustand";
+import type { Todo } from "../types/Todo";
+import type { WithRequired } from "../util";
 
 export type TodosMap = Map<
 	string | undefined,

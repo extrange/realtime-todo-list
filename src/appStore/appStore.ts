@@ -1,5 +1,5 @@
 import { createWithEqualityFn } from "zustand/traditional";
-import { TodoSlice, createTodoSlice } from "./todoSlice";
+import { createTodoSlice, type TodoSlice } from "./todoSlice";
 
 type StoreState = TodoSlice;
 

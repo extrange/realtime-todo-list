@@ -2,10 +2,10 @@ import { Accordion, useMantineTheme } from "@mantine/core";
 import { IconCalendarDue, IconSparkles } from "@tabler/icons-react";
 import { compareAsc, differenceInCalendarDays } from "date-fns";
 import React, { useMemo } from "react";
-import { Counter } from "../Counter";
-import { TodoItem } from "../TodoItem/TodoItem";
 import { useAppStore } from "../appStore/appStore";
 import { useSettingsStore } from "../appStore/settingsStore";
+import { Counter } from "../Counter";
+import { TodoItem } from "../TodoItem/TodoItem";
 
 /**Due/overdue and upcoming todos, unsortable. */
 export const TodoViewDueUpcoming = React.memo(() => {

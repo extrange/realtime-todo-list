@@ -1,15 +1,16 @@
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { notifications } from "@mantine/notifications";
 import syncedStore from "@syncedstore/core";
-import { MappedTypeDescription } from "@syncedstore/core/types/doc";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import type { MappedTypeDescription } from "@syncedstore/core/types/doc";
+import type React from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { IndexeddbPersistence } from "y-indexeddb";
 import * as Y from "yjs";
+import { FORCE_SYNC_INTERVAL, USER_ID } from "./constants";
 import { ProviderContext } from "./ProviderContext";
 import { RoomContext } from "./RoomContext";
 import { StoreContext } from "./StoreContext";
-import { FORCE_SYNC_INTERVAL, USER_ID } from "./constants";
-import { Store } from "./types/Store";
+import type { Store } from "./types/Store";
 
 /**
  * Supplies contexts for Hocuspocus Provider and SyncedStore. Also updates
@@ -60,7 +61,7 @@ export const StoreProvider = ({ children }: React.PropsWithChildren) => {
 		// Check if IndexedDB is supported, then sync
 		let indexeddbPersistence: IndexeddbPersistence | undefined;
 		new Promise<IDBDatabase>((resolve) => {
-			const request = indexedDB.open("test-" + Math.random());
+			const request = indexedDB.open(`test-${Math.random()}`);
 			request.onsuccess = () => resolve(request.result);
 			request.onerror = () => resolve(request.result);
 		}).then((result) => {

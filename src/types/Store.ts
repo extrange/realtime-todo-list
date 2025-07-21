@@ -1,6 +1,6 @@
-import { Todo } from "./Todo";
-import { List } from "./List";
-import { UserData } from "./UserData";
+import type { List } from "./List";
+import type { Todo } from "./Todo";
+import type { UserData } from "./UserData";
 
 export type Store = {
 	todos: Todo[];

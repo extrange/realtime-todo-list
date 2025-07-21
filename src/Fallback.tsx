@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { IconAlertCircle, IconAlertTriangle } from "@tabler/icons-react";
 import { lazy, useState } from "react";
-import { FallbackProps } from "react-error-boundary";
+import type { FallbackProps } from "react-error-boundary";
 import classes from "./Fallback.module.css";
 
 type InputProps = {

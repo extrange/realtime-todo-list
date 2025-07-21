@@ -11,7 +11,13 @@ import {
 } from "@mantine/core";
 import { useLocalStorage, useMediaQuery } from "@mantine/hooks";
 import { IconLogout } from "@tabler/icons-react";
-import React, { CSSProperties, Profiler, useCallback, useState } from "react";
+import React, {
+	type CSSProperties,
+	Profiler,
+	useCallback,
+	useState,
+} from "react";
+import { CURRENT_ROOM_LOCALSTORAGE_KEY } from "./constants";
 import { EditRoom } from "./EditRoom";
 import { EditUser } from "./EditUser";
 import { Import } from "./Import/Import";
@@ -19,7 +25,6 @@ import { ListView } from "./ListView";
 import { MarkAllRead } from "./MarkAllRead";
 import { SavedRoomsView } from "./SavedRoomsView";
 import { Settings } from "./Settings/Settings";
-import { CURRENT_ROOM_LOCALSTORAGE_KEY } from "./constants";
 import "./editor.css";
 
 type InputProps = {

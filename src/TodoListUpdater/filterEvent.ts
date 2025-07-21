@@ -1,5 +1,5 @@
-import { YMapEvent, YXmlEvent } from "yjs";
-import { Todo } from "../types/Todo";
+import type { YMapEvent, YXmlEvent } from "yjs";
+import type { Todo } from "../types/Todo";
 
 /**
  * Returns true if event has specified keys/is a todo addition/deletion.

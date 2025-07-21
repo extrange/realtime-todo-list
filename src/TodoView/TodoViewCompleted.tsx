@@ -1,10 +1,10 @@
 import { Accordion } from "@mantine/core";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { TodoItem } from "../TodoItem/TodoItem";
 import { useAppStore } from "../appStore/appStore";
-import { TodoSlice } from "../appStore/todoSlice";
+import type { TodoSlice } from "../appStore/todoSlice";
+import { TodoItem } from "../TodoItem/TodoItem";
+import type { Todo } from "../types/Todo";
 import { useCurrentList } from "../useCurrentList";
-import { Todo } from "../types/Todo";
 
 /**Accordion of completed todos, unsortable */
 export const TodoViewCompleted = React.memo(() => {
@@ -24,7 +24,9 @@ export const TodoViewCompleted = React.memo(() => {
 	);
 
 	// Default to close when changing lists
-	useEffect(() => setOpen(null), [currentList]);
+	useEffect(() => {
+		if (currentList) setOpen(null);
+	}, [currentList]);
 
 	return (
 		// Accordion is cheap (~3ms)

@@ -1,7 +1,7 @@
-import { Text, TextProps } from "@mantine/core";
+import { Text, type TextProps } from "@mantine/core";
+import clsx from "clsx";
 import React from "react";
 import classes from "./Counter.module.css";
-import clsx from "clsx";
 
 type InputProps = {
 	count: number;

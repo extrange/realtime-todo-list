@@ -1,6 +1,7 @@
 import { Button, Modal, TextInput } from "@mantine/core";
 import { IconPencil } from "@tabler/icons-react";
-import React, { useCallback, useState } from "react";
+import type React from "react";
+import { useCallback, useState } from "react";
 import { useStore } from "./useStore";
 import { selectMeta, useSyncedStoreCustomImpl } from "./useSyncedStore";
 
@@ -19,7 +20,7 @@ export const EditRoom = () => {
 	/* Only allow closing if a roomName was set*/
 	const onClose = useCallback(() => {
 		store.meta.roomName && setOpen(false);
-	}, [setOpen, store]);
+	}, [store]);
 
 	return (
 		<>

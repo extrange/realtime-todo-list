@@ -3,8 +3,8 @@ import { DatePickerInput, type DateValue } from "@mantine/dates";
 import { useSyncedStore } from "@syncedstore/react";
 import { formatISO, isToday } from "date-fns";
 import React, { useCallback, useMemo } from "react";
-import classes from "./EditDueDate.module.css";
 import { useAppStore } from "./appStore/appStore";
+import classes from "./EditDueDate.module.css";
 
 /**Flexbox containing inputs for editing the due date and p */
 export const EditDueDate = React.memo(() => {
@@ -22,19 +22,25 @@ export const EditDueDate = React.memo(() => {
 	);
 
 	const onDueDateChange = useCallback(
-		(newVal: DateValue) =>
-			newVal
-				? (editingTodo.dueDate = formatISO(newVal, { representation: "date" }))
-				: (editingTodo.dueDate = undefined),
+		(newVal: DateValue) => {
+			if (newVal) {
+				editingTodo.dueDate = formatISO(newVal, { representation: "date" });
+			} else {
+				editingTodo.dueDate = undefined;
+			}
+		},
 		[editingTodo],
 	);
 
 	const onRepeatDaysChange = useCallback(
-		(newVal: number | string) =>
-			newVal
-				? (editingTodo.repeatDays =
-						typeof newVal === "string" ? parseInt(newVal) : newVal)
-				: (editingTodo.repeatDays = undefined), // empty string is falsy
+		(newVal: number | string) => {
+			if (newVal) {
+				editingTodo.repeatDays =
+					typeof newVal === "string" ? parseInt(newVal) : newVal;
+			} else {
+				editingTodo.repeatDays = undefined; // empty string is falsy
+			}
+		},
 		[editingTodo],
 	);
 

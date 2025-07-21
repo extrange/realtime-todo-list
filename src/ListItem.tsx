@@ -13,7 +13,7 @@ import clsx from "clsx";
 import React, { useCallback, useMemo, useState, useTransition } from "react";
 import { Counter } from "./Counter";
 import classes from "./ListItem.module.css";
-import { List } from "./types/List";
+import type { List } from "./types/List";
 
 type CommonProps = {
 	selected?: boolean;

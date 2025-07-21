@@ -7,13 +7,13 @@ import React, {
 	useLayoutEffect,
 	useState,
 } from "react";
-import {
+import type {
 	YMap,
 	YXmlElement,
 	YXmlFragment,
 	YXmlText,
 } from "yjs/dist/src/internals";
-import { Todo } from "../types/Todo";
+import type { Todo } from "../types/Todo";
 
 type InputProps = {
 	todo: Todo;

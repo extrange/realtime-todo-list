@@ -1,7 +1,7 @@
 import {
-	BadgeProps,
+	type BadgeProps,
 	Box,
-	BoxProps,
+	type BoxProps,
 	Flex,
 	Indicator,
 	Text,
@@ -9,9 +9,9 @@ import {
 import { IconPencil } from "@tabler/icons-react";
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
+import type { OfflineUser, OnlineUser } from "./getUserStatus";
 import { UserBadge } from "./UserBadge";
 import classes from "./UserStatus.module.css";
-import { OfflineUser, OnlineUser } from "./getUserStatus";
 import { useStore } from "./useStore";
 import { getTodoTitle } from "./util";
 

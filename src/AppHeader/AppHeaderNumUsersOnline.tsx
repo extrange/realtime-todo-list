@@ -1,7 +1,7 @@
 import { ActionIcon, Indicator, useMantineTheme } from "@mantine/core";
 import { useSyncedStore } from "@syncedstore/react";
 import { IconUsers } from "@tabler/icons-react";
-import React, { SetStateAction, useCallback, useMemo } from "react";
+import React, { type SetStateAction, useCallback, useMemo } from "react";
 import { getUserStatus } from "../getUserStatus";
 import { useAwareness } from "../useAwareness";
 import { useStore } from "../useStore";

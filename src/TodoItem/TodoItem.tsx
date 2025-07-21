@@ -28,24 +28,24 @@ import {
 	isValid,
 } from "date-fns";
 import React, {
-	SyntheticEvent,
+	type SyntheticEvent,
 	useCallback,
 	useEffect,
 	useMemo,
 	useState,
 } from "react";
-import { YMap, YMapEvent } from "yjs/dist/src/internals";
-import { DueDateString } from "../DueDateString";
+import type { YMap, YMapEvent } from "yjs/dist/src/internals";
 import { useAppStore } from "../appStore/appStore";
 import { USER_ID } from "../constants";
-import { Todo } from "../types/Todo";
+import { DueDateString } from "../DueDateString";
+import type { Todo } from "../types/Todo";
 import { getTodoTitle } from "../util";
 import classes from "./TodoItem.module.css";
 import { TodoItemAvatar } from "./TodoItemAvatar";
 import { TodoItemMenuDropdown } from "./TodoItemMenuDropdown";
 import { TodoItemSubtaskCount } from "./TodoItemSubtaskCount";
 import { TodoItemTextContent } from "./TodoItemTextContent";
-import { TodoItemProps } from "./TodoItemWrapper";
+import type { TodoItemProps } from "./TodoItemWrapper";
 
 const getLastOpened = (todo: Todo) => {
 	const lastOpenedStr = localStorage.getItem(todo.id);
@@ -139,14 +139,18 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
 
 			// Uncompleting a todo
 			if (todo.completed) {
-				undoActions.push(() => (todo.completed = true));
+				undoActions.push(() => {
+					todo.completed = true;
+				});
 				todo.completed = false;
 			} else {
 				// Completing a todo
 				if (todo.focus) {
 					// Focus todo: also remove Focus
 					todo.focus = false;
-					undoActions.push(() => (todo.focus = true));
+					undoActions.push(() => {
+						todo.focus = true;
+					});
 				}
 
 				/* Repeating todo:
@@ -158,12 +162,16 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
 					});
 
 					// To undo, we reset the due date
-					undoActions.push(() => (todo.dueDate = originalDueDate));
+					undoActions.push(() => {
+						todo.dueDate = originalDueDate;
+					});
 				} else {
 					// Non-repeating todo
 					todo.completed = true;
 
-					undoActions.push(() => (todo.completed = false));
+					undoActions.push(() => {
+						todo.completed = false;
+					});
 				}
 			}
 

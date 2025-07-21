@@ -1,6 +1,6 @@
-import { Button, ButtonProps, Flex, Switch } from "@mantine/core";
-import { PolymorphicComponentProps } from "@mantine/core/lib/core/factory/create-polymorphic-component";
-import { SyntheticEvent, useCallback, useState } from "react";
+import { Button, type ButtonProps, Flex, Switch } from "@mantine/core";
+import type { PolymorphicComponentProps } from "@mantine/core/lib/core/factory/create-polymorphic-component";
+import { type SyntheticEvent, useCallback, useState } from "react";
 
 /**Button which requires toggling a switch before it becomes active.
  *

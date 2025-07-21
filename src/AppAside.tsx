@@ -1,7 +1,11 @@
-import { ScrollArea, Transition, useMantineTheme } from "@mantine/core";
-import { AppShell } from "@mantine/core";
+import {
+	AppShell,
+	ScrollArea,
+	Transition,
+	useMantineTheme,
+} from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import React, { CSSProperties, useCallback } from "react";
+import React, { type CSSProperties, useCallback } from "react";
 import { OnlineUsers } from "./OnlineUsers";
 
 type InputProps = {

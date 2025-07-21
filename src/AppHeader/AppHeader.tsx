@@ -23,15 +23,15 @@ import {
 	IconCopy,
 	IconInfoCircle,
 } from "@tabler/icons-react";
-import React, { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import React, { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import TimeAgo from "react-timeago";
-import { ListType } from "../ListContext";
 import {
 	COMMIT_HASH,
 	COMMIT_MSG,
 	CURRENT_ROOM_LOCALSTORAGE_KEY,
 	RELEASE_DATE,
 } from "../constants";
+import { ListType } from "../ListContext";
 import { useCurrentList } from "../useCurrentList";
 import { useStore } from "../useStore";
 import { formatBytes } from "../util";
@@ -99,9 +99,9 @@ export const AppHeader = React.memo(
 								<td>
 									<Flex align={"center"}>
 										<Code block className={classes.code}>
-											{window.location + "#" + roomId}
+											{`${window.location}#${roomId}`}
 										</Code>
-										<CopyButton value={window.location + "#" + roomId}>
+										<CopyButton value={`${window.location}#${roomId}`}>
 											{({ copied, copy }) => (
 												<ActionIcon variant="subtle" onClick={copy} mx={10}>
 													{copied ? <IconCheck /> : <IconCopy />}

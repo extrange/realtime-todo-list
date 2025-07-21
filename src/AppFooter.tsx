@@ -1,7 +1,7 @@
 import { AppShell, Center, Text } from "@mantine/core";
 import React from "react";
-import { NetworkOverlay } from "./NetworkOverlay";
 import { useAppStore } from "./appStore/appStore";
+import { NetworkOverlay } from "./NetworkOverlay";
 
 const getTodosHiddenString = (numHiddenTodos: number) => {
 	if (!numHiddenTodos) return "";

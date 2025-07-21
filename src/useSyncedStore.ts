@@ -1,12 +1,12 @@
 import { getYjsValue, observeDeep } from "@syncedstore/core";
-import { MappedTypeDescription } from "@syncedstore/core/types/doc";
+import type { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import { debounce } from "lodash-es";
 import { useCallback, useEffect, useState } from "react";
-import { DeepReadonly } from "ts-essentials";
+import type { DeepReadonly } from "ts-essentials";
 import * as Y from "yjs";
-import { useStore } from "./useStore";
 import { DEVELOPMENT } from "./constants";
-import { Store } from "./types/Store";
+import type { Store } from "./types/Store";
+import { useStore } from "./useStore";
 
 /**
  * Reactively subscribe to changes in a slice of the store.

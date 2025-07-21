@@ -1,11 +1,11 @@
 import { Accordion } from "@mantine/core";
 import { useSyncedStore } from "@syncedstore/react";
 import React, { useMemo, useState } from "react";
-import { UserStatus } from "./UserStatus";
 import { getUserStatus } from "./getUserStatus";
+import type { UserData } from "./types/UserData";
+import { UserStatus } from "./UserStatus";
 import { useAwareness } from "./useAwareness";
 import { useStore } from "./useStore";
-import { UserData } from "./types/UserData";
 
 const sortUsers = <T extends UserData>(users: Map<string, T>) =>
 	[...users].sort(
