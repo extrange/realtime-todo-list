@@ -166,7 +166,7 @@ export const validateUuid = (uuid: string) =>
 /**Get the title of the todo*/
 export const getTodoTitle = (todo: Todo) => {
 	/*The XmlFragment can be viewed as an array.
-    
+
     The title is the 0th element, and any notes are from index 1 onward.
 
     The `toJSON` representation of the XmlFragment however, could contain

@@ -91,7 +91,7 @@ export const UserStatus = ({
 		);
 	}, [badgeProps, isIdle, online, userData.user?.color, userData.user?.name]);
 
-	/* 
+	/*
   If online - show if editing or not, followed by idle status
   If offline: show last seen*/
 	const statusSection = useMemo(() => {

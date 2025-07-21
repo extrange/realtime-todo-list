@@ -176,10 +176,10 @@ export const TodoView = React.memo(() => {
 				) as Todo;
 				const overTodo = uncompletedTodos.find((t) => t.id === over.id) as Todo;
 
-				/* If over's sortOrder > active's, user is moving the Todo to 
+				/* If over's sortOrder > active's, user is moving the Todo to
           somewhere above it's original positition. In this case, we want to
           move the active Todo above the over Todo, and vice versa.
-          
+
           Note: if either of the todos don't have a sort order, we still try
           to sort anyway...*/
 				const overTodoSortOrder = overTodo[sortKey];
