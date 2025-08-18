@@ -94,11 +94,11 @@ export const ListView = ({ closeNav }: InputProps) => {
 			const storeTodos = selectTodos(store);
 			storeTodos
 				.filter((t: Todo) => t.listId === listId)
-				.forEach((t: Todo) =>
+				.forEach((t: Todo) => {
 					storeTodos.splice(
 						store.todos.findIndex((t2: Todo) => t2.id === t.id),
-					),
-				);
+					);
+				});
 
 			/* Then delete the list */
 			const storeLists = selectLists(store);

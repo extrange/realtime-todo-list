@@ -55,9 +55,9 @@ export default function DebugTools() {
 
 	const clearStoredUsers = () => {
 		try {
-			Object.keys(store.storedUsers).forEach(
-				(k) => delete store.storedUsers[k],
-			);
+			Object.keys(store.storedUsers).forEach((k) => {
+				delete store.storedUsers[k];
+			});
 			notifications.show({
 				message: "Deleted store.storedUsers",
 				autoClose: false,
@@ -129,22 +129,22 @@ export default function DebugTools() {
 	};
 
 	const deleteAllTodos = () => {
-		store.todos.forEach((t) =>
+		store.todos.forEach((t) => {
 			store.todos.splice(
 				store.todos.findIndex((t2) => t2.id === t.id),
 				1,
-			),
-		);
+			);
+		});
 		notifications.show({ message: "Deleted all todos" });
 	};
 
 	const deleteAllLists = () => {
-		store.lists.forEach((t) =>
+		store.lists.forEach((t) => {
 			store.lists.splice(
 				store.lists.findIndex((t2) => t2.id === t.id),
 				1,
-			),
-		);
+			);
+		});
 		notifications.show({ message: "Deleted all lists" });
 	};
 
