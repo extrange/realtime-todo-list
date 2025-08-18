@@ -46,7 +46,7 @@ export const MarkAllRead = React.memo(
             - was modified by this user */
 						return (
 							lastOpened &&
-							(parseInt(lastOpened) > t.modified || t.by === USER_ID)
+							(parseInt(lastOpened, 10) > t.modified || t.by === USER_ID)
 						);
 					}),
 				);
@@ -74,7 +74,9 @@ export const MarkAllRead = React.memo(
 		// FIXME: poor performance with 1000s of todos
 		const markAllRead = useCallback(() => {
 			const now = Date.now().toString();
-			store.todos.forEach((t) => localStorage.setItem(t.id, now));
+			store.todos.forEach((t) => {
+				localStorage.setItem(t.id, now);
+			});
 
 			// Update button status
 			setUnreadTodos(false);

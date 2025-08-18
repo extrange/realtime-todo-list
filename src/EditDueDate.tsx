@@ -36,7 +36,7 @@ export const EditDueDate = React.memo(() => {
 		(newVal: number | string) => {
 			if (newVal) {
 				editingTodo.repeatDays =
-					typeof newVal === "string" ? parseInt(newVal) : newVal;
+					typeof newVal === "string" ? parseInt(newVal, 10) : newVal;
 			} else {
 				editingTodo.repeatDays = undefined; // empty string is falsy
 			}

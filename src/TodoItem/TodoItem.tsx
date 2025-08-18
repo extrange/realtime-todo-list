@@ -49,7 +49,7 @@ import type { TodoItemProps } from "./TodoItemWrapper";
 
 const getLastOpened = (todo: Todo) => {
 	const lastOpenedStr = localStorage.getItem(todo.id);
-	return lastOpenedStr ? parseInt(lastOpenedStr) : undefined;
+	return lastOpenedStr ? parseInt(lastOpenedStr, 10) : undefined;
 };
 
 export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
@@ -192,7 +192,9 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
 						</div>
 						<Anchor
 							onClick={() => {
-								undoActions.forEach((f) => f());
+								undoActions.forEach((f) => {
+									f();
+								});
 								notifications.update({
 									id: todo.id,
 									message: "Action undone",

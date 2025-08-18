@@ -1,7 +1,7 @@
 import { ActionIcon, Button, JsonInput, Modal, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type React from "react";
-import { useCallback, useRef } from "react";
+import { useCallback, useId, useRef } from "react";
 import { LuImport } from "react-icons/lu";
 import { z } from "zod";
 import { useCurrentList } from "../useCurrentList";
@@ -29,6 +29,7 @@ export const Import = ({ closeNav }: InputProps) => {
 	const store = useStore();
 	const [currentListId] = useCurrentList();
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const fileInputId = useId();
 
 	const jsonRef = useRef<HTMLTextAreaElement>(null);
 
@@ -91,7 +92,7 @@ export const Import = ({ closeNav }: InputProps) => {
 					onChange={handleFileChange}
 					ref={fileInputRef}
 					type="file"
-					id="fileElem"
+					id={fileInputId}
 					accept="text/plain, application/json"
 					style={{ display: "none" }}
 				/>
