@@ -12,7 +12,7 @@ type InputProps = {
 export const UserBadge = ({ name, color, small }: InputProps) => {
 	return (
 		<Text
-			className={"collaboration-cursor__label"}
+			className={"collaboration-carets__label"}
 			style={{
 				position: "static",
 				fontSize: small ? "10" : "inherit",

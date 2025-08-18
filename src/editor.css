@@ -1,5 +1,5 @@
 /* Give a remote user a caret */
-.collaboration-cursor__caret {
+.collaboration-carets__caret {
 	border-left: 1px solid;
 	border-right: 1px solid;
 	margin-left: -1px;
@@ -11,7 +11,7 @@
 }
 
 /* Render the username above the caret */
-.collaboration-cursor__label {
+.collaboration-carets__label {
 	border-radius: 3px 3px 3px 0;
 	color: #0d0d0d;
 	font-size: 12px;
@@ -28,7 +28,7 @@
 }
 
 /* Fade cursor on hover */
-*:hover > .collaboration-cursor__caret {
+*:hover > .collaboration-carets__caret {
 	opacity: 0.7;
 	transition: 0.5s;
 }
