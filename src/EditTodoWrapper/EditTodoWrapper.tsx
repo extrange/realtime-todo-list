@@ -22,7 +22,7 @@ export const EditTodoWrapper = React.memo(() => {
 		<Modal.Root
 			opened={!!editingTodo}
 			fullScreen={isMobile}
-			size={"min(70%, 800px)"} // Not applied if fullScreen=True
+			size={"min(70%, 1000px)"} // Not applied if fullScreen=True
 			onClose={onClose}
 		>
 			<Modal.Overlay className={classes.overlay} />
