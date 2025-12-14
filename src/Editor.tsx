@@ -1,5 +1,5 @@
 import { px, useMantineTheme } from "@mantine/core";
-import { RichTextEditor } from "@mantine/tiptap";
+import { RedoControl, RichTextEditor } from "@mantine/tiptap";
 import { useSyncedStore } from "@syncedstore/react";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-caret";
@@ -109,6 +109,7 @@ export const Editor = React.memo(() => {
 			>
 				<RichTextEditor.ControlsGroup>
 					<UndoControl />
+					<RedoControl />
 					<RichTextEditor.Bold />
 					<RichTextEditor.Italic />
 					<RichTextEditor.Underline />
@@ -146,7 +147,11 @@ export const Editor = React.memo(() => {
 	);
 
 	return (
-		<RichTextEditor editor={editor} withTypographyStyles={false}>
+		<RichTextEditor
+			variant="subtle"
+			editor={editor}
+			withTypographyStyles={false}
+		>
 			{toolbar}
 			<RichTextEditor.Content />
 		</RichTextEditor>
