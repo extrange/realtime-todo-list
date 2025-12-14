@@ -60,8 +60,9 @@ export const Editor = React.memo(() => {
 			TableCell,
 			Highlight,
 			StarterKit.configure({
-				undoRedo: false,
+				undoRedo: false, // The collaborative extension tracks this
 				document: false,
+				trailingNode: { node: "paragraph" },
 			}),
 			Title,
 			Document.extend({ content: "title block+" }),
