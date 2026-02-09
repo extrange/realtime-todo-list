@@ -8,8 +8,9 @@ import {
 	Stack,
 } from "@mantine/core";
 import { IconAlertCircle, IconAlertTriangle } from "@tabler/icons-react";
-import { lazy, useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import type { FallbackProps } from "react-error-boundary";
+import { getErrorMessage } from "react-error-boundary";
 import classes from "./Fallback.module.css";
 
 type InputProps = {
@@ -35,7 +36,7 @@ const FallbackBase = ({
 				color="red"
 			>
 				<Code block className={classes.code}>
-					{error.message}
+					{getErrorMessage(error) ?? "Unknown error"}
 				</Code>
 			</Alert>
 
@@ -45,7 +46,9 @@ const FallbackBase = ({
 					<Accordion.Panel>
 						<ScrollArea h={300}>
 							<Code block className={classes.code}>
-								{error.stack}
+								{error instanceof Error
+									? error.stack
+									: "Failed to load stack trace"}
 							</Code>
 						</ScrollArea>
 					</Accordion.Panel>
@@ -63,12 +66,16 @@ const FallbackBase = ({
 									leftSection={<IconAlertTriangle />}
 									variant="subtle"
 									onClick={() => setDebug(true)}
-									color={"yellow"}
+									color="yellow"
 								>
 									Enable debugging tools (dangerous!)
 								</Button>
 							)}
-							{debug && <DebugTools />}
+							{debug && (
+								<Suspense fallback={null}>
+									<DebugTools />
+								</Suspense>
+							)}
 						</Stack>
 					</Accordion.Panel>
 				</Accordion.Item>
