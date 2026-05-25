@@ -56,7 +56,9 @@ export const StoreProvider = ({ children }: React.PropsWithChildren) => {
 		setProvider(_provider);
 
 		/* Propagate userID (local GUID) to awareness object */
-		_provider.on("sync", () => _provider.setAwarenessField("userId", USER_ID));
+		_provider.on("synced", () =>
+			_provider.setAwarenessField("userId", USER_ID),
+		);
 
 		// Check if IndexedDB is supported, then sync
 		let indexeddbPersistence: IndexeddbPersistence | undefined;
