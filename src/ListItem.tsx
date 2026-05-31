@@ -19,6 +19,7 @@ type CommonProps = {
 	selected?: boolean;
 	selectList: (id?: string) => void;
 	uncompletedTodosCount: number;
+	readOnly?: boolean;
 };
 
 type OptionalProps =
@@ -49,6 +50,7 @@ export const ListItem = React.memo(
 		selectList,
 		editable,
 		focus,
+		readOnly,
 	}: CommonProps & OptionalProps) => {
 		const [, startTransition] = useTransition();
 		const theme = useMantineTheme();
@@ -56,7 +58,7 @@ export const ListItem = React.memo(
 
 		const menu = useMemo(
 			() =>
-				editable ? (
+				editable && !readOnly ? (
 					<Menu opened={menuOpened} onChange={setMenuOpened}>
 						<Portal>{menuOpened && <Overlay opacity={0} />}</Portal>
 						<Menu.Target>
@@ -77,6 +79,7 @@ export const ListItem = React.memo(
 				editable,
 				list?.id,
 				menuOpened,
+				readOnly,
 				renameList,
 				theme.colors.gray,
 			],

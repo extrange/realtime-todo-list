@@ -4,6 +4,7 @@ import { IconCheck, IconTargetArrow, IconTrash } from "@tabler/icons-react";
 import { generateKeyBetween } from "fractional-indexing";
 import React, { type SyntheticEvent, useCallback } from "react";
 import type { Todo } from "../types/Todo";
+import { useIsReadOnly } from "../useIsReadOnly";
 import { useStore } from "../useStore";
 import { getMaxSortOrder } from "../util";
 import classes from "./TodoItemMenuDropdown.module.css";
@@ -15,6 +16,7 @@ type InputProps = {
 export const TodoItemMenuDropdown = React.memo(({ todo }: InputProps) => {
 	const store = useStore();
 	const state = useSyncedStore(store);
+	const { isReadOnly } = useIsReadOnly();
 
 	const moveToList = useCallback(
 		(listId?: string) => (e: SyntheticEvent) => {
@@ -59,10 +61,15 @@ export const TodoItemMenuDropdown = React.memo(({ todo }: InputProps) => {
 			<Menu.Item
 				leftSection={<IconTargetArrow size={16} />}
 				onClick={toggleFocus}
+				disabled={isReadOnly}
 			>
 				{todo.focus ? "Remove from Focus" : "Add to Focus"}
 			</Menu.Item>
-			<Menu.Item leftSection={<IconTrash size={16} />} onClick={deleteTodo}>
+			<Menu.Item
+				leftSection={<IconTrash size={16} />}
+				onClick={deleteTodo}
+				disabled={isReadOnly}
+			>
 				Delete
 			</Menu.Item>
 			<Menu.Divider />
@@ -71,6 +78,7 @@ export const TodoItemMenuDropdown = React.memo(({ todo }: InputProps) => {
 					onClick={moveToList(undefined)}
 					leftSection={!todo.listId && <IconCheck size={16} />}
 					fs={"italic"}
+					disabled={isReadOnly}
 				>
 					Uncategorized
 				</Menu.Item>
@@ -81,6 +89,7 @@ export const TodoItemMenuDropdown = React.memo(({ todo }: InputProps) => {
 						leftSection={todo.listId === l.id && <IconCheck size={16} />}
 						maw={300}
 						className={classes.menuItem}
+						disabled={isReadOnly}
 					>
 						{l.name}
 					</Menu.Item>

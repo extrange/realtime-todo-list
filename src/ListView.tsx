@@ -9,6 +9,7 @@ import { ListType } from "./ListContext";
 import { ListItem } from "./ListItem";
 import type { Todo } from "./types/Todo";
 import { useCurrentList } from "./useCurrentList";
+import { useIsReadOnly } from "./useIsReadOnly";
 import { useStore } from "./useStore";
 import { selectLists, selectTodos } from "./useSyncedStore";
 import { getMaxSortOrder } from "./util";
@@ -36,6 +37,7 @@ export const ListView = ({ closeNav }: InputProps) => {
 	const store = useStore();
 	const lists = useSyncedStore(store.lists);
 	const [currentList, setCurrentList] = useCurrentList();
+	const { isReadOnly } = useIsReadOnly();
 
 	const todosMap = useAppStore((state) => state.todosMap);
 	const focusTodos = useAppStore((state) => state.focusTodos);
@@ -125,7 +127,7 @@ export const ListView = ({ closeNav }: InputProps) => {
 
 	return (
 		<Flex direction="column" h="100%">
-			<Button my={10} onClick={createList}>
+			<Button my={10} onClick={createList} disabled={isReadOnly}>
 				Create List
 			</Button>
 
@@ -150,6 +152,7 @@ export const ListView = ({ closeNav }: InputProps) => {
 				<ListItem
 					key={list.id}
 					editable
+					readOnly={isReadOnly}
 					uncompletedTodosCount={todosMap.get(list.id)?.uncompleted.length ?? 0}
 					selected={list.id === currentList}
 					list={list}

@@ -16,6 +16,7 @@ import { CURRENT_ROOM_LOCALSTORAGE_KEY, USER_ID } from "./constants";
 import { DebugArmedButton } from "./DebugArmedButton";
 import type { Store } from "./types/Store";
 import { useCurrentList } from "./useCurrentList";
+import { useIsReadOnly } from "./useIsReadOnly";
 import { useProvider } from "./useProvider";
 import { useStore } from "./useStore";
 import { getMaxSortOrder, getRandomInt } from "./util";
@@ -42,6 +43,7 @@ export default function DebugTools() {
 	const [roomId] = useLocalStorage({ key: CURRENT_ROOM_LOCALSTORAGE_KEY });
 	const store = useStore();
 	const provider = useProvider();
+	const { isReadOnly } = useIsReadOnly();
 	const lists = store.lists;
 	const todos = store.todos;
 	const syncedStoreTodos = useSyncedStore(todos);
@@ -325,11 +327,21 @@ export default function DebugTools() {
 				] as const,
 			].map(([handler, title, requireArm = false]) =>
 				requireArm ? (
-					<DebugArmedButton key={title} variant="filled" onClick={handler}>
+					<DebugArmedButton
+						key={title}
+						variant="filled"
+						onClick={handler}
+						disabled={isReadOnly}
+					>
 						{title}
 					</DebugArmedButton>
 				) : (
-					<Button key={title} variant="filled" onClick={handler}>
+					<Button
+						key={title}
+						variant="filled"
+						onClick={handler}
+						disabled={isReadOnly}
+					>
 						{title}
 					</Button>
 				),

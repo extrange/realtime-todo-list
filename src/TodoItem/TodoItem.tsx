@@ -39,6 +39,7 @@ import { useAppStore } from "../appStore/appStore";
 import { USER_ID } from "../constants";
 import { DueDateString } from "../DueDateString";
 import type { Todo } from "../types/Todo";
+import { useIsReadOnly } from "../useIsReadOnly";
 import { getTodoTitle } from "../util";
 import classes from "./TodoItem.module.css";
 import { TodoItemAvatar } from "./TodoItemAvatar";
@@ -55,6 +56,7 @@ const getLastOpened = (todo: Todo) => {
 export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
 	const theme = useMantineTheme();
 	const setEditingTodo = useAppStore((state) => state.setEditingTodo);
+	const { isReadOnly } = useIsReadOnly();
 
 	// Necessary to make this reactive
 	// Causes extra rerender only in strict mode (hook 1 changed)
@@ -128,6 +130,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
 	 * */
 	const completeTodo = useCallback(
 		(e: SyntheticEvent<HTMLButtonElement>) => {
+			if (isReadOnly) return;
 			e.stopPropagation();
 			const originalCompleted = todo.completed;
 
@@ -209,18 +212,19 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
 				),
 			});
 		},
-		[todo],
+		[todo, isReadOnly],
 	);
 
 	/* Mark todo as read on open.
   Note: custom events required - localStorage events don't fire in the same tab
   https://developer.mozilla.org/en-US/docs/Web/API/Window/storage_event */
 	const onOpenTodo = useCallback(() => {
+		if (isReadOnly) return;
 		localStorage.setItem(todo.id, Date.now().toString());
 		document.dispatchEvent(new Event(todo.id)); // Update avatar
 		document.dispatchEvent(new Event("todoItemOpened")); // update MarkAllRead
 		setEditingTodo(todo);
-	}, [setEditingTodo, todo]);
+	}, [setEditingTodo, todo, isReadOnly]);
 
 	const checkbox = useMemo(
 		() => (

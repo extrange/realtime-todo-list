@@ -16,6 +16,10 @@ export type Store = {
 		/**Name of the room. The roomId is the name of the backing
 		 * Y Doc. */
 		roomName?: string;
+
+		/**If set, the app enters read-only mode. Contains the UUID of
+		 * the room that data has been migrated to. */
+		nextRoomId?: string;
 	};
 
 	lists: List[];

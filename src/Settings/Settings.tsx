@@ -1,15 +1,26 @@
 import {
 	ActionIcon,
+	Button,
+	Divider,
 	Modal,
 	NumberInput,
+	Stack,
 	Switch,
 	Text,
+	TextInput,
 	Tooltip,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useLocalStorage } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import { IconInfoCircle, IconSettings } from "@tabler/icons-react";
 import React, { useCallback } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { useSettingsStore } from "../appStore/settingsStore";
+import { SAVED_ROOMS_LOCALSTORAGE_KEY } from "../constants";
+import { downloadJson, exportData } from "../Import/util";
+import type { SavedRooms } from "../Login";
+import { useIsReadOnly } from "../useIsReadOnly";
+import { useStore } from "../useStore";
 import classes from "./Settings.module.css";
 
 type InputProps = {
@@ -31,6 +42,13 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
 		setHideRepeating,
 		setHideDueTodosDays,
 	} = useSettingsStore();
+
+	const store = useStore();
+	const { isReadOnly, nextRoomId } = useIsReadOnly();
+	const [, setSavedRooms] = useLocalStorage<SavedRooms>({
+		key: SAVED_ROOMS_LOCALSTORAGE_KEY,
+		defaultValue: {},
+	});
 
 	const onClickOpen = useCallback(() => {
 		open();
@@ -61,6 +79,37 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
 			setUpcomingDays(Number(days) < 1 ? 1 : Number(days)),
 		[setUpcomingDays],
 	);
+
+	const handleMigrate = useCallback(() => {
+		const newRoomId = uuidv4();
+
+		// Add to saved rooms so it appears when switching
+		setSavedRooms((s) => ({ ...s, [newRoomId]: null }));
+
+		// Export and download
+		const data = exportData(store);
+		downloadJson(data, `todos-migration-${newRoomId.slice(0, 8)}.json`);
+
+		// Lock current room
+		store.meta.nextRoomId = newRoomId;
+
+		close();
+
+		notifications.show({
+			title: "Data exported & room locked",
+			message:
+				"A JSON file has been downloaded. Switch to the new room and import it.",
+		});
+	}, [close, setSavedRooms, store]);
+
+	const handleClearLock = useCallback(() => {
+		store.meta.nextRoomId = undefined;
+		close();
+		notifications.show({
+			title: "Migration lock cleared",
+			message: "This room is no longer read-only.",
+		});
+	}, [close, store.meta]);
 
 	return (
 		<>
@@ -138,6 +187,35 @@ export const Settings = React.memo(({ closeNav }: InputProps) => {
 				<Text mt={10} c="dimmed">
 					Filters will be applied sequentially to each todo.
 				</Text>
+
+				<Divider my="lg" />
+				<Text fw={500} mb="xs">
+					Migration
+				</Text>
+
+				{isReadOnly ? (
+					<Stack>
+						<Text size="sm">
+							This room is locked for migration. Data has been exported.
+						</Text>
+						<TextInput
+							readOnly
+							value={nextRoomId ?? ""}
+							label="Target room ID"
+						/>
+						<Button variant="light" color="yellow" onClick={handleClearLock}>
+							Clear lock
+						</Button>
+					</Stack>
+				) : (
+					<Stack>
+						<Text size="sm">
+							Export all data and lock this room for migration to a fresh room.
+							A JSON file will be downloaded automatically.
+						</Text>
+						<Button onClick={handleMigrate}>Migrate & Export</Button>
+					</Stack>
+				)}
 			</Modal>
 		</>
 	);

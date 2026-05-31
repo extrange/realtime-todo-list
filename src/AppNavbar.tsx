@@ -20,6 +20,7 @@ import React, {
 import { CURRENT_ROOM_LOCALSTORAGE_KEY } from "./constants";
 import { EditRoom } from "./EditRoom";
 import { EditUser } from "./EditUser";
+import { Export } from "./Import/Export";
 import { Import } from "./Import/Import";
 import { ListView } from "./ListView";
 import { MarkAllRead } from "./MarkAllRead";
@@ -79,6 +80,7 @@ export const AppNavbar = React.memo(({ navOpen, closeNav }: InputProps) => {
 						</ActionIcon>
 					</Tooltip>
 					<MarkAllRead closeNav={closeNav} />
+					<Export />
 					<Import closeNav={closeNav} />
 					<Settings closeNav={closeNav} />
 				</Flex>

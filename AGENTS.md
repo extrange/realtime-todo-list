@@ -57,3 +57,22 @@ Read `readme.md` for full details. Key points:
 `src/types/Store.ts` defines the root SyncedStore shape: `{ todos: Todo[], storedUsers, meta, lists }`.
 `todo.content` is `XmlFragment` (TipTap rich-text), not a plain string.
 `todo.sortOrder` / `todo.focusSortOrder` use fractional indexing (`fractional-indexing` package).
+
+## Yjs XmlFragment / TipTap content serialization
+
+`todo.content` is a `Y.XmlFragment` containing `Y.XmlElement` (block/inline nodes) and `Y.XmlText` (text with formatting marks).
+
+**Accessing the underlying Yjs types from SyncedStore proxies:**
+- `getYjsValue(todo)` → `Y.Map` — the todo's backing map
+- `getYjsValue(todo).get("content")` → `Y.XmlFragment` — the raw content
+- `getYjsValue(t.content)` does **not** unwrap nested XmlFragment proxies; always go through the YMap with `.get("content")`
+
+**Serializing text formatting (bold, italic, links, strikethrough, code):**
+- `Y.XmlText.getAttributes()` returns **DOM attributes** (`_domAttributes`) only — it does **not** include TipTap formatting marks. It will always be `{}` for normally formatted text.
+- Use `Y.XmlText.toDelta()` instead, which returns `[{ insert: string, attributes?: Record<string, unknown> }]`. The `attributes` contain the actual formatting marks (e.g. `{ bold: true }`, `{ link: { href: "..." } }`, `{ strike: true }`).
+- `Y.XmlText.toString()` includes embedded XML tags for inline elements like links — do not use it for content serialization.
+
+**Deserializing text formatting:**
+- Create a `new Y.XmlText()`, then call `yText.applyDelta(delta)` to atomically restore the full text + formatting in one operation. This avoids ordering issues from separate `insert`/`format` calls.
+
+**Import/export lives in `src/Import/`** — see `util.tsx` for `serializeTodoContent`, `deserializeTodoContent`, `exportData`, `importData`. The `SerializedNode` type uses a `delta` array for text nodes (not a plain `text` string) to preserve formatting round-trips.
