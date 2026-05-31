@@ -1,4 +1,5 @@
 import { notifications } from "@mantine/notifications";
+import { getYjsValue, Y } from "@syncedstore/core";
 import { differenceInCalendarDays } from "date-fns";
 import { generateKeyBetween } from "fractional-indexing";
 import sanitizeHtml from "sanitize-html";
@@ -163,13 +164,37 @@ export const validateUuid = (uuid: string) =>
 		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
 	);
 
+/**
+ * Extract plain text from a Y.XmlText or Y.XmlElement node without
+ * any XML markup. Unlike toString(), this does not include inline
+ * element tags like <code>, <link>, or <strike>.
+ */
+// biome-ignore lint/suspicious/noExplicitAny: yjs toArray callback type compat
+function getPlainText(node: any): string {
+	if (node instanceof Y.XmlText) {
+		return (
+			node
+				.toDelta()
+				// biome-ignore lint/suspicious/noExplicitAny: toDelta returns any[]
+				.filter((d: any) => typeof d.insert === "string")
+				// biome-ignore lint/suspicious/noExplicitAny: toDelta returns any[]
+				.map((d: any) => d.insert)
+				.join("")
+		);
+	}
+	if (node instanceof Y.XmlElement) {
+		return node.toArray().map(getPlainText).join("");
+	}
+	return "";
+}
+
 /**Get the title of the todo*/
 export const getTodoTitle = (todo: Todo) => {
 	/*The XmlFragment can be viewed as an array.
 
     The title is the 0th element, and any notes are from index 1 onward.
 
-    The `toJSON` representation of the XmlFragment however, could contain
+    The toJSON representation of the XmlFragment however, could contain
     XML tags such as <title> even if empty (such as a todo which is created,
     then subsequently cleared). It is therefore not reliable to check if
     todo.content is empty, when determining if the fragment is empty.
@@ -180,21 +205,32 @@ export const getTodoTitle = (todo: Todo) => {
 
 	/* Empty todo. todoReadOnly.content could be non-empty, even
   if the Todo is really empty.*/
-	if (!todo.content || !todo.content.length) return "";
+	if (!todo.content?.length) return "";
+
+	const yMap = getYjsValue(todo) as Y.Map<unknown>;
+	const content = yMap?.get("content");
+	if (!content || !(content instanceof Y.XmlFragment) || !content.length) {
+		return "";
+	}
 
 	/* Note: both title and notes will count spaces as non-empty */
-	return sanitizeHtml(todo.content.get(0).toString());
+	return sanitizeHtml(getPlainText(content.toArray()[0]));
 };
 
 export const getNotes = (todo: Todo) => {
+	const yMap = getYjsValue(todo) as Y.Map<unknown>;
+	const content = yMap?.get("content");
+	if (!content || !(content instanceof Y.XmlFragment)) return "";
+
 	/* Take at most 300 chars of the todo's notes */
 	const notesArray: string[] = [];
-
-	// FIXME For very long strings, they are truncated prematurely before 200 chars
-	todo.content.slice(1).every((e) => {
-		notesArray.push(sanitizeHtml(e.toString()));
-		return notesArray.join(" ").length < 200;
-	});
+	content
+		.toArray()
+		.slice(1)
+		.every((e) => {
+			notesArray.push(sanitizeHtml(getPlainText(e)));
+			return notesArray.join(" ").length < 200;
+		});
 	return notesArray.join(" ");
 };
 
@@ -251,4 +287,22 @@ export const reactTimeAgoFormatter = (
 		return "just now";
 	}
 	return `${value} ${unit}${value !== 1 ? "s" : ""} ${suffix}`;
+};
+
+/**
+ * Deterministically hash a string to an HSL color.
+ * Same input always produces the same color, so all clients see
+ * consistent list colors without storing them.
+ *
+ * Uses lightness 40% for sufficient contrast as text on light variant
+ * badges, and saturation 55% for distinct but not garish colors.
+ */
+export const hashToColor = (str: string): string => {
+	let hash = 0;
+	for (let i = 0; i < str.length; i++) {
+		hash = str.charCodeAt(i) + ((hash << 5) - hash);
+		hash = hash & hash; // 32-bit
+	}
+	const hue = Math.abs(hash % 360);
+	return `oklch(70% 0.18 ${hue})`;
 };

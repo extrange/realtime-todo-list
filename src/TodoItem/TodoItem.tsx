@@ -38,9 +38,12 @@ import type { YMap, YMapEvent } from "yjs/dist/src/internals";
 import { useAppStore } from "../appStore/appStore";
 import { USER_ID } from "../constants";
 import { DueDateString } from "../DueDateString";
+import { ListType } from "../ListContext";
 import type { Todo } from "../types/Todo";
+import { useCurrentList } from "../useCurrentList";
 import { useIsReadOnly } from "../useIsReadOnly";
-import { getTodoTitle } from "../util";
+import { useStore } from "../useStore";
+import { getTodoTitle, hashToColor } from "../util";
 import classes from "./TodoItem.module.css";
 import { TodoItemAvatar } from "./TodoItemAvatar";
 import { TodoItemMenuDropdown } from "./TodoItemMenuDropdown";
@@ -57,6 +60,9 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
 	const theme = useMantineTheme();
 	const setEditingTodo = useAppStore((state) => state.setEditingTodo);
 	const { isReadOnly } = useIsReadOnly();
+	const store = useStore();
+	const [currentList] = useCurrentList();
+	const isFocusView = currentList === ListType.Focus;
 
 	// Necessary to make this reactive
 	// Causes extra rerender only in strict mode (hook 1 changed)
@@ -254,39 +260,55 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
 						: "gray"
 				: undefined;
 
+		if (!todo.dueDate) return null;
+
 		return (
-			<>
-				{todo.dueDate && (
-					<Badge
-						color={color}
-						leftSection={
-							<Center>
-								<IconClockHour4 size={14} />
-							</Center>
-						}
-					>
-						<DueDateString dueDate={todo.dueDate} />
-					</Badge>
-				)}
-				{todo.repeatDays && (
-					<Badge
-						color="gray"
-						leftSection={
-							<Center>
-								<IconRepeat size={14} />
-							</Center>
-						}
-					>
-						{todo.repeatDays} days
-					</Badge>
-				)}
-			</>
+			<Badge
+				color={color}
+				size={"xs"}
+				leftSection={
+					<Center>
+						<IconClockHour4 size={14} />
+					</Center>
+				}
+			>
+				<DueDateString dueDate={todo.dueDate} />
+			</Badge>
 		);
-	}, [theme, todo.dueDate, todo.repeatDays]);
+	}, [theme, todo.dueDate]);
+
+	const repeatIcon = useMemo(
+		() => (todo.repeatDays ? <IconRepeat size={14} /> : null),
+		[todo.repeatDays],
+	);
+
+	const listChip = useMemo(() => {
+		if (!isFocusView || !todo.listId) return null;
+		const list = store.lists.find((l) => l.id === todo.listId);
+		if (!list) return null;
+
+		const maxLen = 20;
+		const truncated =
+			list.name.length > maxLen ? `${list.name.slice(0, maxLen)}…` : list.name;
+
+		return (
+			<Badge
+				variant="light"
+				color={hashToColor(list.name)}
+				size="xs"
+				title={list.name}
+				style={{ flexShrink: 0 }}
+			>
+				{truncated}
+			</Badge>
+		);
+	}, [isFocusView, store.lists, todo.listId]);
 
 	const todoFocus = useMemo(
-		() => todo.focus && <IconTargetArrow className={classes.focus} />,
-		[todo.focus],
+		() =>
+			!isFocusView &&
+			todo.focus && <IconTargetArrow className={classes.focus} />,
+		[todo.focus, isFocusView],
 	);
 
 	return (
@@ -311,9 +333,11 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
 				</Menu>
 			</Flex>
 
-			<Flex mt={5} className={classes.dueDateRepeat}>
+			<Flex gap={4} align="center" mt={5} className={classes.dueDateRepeat}>
 				{dueDateRepeat}
 				<TodoItemSubtaskCount todo={todo} />
+				{listChip}
+				{repeatIcon}
 			</Flex>
 		</Flex>
 	);

@@ -58,6 +58,7 @@ export const TodoItemSubtaskCount = React.memo(({ todo }: InputProps) => {
 	return total ? (
 		<Badge
 			color={checked === total ? "green" : "blue"}
+			size={"xs"}
 			leftSection={
 				<Center>
 					<IconListCheck size={14} />
