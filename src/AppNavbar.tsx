@@ -1,6 +1,7 @@
 import {
 	ActionIcon,
 	AppShellNavbar,
+	Box,
 	Button,
 	Flex,
 	Modal,
@@ -25,6 +26,7 @@ import { Import } from "./Import/Import";
 import { ListView } from "./ListView";
 import { MarkAllRead } from "./MarkAllRead";
 import { SavedRoomsView } from "./SavedRoomsView";
+import { SearchTrigger } from "./SearchResult/SearchTrigger";
 import { Settings } from "./Settings/Settings";
 import "./editor.css";
 
@@ -58,6 +60,9 @@ export const AppNavbar = React.memo(({ navOpen, closeNav }: InputProps) => {
 				</Modal>
 				<EditRoom />
 				<EditUser />
+				<Box mb="xs">
+					<SearchTrigger closeNav={closeNav} />
+				</Box>
 				<ScrollArea pt={5}>
 					<Profiler
 						id={"ListView"}

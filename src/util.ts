@@ -155,6 +155,71 @@ export const formatBytes = (bytes: number, decimals = 2) => {
 	return `${parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
 };
 
+/**
+ * Extract plain text from a raw Y.Map's "content" field for indexing.
+ * Bypasses SyncedStore proxy overhead — works with Y.Map directly.
+ */
+export const getTodoSearchText = (yMap: Y.Map<unknown>): string => {
+	const content = yMap.get("content");
+	if (!content || !(content instanceof Y.XmlFragment) || !content.length)
+		return "";
+	return content.toArray().map(getPlainText).join(" ").toLowerCase();
+};
+
+/**
+ * Given full text and a search query, return a snippet centred around the
+ * first match, with surrounding context words.
+ */
+export const getSearchSnippet = (
+	text: string,
+	query: string,
+	contextChars = 50,
+): string => {
+	const trimmed = query.trim();
+	if (!trimmed) return text;
+
+	const terms = trimmed.toLowerCase().split(/\s+/).filter(Boolean);
+
+	if (terms.length === 0 || !text) return text;
+
+	const lower = text.toLowerCase();
+	let matchStart = -1;
+	let matchEnd = -1;
+
+	for (const term of terms) {
+		const idx = lower.indexOf(term);
+		if (idx !== -1 && (matchStart === -1 || idx < matchStart)) {
+			matchStart = idx;
+			matchEnd = idx + term.length;
+		}
+	}
+
+	if (matchStart === -1) {
+		return text.length > contextChars * 2
+			? `${text.slice(0, contextChars * 2)}…`
+			: text;
+	}
+
+	const matchCenter = Math.floor((matchStart + matchEnd) / 2);
+	let start = Math.max(0, matchCenter - contextChars);
+	let end = Math.min(text.length, matchCenter + contextChars);
+
+	if (start > 0) {
+		const space = text.indexOf(" ", start);
+		if (space !== -1 && space < matchStart) start = space + 1;
+	}
+
+	if (end < text.length) {
+		const space = text.lastIndexOf(" ", end);
+		if (space !== -1 && space > matchEnd) end = space;
+	}
+
+	const prefix = start > 0 ? "…" : "";
+	const suffix = end < text.length ? "…" : "";
+
+	return `${prefix}${text.slice(start, end)}${suffix}`;
+};
+
 /**Identity function for memoization. */
 export const identity = <T>(s: T): T => s;
 
@@ -183,7 +248,7 @@ function getPlainText(node: any): string {
 		);
 	}
 	if (node instanceof Y.XmlElement) {
-		return node.toArray().map(getPlainText).join("");
+		return node.toArray().map(getPlainText).join(" ");
 	}
 	return "";
 }
@@ -230,6 +295,22 @@ export const getNotes = (todo: Todo) => {
 		.every((e) => {
 			notesArray.push(sanitizeHtml(getPlainText(e)));
 			return notesArray.join(" ").length < 200;
+		});
+	return notesArray.join(" ");
+};
+
+/** Get the full notes text of a todo without the 200-char display limit. */
+export const getTodoFullNotes = (todo: Todo) => {
+	const yMap = getYjsValue(todo) as Y.Map<unknown>;
+	const content = yMap?.get("content");
+	if (!content || !(content instanceof Y.XmlFragment)) return "";
+
+	const notesArray: string[] = [];
+	content
+		.toArray()
+		.slice(1)
+		.forEach((e) => {
+			notesArray.push(sanitizeHtml(getPlainText(e)));
 		});
 	return notesArray.join(" ");
 };

@@ -6,6 +6,7 @@ import {
 	type ProfilerOnRenderCallback,
 	type SetStateAction,
 	useCallback,
+	useEffect,
 	useState,
 } from "react";
 import classes from "./App.module.css";
@@ -13,8 +14,10 @@ import { AppAside } from "./AppAside";
 import { AppFooter } from "./AppFooter";
 import { AppHeader } from "./AppHeader/AppHeader";
 import { AppNavbar } from "./AppNavbar";
+import { useSearchStore } from "./appStore/searchStore";
 import { CURRENT_ROOM_LOCALSTORAGE_KEY } from "./constants";
 import { EditTodoWrapper } from "./EditTodoWrapper/EditTodoWrapper";
+import { SearchResults } from "./SearchResult/SearchResults";
 import { TodoView } from "./TodoView/TodoView";
 import { useIsReadOnly } from "./useIsReadOnly";
 
@@ -29,6 +32,34 @@ export const App = () => {
 	const [, setCurrentRoomId] = useLocalStorage({
 		key: CURRENT_ROOM_LOCALSTORAGE_KEY,
 	});
+	const isSearchOpen = useSearchStore((s) => s.isSearchOpen);
+	const openSearch = useSearchStore((s) => s.openSearch);
+	const closeSearch = useSearchStore((s) => s.closeSearch);
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "/" && !isSearchOpen) {
+				const tag = (e.target as HTMLElement)?.tagName?.toLowerCase();
+				const isEditable =
+					tag === "input" ||
+					tag === "textarea" ||
+					tag === "select" ||
+					(e.target as HTMLElement)?.getAttribute("contenteditable") === "true";
+
+				if (!isEditable) {
+					e.preventDefault();
+					openSearch();
+				}
+			}
+
+			if (e.key === "Escape" && isSearchOpen) {
+				closeSearch();
+			}
+		};
+
+		document.addEventListener("keydown", handleKeyDown);
+		return () => document.removeEventListener("keydown", handleKeyDown);
+	}, [openSearch, closeSearch, isSearchOpen]);
 
 	/* For AppHeader: Don't allow both the NavBar and Aside to be open */
 	const _setNavOpen = useCallback((open: SetStateAction<boolean>) => {
@@ -101,14 +132,18 @@ export const App = () => {
 				)}
 				<EditTodoWrapper />
 				<ScrollArea h={height - HEADER_HEIGHT - FOOTER_HEIGHT}>
-					<Profiler
-						id={"TodoView"}
-						onRender={(id, phase, duration) =>
-							duration > 15 && console.info(id, phase, duration)
-						}
-					>
-						<TodoView />
-					</Profiler>
+					{isSearchOpen ? (
+						<SearchResults />
+					) : (
+						<Profiler
+							id={"TodoView"}
+							onRender={(id, phase, duration) =>
+								duration > 15 && console.info(id, phase, duration)
+							}
+						>
+							<TodoView />
+						</Profiler>
+					)}
 				</ScrollArea>
 			</AppShell.Main>
 		</AppShell>

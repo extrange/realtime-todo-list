@@ -5,6 +5,7 @@ import { generateKeyBetween } from "fractional-indexing";
 import { useCallback, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useAppStore } from "./appStore/appStore";
+import { useSearchStore } from "./appStore/searchStore";
 import { ListType } from "./ListContext";
 import { ListItem } from "./ListItem";
 import type { Todo } from "./types/Todo";
@@ -57,6 +58,8 @@ export const ListView = ({ closeNav }: InputProps) => {
 		.slice()
 		.sort((a, b) => a.name.localeCompare(b.name));
 
+	const closeSearch = useSearchStore((s) => s.closeSearch);
+
 	const createList = useCallback(() => {
 		const name = prompt("Enter list name:");
 		if (!name) return;
@@ -67,22 +70,25 @@ export const ListView = ({ closeNav }: InputProps) => {
 		const newListId = uuidv4();
 		selectLists(store).push({ id: newListId, name: name, sortOrder });
 		setCurrentList(newListId);
+		closeSearch();
 		closeNav();
-	}, [closeNav, lists, setCurrentList, store]);
+	}, [closeNav, closeSearch, lists, setCurrentList, store]);
 
 	/* Select Uncategorized/other lists with IDs */
 	const selectList = useCallback(
 		(listId?: string) => {
 			setCurrentList(listId);
+			closeSearch();
 			closeNav();
 		},
-		[closeNav, setCurrentList],
+		[closeNav, closeSearch, setCurrentList],
 	);
 
 	const selectFocus = useCallback(() => {
 		setCurrentList(ListType.Focus);
+		closeSearch();
 		closeNav();
-	}, [closeNav, setCurrentList]);
+	}, [closeNav, closeSearch, setCurrentList]);
 
 	/* Deleting a list deletes all tasks the list, including completed tasks */
 	const deleteList = useCallback(

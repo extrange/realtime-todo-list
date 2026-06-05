@@ -1,4 +1,4 @@
-import { AppShell, Center, Text } from "@mantine/core";
+import { AppShell, Center, Flex, Text } from "@mantine/core";
 import React from "react";
 import { useAppStore } from "./appStore/appStore";
 import { NetworkOverlay } from "./NetworkOverlay";
@@ -10,15 +10,22 @@ const getTodosHiddenString = (numHiddenTodos: number) => {
 };
 
 export const AppFooter = React.memo(() => {
-	// will shallow compare improve rendering time?
 	const numTodosHidden = useAppStore((state) => state.numTodosHidden);
+	const isRebuildingIndex = useAppStore((state) => state.isRebuildingIndex);
 
 	return (
 		<AppShell.Footer>
 			<Center h="100%">
-				<Text c="dimmed" fz="sm">
-					{getTodosHiddenString(numTodosHidden)}
-				</Text>
+				<Flex gap="md" align="center">
+					{isRebuildingIndex && (
+						<Text c="dimmed" fz="xs">
+							Indexing…
+						</Text>
+					)}
+					<Text c="dimmed" fz="sm">
+						{getTodosHiddenString(numTodosHidden)}
+					</Text>
+				</Flex>
 			</Center>
 			<NetworkOverlay />
 		</AppShell.Footer>

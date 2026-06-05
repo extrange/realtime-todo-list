@@ -1,6 +1,8 @@
-import { getYjsValue, observeDeep } from "@syncedstore/core";
+import { getYjsValue, observeDeep, type Y } from "@syncedstore/core";
 import { differenceInCalendarDays } from "date-fns";
-import { useCallback, useEffect, useMemo } from "react";
+import { Document } from "flexsearch";
+import { debounce } from "lodash-es";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { YMapEvent, YXmlEvent } from "yjs";
 import type { YArray, YMap } from "yjs/dist/src/internals";
 import { shallow } from "zustand/shallow";
@@ -10,8 +12,19 @@ import type { Todo } from "../types/Todo";
 import { useProviderEvent } from "../useProviderEvent";
 import { useRerenderDaily } from "../useRerenderDaily";
 import { useStore } from "../useStore";
-import type { WithRequired } from "../util";
+import { getTodoSearchText, type WithRequired } from "../util";
 import { eventHaskeys } from "./filterEvent";
+
+const createSearchIndex = () =>
+	new Document({
+		document: {
+			id: "id",
+			index: ["text"],
+		},
+		tokenize: "forward",
+		cache: true,
+		context: true,
+	});
 
 /**
  * Updates todo lists in the Zustand store.
@@ -32,26 +45,79 @@ import { eventHaskeys } from "./filterEvent";
 export const TodoListUpdater = () => {
 	const store = useStore();
 
-	// We don't need reactivity
 	const lists = store.lists;
 	const todos = store.todos;
 
-	// Used to trigger run on initial sync event
 	const synced = useProviderEvent("synced");
 
-	// Used to trigger a re-render daily at 12mn
 	const time = useRerenderDaily();
 
-	const [setTodosMap, setFocusTodos, setDueTodos, setUpcomingTodos] =
-		useAppStore(
-			(state) => [
-				state.setTodosMap,
-				state.setFocusTodos,
-				state.setDueTodos,
-				state.setUpcomingTodos,
-			],
-			shallow,
-		);
+	const [
+		setTodosMap,
+		setFocusTodos,
+		setDueTodos,
+		setUpcomingTodos,
+		setAllTodosMap,
+		setSearchIndex,
+		setIsRebuildingIndex,
+	] = useAppStore(
+		(state) => [
+			state.setTodosMap,
+			state.setFocusTodos,
+			state.setDueTodos,
+			state.setUpcomingTodos,
+			state.setAllTodosMap,
+			state.setSearchIndex,
+			state.setIsRebuildingIndex,
+		],
+		shallow,
+	);
+
+	const searchIndexRef = useRef<Document>(createSearchIndex());
+
+	const rebuildSearchIndex = useCallback(() => {
+		setIsRebuildingIndex(true);
+		try {
+			const rawTodos = getYjsValue(todos) as YArray<YMap<Todo[keyof Todo]>>;
+			const newIndex = createSearchIndex();
+			const allTodosMap = new Map<string, Todo>();
+
+			rawTodos.forEach((yMap, idx) => {
+				const todo = todos[idx];
+				allTodosMap.set(todo.id, todo);
+
+				const text = getTodoSearchText(yMap as Y.Map<unknown>);
+				if (text) {
+					newIndex.add(todo.id, { id: todo.id, text });
+				}
+			});
+
+			searchIndexRef.current = newIndex;
+			setAllTodosMap(allTodosMap);
+			setSearchIndex(newIndex);
+		} finally {
+			setIsRebuildingIndex(false);
+		}
+	}, [todos, setAllTodosMap, setSearchIndex, setIsRebuildingIndex]);
+
+	const debouncedRebuild = useMemo(
+		() =>
+			debounce(() => {
+				if (useAppStore.getState().editingTodo) return;
+				rebuildSearchIndex();
+			}, 300),
+		[rebuildSearchIndex],
+	);
+
+	useEffect(() => {
+		const unsub = useAppStore.subscribe((state, prevState) => {
+			if (prevState.editingTodo && !state.editingTodo) {
+				debouncedRebuild.cancel();
+				rebuildSearchIndex();
+			}
+		});
+		return unsub;
+	}, [debouncedRebuild, rebuildSearchIndex]);
 
 	const todoItemKeysToCheck: Array<keyof Todo> = useMemo(
 		() => [
@@ -59,22 +125,18 @@ export const TodoListUpdater = () => {
 			"completed",
 			"listId",
 			"dueDate",
-
-			//Need to listen to sort orders, so that downstream sorting will be re-triggered (since zustand store is updated)
 			"sortOrder",
 			"focusSortOrder",
 		],
 		[],
 	);
 
-	/* Place todos into categories.
-  Will not appear in React Profiler graph.*/
 	const handleTodosUpdate = useCallback(
 		(e?: Array<YMapEvent<Todo> | YXmlEvent>) => {
-			/* If there is an event, only continue if it has required keys
-      This function can also be called without an event (on list changes),
-      so we also continue if there is no event.*/
-			if (e && !eventHaskeys(todoItemKeysToCheck, e)) return;
+			if (e && !eventHaskeys(todoItemKeysToCheck, e)) {
+				debouncedRebuild();
+				return;
+			}
 
 			const start = performance.now();
 
@@ -92,46 +154,40 @@ export const TodoListUpdater = () => {
 			const dueTodos: WithRequired<Todo, "dueDate">[] = [];
 			const upcomingTodos: WithRequired<Todo, "dueDate">[] = [];
 
-			/* Looping through the allTodos array is not expensive (1-2ms).
-      - The expensive operation is the .get for the yjs map objects.
-      - Approx 30ms for 3000 iterations.
-      - toJSON() is even more expensive at 100ms+ for 3000 iterations. */
+			const rawTodos = getYjsValue(todos) as YArray<YMap<Todo[keyof Todo]>>;
 
-			(getYjsValue(todos) as YArray<YMap<Todo[keyof Todo]>>).forEach(
-				(t, idx) => {
-					const listId = t.get("listId") as Todo["listId"];
+			rawTodos.forEach((t, idx) => {
+				const listId = t.get("listId") as Todo["listId"];
 
-					const completed = t.get("completed") as Todo["completed"];
+				const completed = t.get("completed") as Todo["completed"];
 
-					// 1. Named and uncategorized lists
-					todosMap
-						.get(listId)
-						?.[completed ? "completed" : "uncompleted"].push(todos[idx]);
+				todosMap
+					.get(listId)
+					?.[completed ? "completed" : "uncompleted"].push(todos[idx]);
 
-					// 2. Focus, uncompleted
-					!completed &&
-						(t.get("focus") as Todo["focus"]) &&
-						focusTodos.push(todos[idx]);
+				!completed &&
+					(t.get("focus") as Todo["focus"]) &&
+					focusTodos.push(todos[idx]);
 
-					// 3. Due/overdue uncompleted
-					const dueDate = t.get("dueDate") as Todo["dueDate"];
-					!completed &&
-						dueDate &&
-						differenceInCalendarDays(new Date(), Date.parse(dueDate)) >= 0 &&
-						dueTodos.push(todos[idx] as WithRequired<Todo, "dueDate">);
+				const dueDate = t.get("dueDate") as Todo["dueDate"];
+				!completed &&
+					dueDate &&
+					differenceInCalendarDays(new Date(), Date.parse(dueDate)) >= 0 &&
+					dueTodos.push(todos[idx] as WithRequired<Todo, "dueDate">);
 
-					// 4. Upcoming uncompleted
-					!completed &&
-						dueDate &&
-						differenceInCalendarDays(new Date(), Date.parse(dueDate)) < 0 &&
-						upcomingTodos.push(todos[idx] as WithRequired<Todo, "dueDate">);
-				},
-			);
+				!completed &&
+					dueDate &&
+					differenceInCalendarDays(new Date(), Date.parse(dueDate)) < 0 &&
+					upcomingTodos.push(todos[idx] as WithRequired<Todo, "dueDate">);
+			});
 
 			setTodosMap(todosMap);
 			setFocusTodos(focusTodos);
 			setDueTodos(dueTodos);
 			setUpcomingTodos(upcomingTodos);
+
+			rebuildSearchIndex();
+
 			console.log("TodoListUpdater", performance.now() - start);
 		},
 		[
@@ -142,6 +198,8 @@ export const TodoListUpdater = () => {
 			setUpcomingTodos,
 			todoItemKeysToCheck,
 			todos,
+			debouncedRebuild,
+			rebuildSearchIndex,
 		],
 	);
 
@@ -155,13 +213,11 @@ export const TodoListUpdater = () => {
 		[handleTodosUpdate, lists],
 	);
 
-	/* On initial sync */
 	useEffect(
 		() => void (synced && handleTodosUpdate()),
 		[handleTodosUpdate, synced],
 	);
 
-	// Rerender daily
 	useEffect(
 		() => void (time && handleTodosUpdate()),
 		[handleTodosUpdate, time],
