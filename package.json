@@ -50,7 +50,7 @@
 		"eruda": "^3.4.3",
 		"events": "^3.3.0",
 		"flexsearch": "^0.8.212",
-		"fractional-indexing": "^3.2.0",
+		"fractional-indexing": "^4.0.0",
 		"lodash-es": "^4.17.21",
 		"react": "^19.2.3",
 		"react-dom": "^19.2.3",
