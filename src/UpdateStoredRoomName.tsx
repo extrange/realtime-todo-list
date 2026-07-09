@@ -39,6 +39,7 @@ export const UpdateStoredRoomName = () => {
 	}, [defaultRoomName, isConnected, meta.roomName, store.meta]);
 
 	useEffect(() => {
+		if (!currentRoomId) return;
 		/* Set a default room name if none was given*/
 		setSavedRooms((s) => ({
 			...s,
