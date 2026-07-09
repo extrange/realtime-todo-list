@@ -3,22 +3,17 @@ on:
   pull_request:
     branches: [main]
   workflow_call:
-  workflow_dispatch:
-
-permissions:
-  contents: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: pnpm/action-setup@v4
+        with:
+          cache: true
 
-      - name: Test
-        env:
-          VITE_COMMIT_DATE: ${{github.event.head_commit.timestamp}}
-          VITE_COMMIT_MSG: ${{github.event.head_commit.message}}
-          VITE_COMMIT_HASH: ${{github.event.after}}
+      - name: Install and build packages
         run: |
-          npm ci
-          npm run lint
+          pnpm i
+          pnpm build
