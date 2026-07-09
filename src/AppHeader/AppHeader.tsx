@@ -32,6 +32,7 @@ import {
 	RELEASE_DATE,
 } from "../constants";
 import { ListType } from "../ListContext";
+import type { List } from "../types/List";
 import { useCurrentList } from "../useCurrentList";
 import { useStore } from "../useStore";
 import { formatBytes } from "../util";
@@ -63,7 +64,8 @@ export const AppHeader = React.memo(
 			() =>
 				currentList === ListType.Focus
 					? "Focus/Due"
-					: ((update && store.lists.find((l) => l.id === currentList)?.name) ??
+					: ((update &&
+							store.lists.find((l: List) => l.id === currentList)?.name) ??
 						"Uncategorized"),
 			[currentList, store, update],
 		);

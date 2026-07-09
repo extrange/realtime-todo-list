@@ -3,8 +3,7 @@ import { differenceInCalendarDays } from "date-fns";
 import { Document } from "flexsearch";
 import { debounce } from "lodash-es";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import type { YMapEvent, YXmlEvent } from "yjs";
-import type { YArray, YMap } from "yjs/dist/src/internals";
+import type { Array as YArray, Map as YMap, YMapEvent, YXmlEvent } from "yjs";
 import { shallow } from "zustand/shallow";
 import { useAppStore } from "../appStore/appStore";
 import type { TodosMap } from "../appStore/todoSlice";
@@ -82,7 +81,7 @@ export const TodoListUpdater = () => {
 			const newIndex = createSearchIndex();
 			const allTodosMap = new Map<string, Todo>();
 
-			rawTodos.forEach((yMap, idx) => {
+			rawTodos.forEach((yMap: YMap<Todo[keyof Todo]>, idx: number) => {
 				const todo = todos[idx];
 				allTodosMap.set(todo.id, todo);
 
@@ -144,7 +143,7 @@ export const TodoListUpdater = () => {
 				[undefined, { completed: [], uncompleted: [] }],
 				...lists.map(
 					(l) =>
-						[l.id, { completed: [], uncompleted: [] }] as [
+						[l.id as string, { completed: [], uncompleted: [] }] as [
 							string,
 							TodosMap extends Map<unknown, infer V> ? V : never,
 						],
@@ -156,7 +155,7 @@ export const TodoListUpdater = () => {
 
 			const rawTodos = getYjsValue(todos) as YArray<YMap<Todo[keyof Todo]>>;
 
-			rawTodos.forEach((t, idx) => {
+			rawTodos.forEach((t: YMap<Todo[keyof Todo]>, idx: number) => {
 				const listId = t.get("listId") as Todo["listId"];
 
 				const completed = t.get("completed") as Todo["completed"];

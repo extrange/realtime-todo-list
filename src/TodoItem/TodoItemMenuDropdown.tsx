@@ -31,7 +31,9 @@ export const TodoItemMenuDropdown = React.memo(({ todo }: InputProps) => {
 			e.stopPropagation();
 			confirm("Are you sure?") &&
 				state.todos.splice(
-					state.todos.findIndex((t) => t.id === todo.id),
+					state.todos.findIndex(
+						(t: NonNullable<(typeof state.todos)[number]>) => t.id === todo.id,
+					),
 					1,
 				);
 		},
@@ -44,7 +46,10 @@ export const TodoItemMenuDropdown = React.memo(({ todo }: InputProps) => {
 		/* Generate focusSortOrder if moving to focus list */
 		if (todo.focus && !todo.focusSortOrder) {
 			const maxSortOrder = getMaxSortOrder(
-				state.todos.filter((t) => t.focus && !t.completed),
+				state.todos.filter(
+					(t: NonNullable<(typeof state.todos)[number]>) =>
+						t.focus && !t.completed,
+				),
 				"focusSortOrder",
 			);
 			todo.focusSortOrder = generateKeyBetween(maxSortOrder, undefined);
@@ -82,7 +87,7 @@ export const TodoItemMenuDropdown = React.memo(({ todo }: InputProps) => {
 				>
 					Uncategorized
 				</Menu.Item>
-				{state.lists.map((l) => (
+				{state.lists.map((l: NonNullable<(typeof state.lists)[number]>) => (
 					<Menu.Item
 						key={l.id}
 						onClick={moveToList(l.id)}

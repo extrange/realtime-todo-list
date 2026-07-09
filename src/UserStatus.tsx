@@ -10,6 +10,7 @@ import { IconPencil } from "@tabler/icons-react";
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import type { OfflineUser, OnlineUser } from "./getUserStatus";
+import type { Todo } from "./types/Todo";
 import { UserBadge } from "./UserBadge";
 import classes from "./UserStatus.module.css";
 import { useStore } from "./useStore";
@@ -100,10 +101,10 @@ export const UserStatus = ({
 		if (online) {
 			const editingTodos =
 				userData.editingIds.size &&
-				store.todos.filter((t) => userData.editingIds.has(t.id));
+				store.todos.filter((t: Todo) => userData.editingIds.has(t.id));
 
 			if (editingTodos) {
-				editingTodos.forEach((t) => {
+				editingTodos.forEach((t: Todo) => {
 					const title = getTodoTitle(t);
 					items.push(
 						<Flex align={"center"} key={t.id}>

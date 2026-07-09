@@ -1,6 +1,9 @@
 import { Button, type ButtonProps, Flex, Switch } from "@mantine/core";
-import type { PolymorphicComponentProps } from "@mantine/core/lib/core/factory/create-polymorphic-component";
 import { type SyntheticEvent, useCallback, useState } from "react";
+
+type DebugArmedButtonProps = ButtonProps & {
+	onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+};
 
 /**Button which requires toggling a switch before it becomes active.
  *
@@ -10,9 +13,7 @@ export const DebugArmedButton = ({
 	onClick,
 	children,
 	...props
-}: React.PropsWithChildren<
-	PolymorphicComponentProps<"button", ButtonProps>
->) => {
+}: DebugArmedButtonProps) => {
 	const [enabled, setEnabled] = useState(false);
 
 	const onChange = useCallback((e: SyntheticEvent<HTMLInputElement>) => {

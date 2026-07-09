@@ -4,6 +4,7 @@ import React, { useCallback } from "react";
 import { useAppStore } from "../appStore/appStore";
 import { useSearchStore } from "../appStore/searchStore";
 import { DueDateString } from "../DueDateString";
+import type { List } from "../types/List";
 import type { Todo } from "../types/Todo";
 import { useStore } from "../useStore";
 import {
@@ -38,7 +39,7 @@ export const SearchResultItem = React.memo(({ todo: _todo }: InputProps) => {
 		: "";
 
 	const listName = todo.listId
-		? (store.lists.find((l) => l.id === todo.listId)?.name ?? null)
+		? (store.lists.find((l: List) => l.id === todo.listId)?.name ?? null)
 		: null;
 
 	const maxListNameLen = 20;

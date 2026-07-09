@@ -5,6 +5,7 @@ import {
 	type StateFilter,
 	useSearchStore,
 } from "../appStore/searchStore";
+import type { List } from "../types/List";
 import { useStore } from "../useStore";
 
 const UNCATEGORIZED_VALUE = "__uncategorized__";
@@ -38,7 +39,7 @@ export const SearchFilters = React.memo(() => {
 	const listData = useMemo(
 		() => [
 			{ value: UNCATEGORIZED_VALUE, label: "Uncategorized" },
-			...store.lists.map((l) => ({ value: l.id, label: l.name })),
+			...store.lists.map((l: List) => ({ value: l.id, label: l.name })),
 		],
 		[store.lists],
 	);

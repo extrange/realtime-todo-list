@@ -8,6 +8,7 @@ import { useAppStore } from "./appStore/appStore";
 import { useSearchStore } from "./appStore/searchStore";
 import { ListType } from "./ListContext";
 import { ListItem } from "./ListItem";
+import type { List } from "./types/List";
 import type { Todo } from "./types/Todo";
 import { useCurrentList } from "./useCurrentList";
 import { useIsReadOnly } from "./useIsReadOnly";
@@ -56,7 +57,7 @@ export const ListView = ({ closeNav }: InputProps) => {
   Cost: ~5ms for 100 lists*/
 	const sortedLists = lists
 		.slice()
-		.sort((a, b) => a.name.localeCompare(b.name));
+		.sort((a: List, b: List) => a.name.localeCompare(b.name));
 
 	const closeSearch = useSearchStore((s) => s.closeSearch);
 
@@ -93,7 +94,7 @@ export const ListView = ({ closeNav }: InputProps) => {
 	/* Deleting a list deletes all tasks the list, including completed tasks */
 	const deleteList = useCallback(
 		(listId: string) => {
-			const name = lists.find((l) => l.id === listId)?.name;
+			const name = lists.find((l: List) => l.id === listId)?.name;
 
 			if (!confirm(`Delete '${name}'? This will delete all todos as well.`))
 				return;
@@ -110,7 +111,7 @@ export const ListView = ({ closeNav }: InputProps) => {
 
 			/* Then delete the list */
 			const storeLists = selectLists(store);
-			storeLists.splice(storeLists.findIndex((l) => l.id === listId, 1));
+			storeLists.splice(storeLists.findIndex((l: List) => l.id === listId, 1));
 
 			// Switch to Uncategorized
 			setCurrentList(undefined);
@@ -122,7 +123,7 @@ export const ListView = ({ closeNav }: InputProps) => {
 		(listId: string) => {
 			const name = prompt("Enter a new name:");
 			if (!name) return;
-			const list = store.lists.find((l) => l.id === listId);
+			const list = store.lists.find((l: List) => l.id === listId);
 			if (list) {
 				list.name = name;
 			}
@@ -154,7 +155,7 @@ export const ListView = ({ closeNav }: InputProps) => {
 				selectList={selectList}
 			/>
 
-			{sortedLists.map((list) => (
+			{sortedLists.map((list: List) => (
 				<ListItem
 					key={list.id}
 					editable

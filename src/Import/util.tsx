@@ -1,7 +1,7 @@
 import { getYjsValue, Y } from "@syncedstore/core";
-import type { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import { DEVELOPMENT, USER_ID } from "../constants";
-import type { Store } from "../types/Store";
+import type { List } from "../types/List";
+import type { MappedStoreType } from "../types/MappedStore";
 import type { Todo } from "../types/Todo";
 
 export type ExportStoredUser = {
@@ -194,7 +194,7 @@ function deserializeTodoContent(nodes: SerializedNode[]): Y.XmlFragment {
 	return fragment;
 }
 
-export function exportData(store: MappedTypeDescription<Store>): ExportData {
+export function exportData(store: MappedStoreType): ExportData {
 	const storedUsersYMap = getYjsValue(store.storedUsers) as Y.Map<unknown>;
 	const storedUsers: Record<string, ExportStoredUser> = {};
 	// biome-ignore lint/suspicious/noExplicitAny: Y.Map<unknown> yields unknown values
@@ -208,12 +208,12 @@ export function exportData(store: MappedTypeDescription<Store>): ExportData {
 	});
 
 	return {
-		lists: store.lists.map((l) => ({
+		lists: store.lists.map((l: List) => ({
 			name: l.name,
 			id: l.id,
 			sortOrder: l.sortOrder,
 		})),
-		todos: store.todos.map((t) => ({
+		todos: store.todos.map((t: Todo) => ({
 			id: t.id,
 			sortOrder: t.sortOrder,
 			completed: t.completed,
@@ -244,7 +244,7 @@ export function downloadJson(data: unknown, filename: string) {
 
 export async function importData(
 	data: ExportData,
-	store: MappedTypeDescription<Store>,
+	store: MappedStoreType,
 	progressCallback?: (p: number) => void,
 ) {
 	const total =
@@ -263,7 +263,7 @@ export async function importData(
 	// Create lists first so that todo listId references are valid
 	if (data.lists) {
 		for (const list of data.lists) {
-			if (store.lists.find((l) => l.id === list.id)) {
+			if (store.lists.find((l: List) => l.id === list.id)) {
 				await tick();
 				continue;
 			}
@@ -279,7 +279,7 @@ export async function importData(
 	// Then create todos
 	if (data.todos) {
 		for (const todo of data.todos) {
-			if (store.todos.find((t) => t.id === todo.id)) {
+			if (store.todos.find((t: Todo) => t.id === todo.id)) {
 				await tick();
 				continue;
 			}

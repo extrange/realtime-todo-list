@@ -8,11 +8,11 @@ import React, {
 	useState,
 } from "react";
 import type {
-	YMap,
-	YXmlElement,
-	YXmlFragment,
-	YXmlText,
-} from "yjs/dist/src/internals";
+	Map as YMap,
+	XmlElement as YXmlElement,
+	XmlFragment as YXmlFragment,
+	XmlText as YXmlText,
+} from "yjs";
 import type { Todo } from "../types/Todo";
 
 type InputProps = {

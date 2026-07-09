@@ -1,7 +1,6 @@
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { notifications } from "@mantine/notifications";
 import syncedStore from "@syncedstore/core";
-import type { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import type React from "react";
 import { useContext, useEffect, useRef, useState } from "react";
 import { IndexeddbPersistence } from "y-indexeddb";
@@ -10,6 +9,7 @@ import { FORCE_SYNC_INTERVAL, USER_ID } from "./constants";
 import { ProviderContext } from "./ProviderContext";
 import { RoomContext } from "./RoomContext";
 import { StoreContext } from "./StoreContext";
+import type { MappedStoreType } from "./types/MappedStore";
 import type { Store } from "./types/Store";
 
 /**
@@ -26,7 +26,7 @@ export const StoreProvider = ({ children }: React.PropsWithChildren) => {
 
 	// Initialize YDoc
 	const yDoc = useRef<Y.Doc>(new Y.Doc());
-	const [store, setStore] = useState<MappedTypeDescription<Store>>();
+	const [store, setStore] = useState<MappedStoreType>();
 	const [provider, setProvider] = useState<HocuspocusProvider>();
 
 	/* Initialize Y.Doc, setup listeners for awareness propagation,

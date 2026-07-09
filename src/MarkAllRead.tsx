@@ -34,7 +34,7 @@ export const MarkAllRead = React.memo(
 			const handler = () => {
 				setUnreadTodos(
 					/* Perf: takes 4-6ms for few thousand todos */
-					!store.todos.every((t) => {
+					!store.todos.every((t: Todo) => {
 						// Ignore completed todos
 						if (t.completed) return true;
 
@@ -74,7 +74,7 @@ export const MarkAllRead = React.memo(
 		// FIXME: poor performance with 1000s of todos
 		const markAllRead = useCallback(() => {
 			const now = Date.now().toString();
-			store.todos.forEach((t) => {
+			store.todos.forEach((t: Todo) => {
 				localStorage.setItem(t.id, now);
 			});
 

@@ -34,11 +34,12 @@ import React, {
 	useMemo,
 	useState,
 } from "react";
-import type { YMap, YMapEvent } from "yjs/dist/src/internals";
+import type { Map as YMap, YMapEvent } from "yjs";
 import { useAppStore } from "../appStore/appStore";
 import { USER_ID } from "../constants";
 import { DueDateString } from "../DueDateString";
 import { ListType } from "../ListContext";
+import type { List } from "../types/List";
 import type { Todo } from "../types/Todo";
 import { useCurrentList } from "../useCurrentList";
 import { useIsReadOnly } from "../useIsReadOnly";
@@ -115,9 +116,9 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
 				todo.by = USER_ID;
 			});
 		};
-		//@ts-expect-error YMapEvent somehow isn't allowed even though it subclasses YEvent
+		//@ts-expect-error YMapEvent type mismatch with observeDeep signature
 		yTodo.observeDeep(listener);
-		//@ts-expect-error ignore
+		//@ts-expect-error YMapEvent type mismatch with unobserveDeep signature
 		return () => yTodo.unobserveDeep(listener);
 	}, [todo, yTodo]);
 
@@ -284,7 +285,7 @@ export const TodoItem = React.memo(({ todo: _todo }: TodoItemProps) => {
 
 	const listChip = useMemo(() => {
 		if (!isFocusView || !todo.listId) return null;
-		const list = store.lists.find((l) => l.id === todo.listId);
+		const list = store.lists.find((l: List) => l.id === todo.listId);
 		if (!list) return null;
 
 		const maxLen = 20;

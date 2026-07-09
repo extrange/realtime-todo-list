@@ -4,7 +4,6 @@ import { Button } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { getYjsDoc, Y } from "@syncedstore/core";
-import type { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import { useSyncedStore } from "@syncedstore/react";
 import { formatISO } from "date-fns";
 import { generateKeyBetween, generateNKeysBetween } from "fractional-indexing";
@@ -14,7 +13,7 @@ import { v4 as uuidv4 } from "uuid";
 import type { Doc } from "yjs";
 import { CURRENT_ROOM_LOCALSTORAGE_KEY, USER_ID } from "./constants";
 import { DebugArmedButton } from "./DebugArmedButton";
-import type { Store } from "./types/Store";
+import type { MappedStoreType } from "./types/MappedStore";
 import { useCurrentList } from "./useCurrentList";
 import { useIsReadOnly } from "./useIsReadOnly";
 import { useProvider } from "./useProvider";
@@ -25,7 +24,7 @@ declare global {
 	interface Window {
 		YDoc: Doc;
 		provider: HocuspocusProvider;
-		store: MappedTypeDescription<Store>;
+		store: MappedStoreType;
 	}
 }
 
@@ -44,9 +43,7 @@ export default function DebugTools() {
 	const store = useStore();
 	const provider = useProvider();
 	const { isReadOnly } = useIsReadOnly();
-	const lists = store.lists;
-	const todos = store.todos;
-	const syncedStoreTodos = useSyncedStore(todos);
+	const syncedStoreTodos = useSyncedStore(store.todos);
 	const [devToolsEnabled, setDevToolsEnabled] = useState(false);
 	const [currentList] = useCurrentList();
 	const { showBoundary } = useErrorBoundary();
@@ -123,17 +120,22 @@ export default function DebugTools() {
 
 	/**Dump todos which have a listId of a non-existent list */
 	const dumpOrphanedTodos = () => {
-		const listIds = lists.map((l) => l.id);
-		const orphanedTodos = todos.filter(
-			(t) => t.listId && !listIds.includes(t.listId),
+		const listIds = store.lists.map(
+			(l: NonNullable<(typeof store.lists)[number]>) => l.id,
+		);
+		const orphanedTodos = store.todos.filter(
+			(t: NonNullable<(typeof store.todos)[number]>) =>
+				t.listId && !listIds.includes(t.listId),
 		);
 		alert(JSON.stringify(orphanedTodos, undefined, 2));
 	};
 
 	const deleteAllTodos = () => {
-		store.todos.forEach((t) => {
+		store.todos.forEach((t: NonNullable<(typeof store.todos)[number]>) => {
 			store.todos.splice(
-				store.todos.findIndex((t2) => t2.id === t.id),
+				store.todos.findIndex(
+					(t2: NonNullable<(typeof store.todos)[number]>) => t2.id === t.id,
+				),
 				1,
 			);
 		});
@@ -141,9 +143,11 @@ export default function DebugTools() {
 	};
 
 	const deleteAllLists = () => {
-		store.lists.forEach((t) => {
+		store.lists.forEach((l: NonNullable<(typeof store.lists)[number]>) => {
 			store.lists.splice(
-				store.lists.findIndex((t2) => t2.id === t.id),
+				store.lists.findIndex(
+					(l2: NonNullable<(typeof store.lists)[number]>) => l2.id === l.id,
+				),
 				1,
 			);
 		});
@@ -183,7 +187,9 @@ export default function DebugTools() {
 		lists.forEach((l) => {
 			const sortKeys = generateNKeysBetween(
 				getMaxSortOrder(
-					store.todos.filter((t) => t.listId === l),
+					store.todos.filter(
+						(t: NonNullable<(typeof store.todos)[number]>) => t.listId === l,
+					),
 					"sortOrder",
 				),
 				undefined,
@@ -251,8 +257,11 @@ export default function DebugTools() {
 	const markAllCompleted = () => {
 		currentList &&
 			store.todos
-				.filter((t) => t.listId === currentList)
-				.forEach((t) => {
+				.filter(
+					(t: NonNullable<(typeof store.todos)[number]>) =>
+						t.listId === currentList,
+				)
+				.forEach((t: NonNullable<(typeof store.todos)[number]>) => {
 					t.completed = true;
 				});
 	};
@@ -267,7 +276,9 @@ export default function DebugTools() {
 
 	const benchmarkForEach = () => {
 		const start = performance.now();
-		syncedStoreTodos.filter((t) => t.id === "");
+		syncedStoreTodos.filter(
+			(t: NonNullable<(typeof syncedStoreTodos)[number]>) => t.id === "",
+		);
 		const end = performance.now();
 		console.log(`Took ${end - start}ms`);
 	};

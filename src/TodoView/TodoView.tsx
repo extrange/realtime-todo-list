@@ -156,7 +156,7 @@ export const TodoView = React.memo(() => {
 	const onClickCreateTodo = useCallback(() => {
 		const newTodo = createTodo();
 		store.todos.unshift(newTodo);
-		setEditingId(store.todos.find((t) => t.id === newTodo.id));
+		setEditingId(store.todos.find((t: Todo) => t.id === newTodo.id));
 	}, [createTodo, setEditingId, store.todos]);
 
 	const handleDragStart = useCallback(

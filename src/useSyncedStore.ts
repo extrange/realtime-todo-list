@@ -1,11 +1,10 @@
 import { getYjsValue, observeDeep } from "@syncedstore/core";
-import type { MappedTypeDescription } from "@syncedstore/core/types/doc";
 import { debounce } from "lodash-es";
 import { useCallback, useEffect, useState } from "react";
 import type { DeepReadonly } from "ts-essentials";
 import * as Y from "yjs";
 import { DEVELOPMENT } from "./constants";
-import type { Store } from "./types/Store";
+import type { MappedStoreType } from "./types/MappedStore";
 import { useStore } from "./useStore";
 
 /**
@@ -24,7 +23,7 @@ import { useStore } from "./useStore";
  * @deprecated
  */
 export const useSyncedStoreCustomImpl = <T>(
-	selector: (s: MappedTypeDescription<Store>) => T,
+	selector: (s: MappedStoreType) => T,
 	debounceMs = 300,
 ): DeepReadonly<T> => {
 	const store = useStore();
@@ -75,9 +74,8 @@ export const useSyncedStoreCustomImpl = <T>(
 };
 
 /* Selectors for memoization */
-export const selectStore = (s: MappedTypeDescription<Store>) => s;
-export const selectTodos = (s: MappedTypeDescription<Store>) => s.todos;
-export const selectLists = (s: MappedTypeDescription<Store>) => s.lists;
-export const selectStoredUsers = (s: MappedTypeDescription<Store>) =>
-	s.storedUsers;
-export const selectMeta = (s: MappedTypeDescription<Store>) => s.meta;
+export const selectStore = (s: MappedStoreType) => s;
+export const selectTodos = (s: MappedStoreType) => s.todos;
+export const selectLists = (s: MappedStoreType) => s.lists;
+export const selectStoredUsers = (s: MappedStoreType) => s.storedUsers;
+export const selectMeta = (s: MappedStoreType) => s.meta;
