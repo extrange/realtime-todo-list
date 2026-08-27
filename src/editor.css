@@ -121,7 +121,11 @@
 	flex-grow: 1;
 	/* Allow shrinking */
 	min-width: 0;
-}
+	/* Mantine's tiptap styles give every div inside editor content z-index:2
+	(.m_c2204cc2 div:not(.ProseMirror), meant for bubble menus). TaskItem renders
+	li > label + div, so scrolled-up rows painted above the sticky toolbar
+	(z-index:1) and its clicks toggled checkboxes instead. Restore normal order. */
+	z-index: auto;
 
 /* Placeholder */
 .ProseMirror :is(p, h2).is-empty:nth-child(-n + 2)::before {
