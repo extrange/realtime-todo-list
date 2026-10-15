@@ -1,9 +1,21 @@
-import { Badge, Flex, Stack, Text, useMantineTheme } from "@mantine/core";
+import {
+	ActionIcon,
+	Badge,
+	Flex,
+	Menu,
+	Overlay,
+	Portal,
+	Stack,
+	Text,
+	useMantineTheme,
+} from "@mantine/core";
 import { useSyncedStore } from "@syncedstore/react";
-import React, { useCallback } from "react";
+import { IconDotsVertical } from "@tabler/icons-react";
+import React, { type SyntheticEvent, useCallback, useState } from "react";
 import { useAppStore } from "../appStore/appStore";
 import { useSearchStore } from "../appStore/searchStore";
 import { DueDateString } from "../DueDateString";
+import { TodoItemMenuDropdown } from "../TodoItem/TodoItemMenuDropdown";
 import type { List } from "../types/List";
 import type { Todo } from "../types/Todo";
 import { useStore } from "../useStore";
@@ -31,6 +43,13 @@ export const SearchResultItem = React.memo(({ todo: _todo }: InputProps) => {
 		setEditingTodo(todo);
 	}, [setEditingTodo, todo]);
 
+	const [menuOpened, setMenuOpened] = useState(false);
+
+	const openMenu = useCallback((e: SyntheticEvent) => {
+		e.stopPropagation();
+		setMenuOpened(true);
+	}, []);
+
 	const title = getTodoTitle(todo);
 	const notes = getNotes(todo);
 	const fullNotes = getTodoFullNotes(todo);
@@ -51,6 +70,7 @@ export const SearchResultItem = React.memo(({ todo: _todo }: InputProps) => {
 	return (
 		<Flex
 			onClick={onClick}
+			align="center"
 			px="sm"
 			py="xs"
 			style={{
@@ -116,6 +136,16 @@ export const SearchResultItem = React.memo(({ todo: _todo }: InputProps) => {
 					)}
 				</Flex>
 			</Stack>
+
+			<Menu opened={menuOpened} onChange={setMenuOpened} withinPortal>
+				<Portal>{menuOpened && <Overlay opacity={0} />}</Portal>
+				<Menu.Target>
+					<ActionIcon variant="subtle" onClick={openMenu}>
+						<IconDotsVertical color={theme.colors.gray[6]} />
+					</ActionIcon>
+				</Menu.Target>
+				{menuOpened && <TodoItemMenuDropdown todo={todo} />}
+			</Menu>
 		</Flex>
 	);
 });

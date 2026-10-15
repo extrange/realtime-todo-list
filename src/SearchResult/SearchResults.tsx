@@ -85,7 +85,6 @@ export const SearchResults = React.memo(() => {
 
 		const todos: Todo[] = [];
 		for (const id of idSet) {
-			if (todos.length >= MAX_RESULTS) break;
 			const todo = allTodosMap.get(id);
 			if (!todo) continue;
 			if (!matchesStateFilter(todo, stateFilter)) continue;
@@ -94,7 +93,10 @@ export const SearchResults = React.memo(() => {
 			todos.push(todo);
 		}
 
-		return todos;
+		// Uncompleted todos first, preserving relevance order within each group
+		todos.sort((a, b) => Number(a.completed) - Number(b.completed));
+
+		return todos.slice(0, MAX_RESULTS);
 	}, [
 		searchIndex,
 		searchQuery,
