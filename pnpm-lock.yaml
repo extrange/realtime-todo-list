@@ -394,7 +394,7 @@ importers:
         version: 8.70.0(eslint@10.10.0)(typescript@7.0.2)
       '@vitejs/plugin-react':
         specifier: 6.1.0
-        version: 6.1.0(vite@8.2.2(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0))
+        version: 6.1.0(vite@8.2.4(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0))
       '@welldone-software/why-did-you-render':
         specifier: 10.0.1
         version: 10.0.1(react@19.3.0)
@@ -426,11 +426,11 @@ importers:
         specifier: 7.0.2
         version: 7.0.2
       vite:
-        specifier: 8.2.2
-        version: 8.2.2(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0)
+        specifier: 8.2.4
+        version: 8.2.4(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0)
       vite-plugin-pwa:
         specifier: 1.3.0
-        version: 1.3.0(vite@8.2.2(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0))(workbox-build@7.4.1)(workbox-window@7.4.1)
+        version: 1.3.0(vite@8.2.4(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0))(workbox-build@7.4.1)(workbox-window@7.4.1)
 
 packages:
 
@@ -3699,8 +3699,8 @@ packages:
       '@vite-pwa/assets-generator':
         optional: true
 
-  vite@8.2.2:
-    resolution: {integrity: sha512-cFKLV/PRgAUlIRm5WjMjJ86jrftzpqcgH+Us+DS8mI3CDNiH30Whrz8uHL3+MOLPAgqbMBAqWdAHAphOAM+z/Q==}
+  vite@8.2.4:
+    resolution: {integrity: sha512-lfauXnrf2x0p+UoA+wXh0dgFWnUjCyG6Js95KBkgaCwUU9k0DAHI4W6Q0WCx+h+5g+Alce1y4Zi2QjjK0UvGBw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -5588,10 +5588,10 @@ snapshots:
   '@typescript/typescript-win32-x64@7.0.2':
     optional: true
 
-  '@vitejs/plugin-react@6.1.0(vite@8.2.2(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0))':
+  '@vitejs/plugin-react@6.1.0(vite@8.2.4(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
-      vite: 8.2.2(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0)
+      vite: 8.2.4(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0)
 
   '@welldone-software/why-did-you-render@10.0.1(react@19.3.0)':
     dependencies:
@@ -7322,18 +7322,18 @@ snapshots:
 
   uuid@14.0.2: {}
 
-  vite-plugin-pwa@1.3.0(vite@8.2.2(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0))(workbox-build@7.4.1)(workbox-window@7.4.1):
+  vite-plugin-pwa@1.3.0(vite@8.2.4(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0))(workbox-build@7.4.1)(workbox-window@7.4.1):
     dependencies:
       debug: 4.4.3
       pretty-bytes: 6.1.1
       tinyglobby: 0.2.17
-      vite: 8.2.2(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0)
+      vite: 8.2.4(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0)
       workbox-build: 7.4.1
       workbox-window: 7.4.1
     transitivePeerDependencies:
       - supports-color
 
-  vite@8.2.2(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0):
+  vite@8.2.4(sugarss@5.0.1(postcss@8.5.28))(terser@5.50.0):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
