@@ -47,7 +47,7 @@ export const StoreProvider = ({ children }: React.PropsWithChildren) => {
 			),
 		);
 		const _provider = new HocuspocusProvider({
-			url: "wss://tasks-server.nicholaslyz.com",
+			url: "wss://tasks-server.internal.nicholaslyz.com",
 			document: yDoc.current,
 			name: roomId,
 			forceSyncInterval: FORCE_SYNC_INTERVAL,

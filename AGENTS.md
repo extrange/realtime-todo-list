@@ -31,7 +31,7 @@ Yjs (CRDT doc) → SyncedStore (reactive proxy) → Hocuspocus (WebSocket provid
                                               → y-indexeddb (offline persistence)
 ```
 
-WebSocket server is hardcoded: `wss://tasks-server.nicholaslyz.com` (`StoreProvider.tsx:50`).
+WebSocket server is hardcoded: `wss://tasks-server.internal.nicholaslyz.com` (`StoreProvider.tsx:50`).
 
 **Provider hierarchy (from `main.tsx`):**
 `RoomProvider → StoreProvider → Login → ListProvider → App`
